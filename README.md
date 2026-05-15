@@ -437,11 +437,8 @@ copies of the Software...
 
 ## 👤 Author & Contact
 
-**Mahad Abdullahi**  
-*GitHub Profile: Mahad A. Mohamed Noor*
-
+- **Author:** Mahad Abdullahi (Mahad Abdullahi Mohamed Noor)
 - **GitHub:** [@abdimannor](https://github.com/abdimannor)
-- **GitHub Profile:** [Mahad A. Mohamed Noor](https://github.com/abdimannor)
 - **Repository:** [heartlux](https://github.com/abdimannor/heartlux)
 - **Live Demo:** [GitHub Pages](https://abdimannor.github.io/heartlux) (when deployed)
 
@@ -468,6 +465,4 @@ If Heartlux helped you or you found it useful:
 ---
 
 **Built with ❤️ using HTML, CSS, and JavaScript**  
-**Last updated: May 15, 2026**
-
 *An evolution of web development — from student exercises to production-ready code.*
