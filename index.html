@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Heartlux - Where hearts connect. Modern social discovery and dating app.">
+  <title>Heartlux - Find Your Connection</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="container">
+      <div class="navbar-content">
+        <a href="#" class="navbar-brand" onclick="showPage('home')">Heartlux</a>
+        <div class="navbar-nav">
+          <a href="#" class="navbar-link" onclick="showPage('home')">Home</a>
+          <a href="#" class="navbar-link" onclick="showPage('discover')">Discover</a>
+          <a href="#" class="navbar-link" onclick="showPage('register')">Join</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Home Page -->
+  <section id="home" class="page active">
+    <div class="hero">
+      <div class="container">
+        <div class="hero-content">
+          <div class="hero-left">
+            <h1>Heartlux</h1>
+            <p>Where meaningful connections flow. Meet people who truly get you.</p>
+            <p style="font-size: 0.95rem; margin-bottom: 1.5rem; color: #999;">Discover genuine connections based on shared interests and values.</p>
+            <div>
+              <button class="btn btn-primary btn-lg" onclick="showPage('discover')">
+                Start Discovering
+              </button>
+              <button class="btn btn-secondary btn-lg" onclick="showPage('register')">
+                Create Account
+              </button>
+            </div>
+          </div>
+          <div class="hero-right">
+            <div class="hero-image">💑</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Register Page -->
+  <section id="register" class="page">
+    <div class="container" style="padding: 2rem 0;">
+      <div class="auth-container">
+        <h2>❤️ Join Heartlux</h2>
+        <p class="auth-info">Create an account and start finding meaningful connections</p>
+
+        <form id="registerForm" onsubmit="handleRegister(event)">
+          <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" placeholder="Choose your username" required>
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" name="email" placeholder="your@email.com" required>
+          </div>
+
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" placeholder="Minimum 8 characters" required>
+          </div>
+
+          <div class="form-group">
+            <label for="confirmPassword">Confirm Password</label>
+            <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm your password" required>
+          </div>
+
+          <div class="form-group">
+            <label>Välj kön</label>
+            <div class="checkbox-group">
+              <div class="checkbox-item">
+                <input type="radio" id="genderMale" name="gender" value="male" required>
+                <label for="genderMale">Man</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="radio" id="genderFemale" name="gender" value="female" required>
+                <label for="genderFemale">Kvinna</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="radio" id="genderOther" name="gender" value="other" required>
+                <label for="genderOther">Annat</label>
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block btn-lg">Skapa Konto</button>
+        </form>
+
+        <div id="successMessage" class="success-message">
+          ✓ Välkommen till Heartlux! Ditt konto är nu skapat.
+        </div>
+
+        <div class="auth-link">
+          Redan medlem? <a href="#" onclick="showPage('home')">Logga in</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Discover Page -->
+  <section id="discover" class="page">
+    <div class="discover-container" style="padding: 2rem 0;">
+      <div class="selector-section">
+        <h2>🎀 Vad letar du efter?</h2>
+        <p style="margin-bottom: 2rem; color: #999;">Berätta lite om dig själv för att hitta den perfekta matchen.</p>
+
+        <!-- Gender Selection - Two Column Layout -->
+        <div style="margin: 2rem 0;">
+          <h3 style="text-align: center; margin-bottom: 1.5rem;">Jag är intresserad av att möta</h3>
+          <div class="gender-grid">
+            <div class="option-card" onclick="selectOption('interest', 'male', this)">
+              <div class="option-icon">👨</div>
+              <h3>Män</h3>
+              <p>Anslut med manliga användare</p>
+            </div>
+            <div class="option-card" onclick="selectOption('interest', 'female', this)">
+              <div class="option-icon">👩</div>
+              <h3>Kvinnor</h3>
+              <p>Anslut med kvinnliga användare</p>
+            </div>
+          </div>
+          <div style="text-align: center; margin-top: 1rem;">
+            <div class="option-card" onclick="selectOption('interest', 'everyone', this)" style="max-width: 300px; margin: 0 auto;">
+              <div class="option-icon">🌍</div>
+              <h3>Öppen för alla</h3>
+              <p>Anslut med vem som helst</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Age Range Selection -->
+        <div style="margin: 3rem 0;">
+          <h3 style="text-align: center; margin-bottom: 1.5rem;">Åldersintervall</h3>
+          <div class="age-slider">
+            <input type="range" id="ageRange" min="18" max="80" value="25">
+            <div id="ageDisplay">25</div>
+            <p style="font-size: 0.875rem; margin-top: 0.5rem; color: #999;">år</p>
+          </div>
+        </div>
+
+        <!-- Interests Selection -->
+        <div style="margin: 3rem 0;">
+          <h3 style="text-align: center; margin-bottom: 1.5rem;">Mina intressen</h3>
+          <div class="checkbox-group" style="justify-content: center; gap: 2rem;">
+            <div class="checkbox-item">
+              <input type="checkbox" id="travel" name="interests" value="travel">
+              <label for="travel">✈️ Resor</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="music" name="interests" value="music">
+              <label for="music">🎵 Musik</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="fitness" name="interests" value="fitness">
+              <label for="fitness">💪 Fitness</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="cooking" name="interests" value="cooking">
+              <label for="cooking">🍳 Mat</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="books" name="interests" value="books">
+              <label for="books">📚 Böcker</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="art" name="interests" value="art">
+              <label for="art">🎨 Konst</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="action-buttons">
+          <button class="btn btn-secondary" onclick="showPage('home')">← Tillbaka</button>
+          <button class="btn btn-primary btn-lg" onclick="finishSetup()">Slutför Profilen</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <p>&copy; 2026 Heartlux. <a href="#">Integritet</a> • <a href="#">Användarvillkor</a></p>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
