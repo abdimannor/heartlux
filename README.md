@@ -437,8 +437,11 @@ copies of the Software...
 
 ## 👤 Author & Contact
 
-**Mahad Abdullahi**
+**Mahad Abdullahi**  
+*GitHub Profile: Mahad A. Mohamed Noor*
+
 - **GitHub:** [@abdimannor](https://github.com/abdimannor)
+- **GitHub Profile:** [Mahad A. Mohamed Noor](https://github.com/abdimannor)
 - **Repository:** [heartlux](https://github.com/abdimannor/heartlux)
 - **Live Demo:** [GitHub Pages](https://abdimannor.github.io/heartlux) (when deployed)
 
