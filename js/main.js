@@ -81,6 +81,23 @@ const translations = {
 
     'footer.privacy': 'Integritet',
     'footer.terms':   'Användarvillkor',
+
+    'auth.tab.register': 'Skapa konto',
+    'auth.tab.login':    'Logga in',
+    'auth.gate':         '🔒 Du behöver ett konto för att fortsätta. Registrera dig eller logga in nedan.',
+
+    'login.title':                  '❤️ Logga in på Heartlux',
+    'login.subtitle':               'Välkommen tillbaka!',
+    'login.identifier':             'E-post eller användarnamn',
+    'login.identifier.placeholder': 'din@email.com',
+    'login.password':               'Lösenord',
+    'login.password.placeholder':   'Ditt lösenord',
+    'login.submit':                 'Logga in',
+    'login.register':               'Inte registrerad?',
+    'login.register.link':          'Skapa konto',
+    'login.success':                '✓ Välkommen tillbaka, {name}!',
+    'login.alert.notfound':         'Inget konto hittades. Registrera dig först.',
+    'login.alert.invalid':          'Fel e-post/användarnamn eller lösenord.',
   },
   en: {
     'nav.home':     'Home',
@@ -162,6 +179,23 @@ const translations = {
 
     'footer.privacy': 'Privacy',
     'footer.terms':   'Terms of Service',
+
+    'auth.tab.register': 'Create account',
+    'auth.tab.login':    'Log in',
+    'auth.gate':         '🔒 You need an account to continue. Register or log in below.',
+
+    'login.title':                  '❤️ Log in to Heartlux',
+    'login.subtitle':               'Welcome back!',
+    'login.identifier':             'Email or username',
+    'login.identifier.placeholder': 'your@email.com',
+    'login.password':               'Password',
+    'login.password.placeholder':   'Your password',
+    'login.submit':                 'Log in',
+    'login.register':               'Not registered?',
+    'login.register.link':          'Create account',
+    'login.success':                '✓ Welcome back, {name}!',
+    'login.alert.notfound':         'No account found. Please register first.',
+    'login.alert.invalid':          'Incorrect email/username or password.',
   }
 };
 
@@ -196,10 +230,32 @@ function toggleLanguage() {
 // ─── Navigation ───────────────────────────────────────────────────────────
 
 function showPage(pageId) {
+  const user = JSON.parse(localStorage.getItem('heartlux_user'));
+
+  if ((pageId === 'discover' || pageId === 'matches') && !user) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('register').classList.add('active');
+    window.scrollTo(0, 0);
+    switchAuthTab('register');
+    const gate = document.getElementById('authGate');
+    if (gate) { gate.textContent = t('auth.gate'); gate.style.display = 'block'; }
+    return;
+  }
+
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById(pageId).classList.add('active');
   window.scrollTo(0, 0);
   if (pageId === 'matches') initMatches();
+}
+
+function switchAuthTab(tab) {
+  const isReg = tab === 'register';
+  document.getElementById('sectionRegister').style.display = isReg ? '' : 'none';
+  document.getElementById('sectionLogin').style.display    = isReg ? 'none' : '';
+  document.getElementById('tabRegister').classList.toggle('active',  isReg);
+  document.getElementById('tabLogin').classList.toggle('active', !isReg);
+  const gate = document.getElementById('authGate');
+  if (gate && isReg === false) gate.style.display = 'none';
 }
 
 // ─── Age slider ───────────────────────────────────────────────────────────
@@ -236,7 +292,7 @@ function handleRegister(event) {
   if (password !== confirmPassword) { alert(t('register.alert.password.match')); return; }
 
   localStorage.setItem('heartlux_user', JSON.stringify({
-    username, email, password: '***', gender,
+    username, email, password, gender,
     createdAt: new Date().toISOString()
   }));
 
@@ -251,6 +307,33 @@ function handleRegister(event) {
     updateNavbar();
     showPage('discover');
   }, 2000);
+}
+
+// ─── Login ────────────────────────────────────────────────────────────────
+
+function handleLogin(event) {
+  event.preventDefault();
+  const identifier = document.getElementById('loginIdentifier').value.trim().toLowerCase();
+  const password   = document.getElementById('loginPassword').value;
+  const stored     = JSON.parse(localStorage.getItem('heartlux_user'));
+
+  if (!stored) { alert(t('login.alert.notfound')); return; }
+
+  const valid = (identifier === stored.email.toLowerCase() || identifier === stored.username.toLowerCase())
+             && password === stored.password;
+
+  if (!valid) { alert(t('login.alert.invalid')); return; }
+
+  const successEl = document.getElementById('loginSuccess');
+  successEl.textContent = t('login.success', { name: stored.username });
+  successEl.classList.add('show');
+
+  setTimeout(() => {
+    successEl.classList.remove('show');
+    document.getElementById('loginForm').reset();
+    updateNavbar();
+    showPage(localStorage.getItem('heartlux_preferences') ? 'matches' : 'discover');
+  }, 1500);
 }
 
 // ─── Discover / Setup ─────────────────────────────────────────────────────
@@ -409,6 +492,8 @@ function initMatches() {
   if (!profileCard) return;
 
   if (!preferences) {
+    matchState = { currentProfileIndex: 0, profiles: [], likes: [], passes: [], shown: [], history: [], matches: 0 };
+    updateStats();
     profileCard.style.display = 'none';
     if (actionButtons) actionButtons.style.display = 'none';
     if (noMore) {
@@ -440,6 +525,7 @@ function initMatches() {
 
   updateStats();
   loadProfile();
+  initSwipeGesture();
 }
 
 function loadProfile() {
@@ -482,18 +568,19 @@ function loadProfile() {
   updateStats();
 }
 
-function likeProfile() {
+function likeProfile(fromSwipe = false) {
   if (matchState.currentProfileIndex >= matchState.profiles.length) return;
   const profile = matchState.profiles[matchState.currentProfileIndex];
   const card    = document.getElementById('profileCard');
-
-  matchState.history.push({ profileId: profile.id, action: 'like', index: matchState.currentProfileIndex });
-  card.classList.add('card-swipe-right');
-  matchState.likes.push(profile.id);
   const isMatch = Math.random() < 0.35;
 
+  matchState.history.push({ profileId: profile.id, action: 'like', index: matchState.currentProfileIndex });
+  matchState.likes.push(profile.id);
+
+  if (!fromSwipe) card.classList.add('card-swipe-right');
+
   setTimeout(() => {
-    card.classList.remove('card-swipe-right');
+    if (!fromSwipe) card.classList.remove('card-swipe-right');
     matchState.currentProfileIndex++;
     localStorage.setItem('heartlux_likes', JSON.stringify(matchState.likes));
     loadProfile();
@@ -501,24 +588,117 @@ function likeProfile() {
       matchState.matches++;
       setTimeout(() => showMatchPopup(profile.name), 200);
     }
-  }, 500);
+  }, fromSwipe ? 50 : 500);
 }
 
-function passProfile() {
+function passProfile(fromSwipe = false) {
   if (matchState.currentProfileIndex >= matchState.profiles.length) return;
   const profile = matchState.profiles[matchState.currentProfileIndex];
   const card    = document.getElementById('profileCard');
 
   matchState.history.push({ profileId: profile.id, action: 'pass', index: matchState.currentProfileIndex });
-  card.classList.add('card-swipe-left');
   matchState.passes.push(profile.id);
 
+  if (!fromSwipe) card.classList.add('card-swipe-left');
+
   setTimeout(() => {
-    card.classList.remove('card-swipe-left');
+    if (!fromSwipe) card.classList.remove('card-swipe-left');
     matchState.currentProfileIndex++;
     localStorage.setItem('heartlux_passes', JSON.stringify(matchState.passes));
     loadProfile();
-  }, 500);
+  }, fromSwipe ? 50 : 500);
+}
+
+// ─── Swipe gesture ────────────────────────────────────────────────────────
+
+let swipeInitialized = false;
+
+function initSwipeGesture() {
+  if (swipeInitialized) return;
+  swipeInitialized = true;
+
+  const card = document.getElementById('profileCard');
+  if (!card) return;
+
+  let startX = 0, currentX = 0, isDragging = false;
+
+  function getX(e) { return e.touches ? e.touches[0].clientX : e.clientX; }
+
+  function onStart(e) {
+    if (matchState.currentProfileIndex >= matchState.profiles.length) return;
+    isDragging = true;
+    startX = getX(e);
+    currentX = 0;
+    card.style.transition = 'none';
+  }
+
+  function onMove(e) {
+    if (!isDragging) return;
+    if (e.cancelable) e.preventDefault();
+    currentX = getX(e) - startX;
+    const rotation = currentX * 0.07;
+    card.style.transform = `translateX(${currentX}px) rotate(${rotation}deg)`;
+
+    const like = document.getElementById('swipeLike');
+    const pass = document.getElementById('swipePass');
+    if (currentX > 20) {
+      like.style.opacity = Math.min((currentX - 20) / 80, 1);
+      pass.style.opacity = 0;
+    } else if (currentX < -20) {
+      pass.style.opacity = Math.min((-currentX - 20) / 80, 1);
+      like.style.opacity = 0;
+    } else {
+      like.style.opacity = 0;
+      pass.style.opacity = 0;
+    }
+  }
+
+  function resetIndicators() {
+    const like = document.getElementById('swipeLike');
+    const pass = document.getElementById('swipePass');
+    if (like) like.style.opacity = 0;
+    if (pass) pass.style.opacity = 0;
+  }
+
+  function onEnd() {
+    if (!isDragging) return;
+    isDragging = false;
+    resetIndicators();
+
+    if (currentX > 100) {
+      card.style.transition = 'transform 0.38s ease, opacity 0.38s ease';
+      card.style.transform  = 'translateX(700px) rotate(28deg)';
+      card.style.opacity    = '0';
+      setTimeout(() => {
+        card.style.transition = '';
+        card.style.transform  = '';
+        card.style.opacity    = '';
+        likeProfile(true);
+      }, 370);
+    } else if (currentX < -100) {
+      card.style.transition = 'transform 0.38s ease, opacity 0.38s ease';
+      card.style.transform  = 'translateX(-700px) rotate(-28deg)';
+      card.style.opacity    = '0';
+      setTimeout(() => {
+        card.style.transition = '';
+        card.style.transform  = '';
+        card.style.opacity    = '';
+        passProfile(true);
+      }, 370);
+    } else {
+      card.style.transition = 'transform 0.32s cubic-bezier(0.34, 1.56, 0.64, 1)';
+      card.style.transform  = '';
+      setTimeout(() => { card.style.transition = ''; }, 320);
+    }
+    currentX = 0;
+  }
+
+  card.addEventListener('mousedown', onStart);
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', onEnd);
+  card.addEventListener('touchstart', onStart, { passive: true });
+  document.addEventListener('touchmove', onMove, { passive: false });
+  document.addEventListener('touchend', onEnd);
 }
 
 function undoProfile() {
