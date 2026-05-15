@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="sv">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Heartlux - Where hearts connect. Modern social discovery and dating app.">
-  <title>Heartlux - Find Your Connection</title>
+  <title>Heartlux</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -14,9 +14,11 @@
       <div class="navbar-content">
         <a href="#" class="navbar-brand" onclick="showPage('home')">Heartlux</a>
         <div class="navbar-nav">
-          <a href="#" class="navbar-link" onclick="showPage('home')">Home</a>
-          <a href="#" class="navbar-link" onclick="showPage('discover')">Discover</a>
-          <a href="#" class="navbar-link" onclick="showPage('register')">Join</a>
+          <a href="#" class="navbar-link" data-page="home" onclick="showPage('home')" data-i18n="nav.home">Hem</a>
+          <a href="#" class="navbar-link" data-page="discover" onclick="showPage('discover')" data-i18n="nav.discover">Utforska</a>
+          <a href="#" class="navbar-link" data-page="matches" onclick="showPage('matches')" data-i18n="nav.matches">Matchningar</a>
+          <a href="#" class="navbar-link" data-page="register" onclick="showPage('register')" data-i18n="nav.join">Gå med</a>
+          <button class="lang-toggle" id="langToggle" onclick="toggleLanguage()">EN</button>
         </div>
       </div>
     </div>
@@ -29,14 +31,14 @@
         <div class="hero-content">
           <div class="hero-left">
             <h1>Heartlux</h1>
-            <p>Where meaningful connections flow. Meet people who truly get you.</p>
-            <p style="font-size: 0.95rem; margin-bottom: 1.5rem; color: #999;">Discover genuine connections based on shared interests and values.</p>
+            <p data-i18n="hero.tagline">Där meningsfulla kontakter skapas. Möt människor som verkligen förstår dig.</p>
+            <p style="font-size: 0.95rem; margin-bottom: 1.5rem; color: #999;" data-i18n="hero.description">Hitta genuina kontakter baserat på gemensamma intressen och värderingar.</p>
             <div>
-              <button class="btn btn-primary btn-lg" onclick="showPage('discover')">
-                Start Discovering
+              <button class="btn btn-primary btn-lg" onclick="showPage('discover')" data-i18n="hero.cta.discover">
+                Börja Utforska
               </button>
-              <button class="btn btn-secondary btn-lg" onclick="showPage('register')">
-                Create Account
+              <button class="btn btn-secondary btn-lg" onclick="showPage('register')" data-i18n="hero.cta.register">
+                Skapa Konto
               </button>
             </div>
           </div>
@@ -52,57 +54,66 @@
   <section id="register" class="page">
     <div class="container" style="padding: 2rem 0;">
       <div class="auth-container">
-        <h2>❤️ Join Heartlux</h2>
-        <p class="auth-info">Create an account and start finding meaningful connections</p>
+        <h2 data-i18n="register.title">❤️ Gå med i Heartlux</h2>
+        <p class="auth-info" data-i18n="register.subtitle">Skapa ett konto och börja hitta meningsfulla kontakter</p>
 
         <form id="registerForm" onsubmit="handleRegister(event)">
           <div class="form-group">
-            <label for="username">Username</label>
-            <input type="text" id="username" name="username" placeholder="Choose your username" required>
+            <label for="username" data-i18n="register.username">Användarnamn</label>
+            <input type="text" id="username" name="username"
+              data-i18n-placeholder="register.username.placeholder"
+              placeholder="Välj ditt användarnamn" required>
           </div>
 
           <div class="form-group">
-            <label for="email">Email Address</label>
-            <input type="email" id="email" name="email" placeholder="your@email.com" required>
+            <label for="email" data-i18n="register.email">E-postadress</label>
+            <input type="email" id="email" name="email"
+              data-i18n-placeholder="register.email.placeholder"
+              placeholder="din@email.com" required>
           </div>
 
           <div class="form-group">
-            <label for="password">Password</label>
-            <input type="password" id="password" name="password" placeholder="Minimum 8 characters" required>
+            <label for="password" data-i18n="register.password">Lösenord</label>
+            <input type="password" id="password" name="password"
+              data-i18n-placeholder="register.password.placeholder"
+              placeholder="Minst 8 tecken" required>
           </div>
 
           <div class="form-group">
-            <label for="confirmPassword">Confirm Password</label>
-            <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm your password" required>
+            <label for="confirmPassword" data-i18n="register.confirm">Bekräfta Lösenord</label>
+            <input type="password" id="confirmPassword" name="confirmPassword"
+              data-i18n-placeholder="register.confirm.placeholder"
+              placeholder="Bekräfta ditt lösenord" required>
           </div>
 
           <div class="form-group">
-            <label>Välj kön</label>
+            <label data-i18n="register.gender">Välj kön</label>
             <div class="checkbox-group">
               <div class="checkbox-item">
                 <input type="radio" id="genderMale" name="gender" value="male" required>
-                <label for="genderMale">Man</label>
+                <label for="genderMale" data-i18n="register.gender.male">Man</label>
               </div>
               <div class="checkbox-item">
                 <input type="radio" id="genderFemale" name="gender" value="female" required>
-                <label for="genderFemale">Kvinna</label>
+                <label for="genderFemale" data-i18n="register.gender.female">Kvinna</label>
               </div>
               <div class="checkbox-item">
                 <input type="radio" id="genderOther" name="gender" value="other" required>
-                <label for="genderOther">Annat</label>
+                <label for="genderOther" data-i18n="register.gender.other">Annat</label>
               </div>
             </div>
           </div>
 
-          <button type="submit" class="btn btn-primary btn-block btn-lg">Skapa Konto</button>
+          <button type="submit" class="btn btn-primary btn-block btn-lg" data-i18n="register.submit">Skapa Konto</button>
         </form>
 
-        <div id="successMessage" class="success-message">
+        <div id="successMessage" class="success-message" data-i18n="register.success">
           ✓ Välkommen till Heartlux! Ditt konto är nu skapat.
         </div>
 
         <div class="auth-link">
-          Redan medlem? <a href="#" onclick="showPage('home')">Logga in</a>
+          <span data-i18n="register.login">Redan medlem?</span>
+          <a href="#" onclick="showPage('home')" data-i18n="register.login.link">Logga in</a>
         </div>
       </div>
     </div>
@@ -112,86 +123,169 @@
   <section id="discover" class="page">
     <div class="discover-container" style="padding: 2rem 0;">
       <div class="selector-section">
-        <h2>🎀 Vad letar du efter?</h2>
-        <p style="margin-bottom: 2rem; color: #999;">Berätta lite om dig själv för att hitta den perfekta matchen.</p>
+        <h2 data-i18n="discover.title">🎀 Vad letar du efter?</h2>
+        <p style="margin-bottom: 2rem; color: #999;" data-i18n="discover.subtitle">Berätta lite om dig själv för att hitta den perfekta matchen.</p>
 
-        <!-- Gender Selection - Two Column Layout -->
+        <!-- Gender Selection -->
         <div style="margin: 2rem 0;">
-          <h3 style="text-align: center; margin-bottom: 1.5rem;">Jag är intresserad av att möta</h3>
+          <h3 style="text-align: center; margin-bottom: 1.5rem;" data-i18n="discover.interest.heading">Jag är intresserad av att möta</h3>
           <div class="gender-grid">
-            <div class="option-card" onclick="selectOption('interest', 'male', this)">
+            <div class="option-card" data-value="male" onclick="selectOption('interest', 'male', this)">
               <div class="option-icon">👨</div>
-              <h3>Män</h3>
-              <p>Anslut med manliga användare</p>
+              <h3 data-i18n="discover.interest.male">Män</h3>
+              <p data-i18n="discover.interest.male.desc">Anslut med manliga användare</p>
             </div>
-            <div class="option-card" onclick="selectOption('interest', 'female', this)">
+            <div class="option-card" data-value="female" onclick="selectOption('interest', 'female', this)">
               <div class="option-icon">👩</div>
-              <h3>Kvinnor</h3>
-              <p>Anslut med kvinnliga användare</p>
+              <h3 data-i18n="discover.interest.female">Kvinnor</h3>
+              <p data-i18n="discover.interest.female.desc">Anslut med kvinnliga användare</p>
             </div>
-          </div>
-          <div style="text-align: center; margin-top: 1rem;">
-            <div class="option-card" onclick="selectOption('interest', 'everyone', this)" style="max-width: 300px; margin: 0 auto;">
+            <div class="option-card option-card-full" data-value="everyone" onclick="selectOption('interest', 'everyone', this)">
               <div class="option-icon">🌍</div>
-              <h3>Öppen för alla</h3>
-              <p>Anslut med vem som helst</p>
+              <h3 data-i18n="discover.interest.everyone">Öppen för alla</h3>
+              <p data-i18n="discover.interest.everyone.desc">Anslut med vem som helst</p>
             </div>
           </div>
         </div>
 
-        <!-- Age Range Selection -->
+        <!-- Age Range -->
         <div style="margin: 3rem 0;">
-          <h3 style="text-align: center; margin-bottom: 1.5rem;">Åldersintervall</h3>
+          <h3 style="text-align: center; margin-bottom: 1.5rem;" data-i18n="discover.age.heading">Åldersintervall</h3>
           <div class="age-slider">
             <input type="range" id="ageRange" min="18" max="80" value="25">
             <div id="ageDisplay">25</div>
-            <p style="font-size: 0.875rem; margin-top: 0.5rem; color: #999;">år</p>
+            <p style="font-size: 0.875rem; margin-top: 0.5rem; color: #999;" data-i18n="discover.age.unit">år</p>
           </div>
         </div>
 
-        <!-- Interests Selection -->
+        <!-- Interests -->
         <div style="margin: 3rem 0;">
-          <h3 style="text-align: center; margin-bottom: 1.5rem;">Mina intressen</h3>
+          <h3 style="text-align: center; margin-bottom: 1.5rem;" data-i18n="discover.interests.heading">Mina intressen</h3>
           <div class="checkbox-group" style="justify-content: center; gap: 2rem;">
             <div class="checkbox-item">
               <input type="checkbox" id="travel" name="interests" value="travel">
-              <label for="travel">✈️ Resor</label>
+              <label for="travel" data-i18n="interest.travel">✈️ Resor</label>
             </div>
             <div class="checkbox-item">
               <input type="checkbox" id="music" name="interests" value="music">
-              <label for="music">🎵 Musik</label>
+              <label for="music" data-i18n="interest.music">🎵 Musik</label>
             </div>
             <div class="checkbox-item">
               <input type="checkbox" id="fitness" name="interests" value="fitness">
-              <label for="fitness">💪 Fitness</label>
+              <label for="fitness" data-i18n="interest.fitness">💪 Fitness</label>
             </div>
             <div class="checkbox-item">
               <input type="checkbox" id="cooking" name="interests" value="cooking">
-              <label for="cooking">🍳 Mat</label>
+              <label for="cooking" data-i18n="interest.cooking">🍳 Mat</label>
             </div>
             <div class="checkbox-item">
               <input type="checkbox" id="books" name="interests" value="books">
-              <label for="books">📚 Böcker</label>
+              <label for="books" data-i18n="interest.books">📚 Böcker</label>
             </div>
             <div class="checkbox-item">
               <input type="checkbox" id="art" name="interests" value="art">
-              <label for="art">🎨 Konst</label>
+              <label for="art" data-i18n="interest.art">🎨 Konst</label>
             </div>
           </div>
         </div>
 
         <div class="action-buttons">
-          <button class="btn btn-secondary" onclick="showPage('home')">← Tillbaka</button>
-          <button class="btn btn-primary btn-lg" onclick="finishSetup()">Slutför Profilen</button>
+          <button class="btn btn-secondary" onclick="showPage('home')" data-i18n="discover.back">← Tillbaka</button>
+          <button class="btn btn-primary btn-lg" onclick="finishSetup()" data-i18n="discover.finish">Slutför Profilen</button>
         </div>
       </div>
     </div>
   </section>
 
+  <!-- Matches Page -->
+  <section id="matches" class="page">
+    <div class="matches-container">
+      <!-- Stats Bar -->
+      <div class="matches-header">
+        <div class="stat">
+          <span class="stat-icon">❤️</span>
+          <div>
+            <p class="stat-label" data-i18n="matches.stat.likes">Antal Likes</p>
+            <p class="stat-value" id="likesCount">0</p>
+          </div>
+        </div>
+        <div class="stat">
+          <span class="stat-icon">💕</span>
+          <div>
+            <p class="stat-label" data-i18n="matches.stat.matches">Matchningar</p>
+            <p class="stat-value" id="matchesCount">0</p>
+          </div>
+        </div>
+        <div class="stat">
+          <span class="stat-icon">👤</span>
+          <div>
+            <p class="stat-label" data-i18n="matches.stat.shown">Visade</p>
+            <p class="stat-value" id="shownCount">0</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Profile Card -->
+      <div class="matches-content">
+        <div id="profileCard" class="profile-card">
+          <div class="card-image">
+            <div id="cardAvatar" class="card-avatar">👤</div>
+          </div>
+          <div class="card-info">
+            <div class="card-header">
+              <h2 id="cardName">—</h2>
+              <p id="cardLocation"></p>
+            </div>
+            <p id="cardBio" class="card-bio"></p>
+            <div class="interests-tags">
+              <div id="interestsList"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- No More / No Preferences -->
+        <div id="noMoreProfiles" class="no-more-profiles" style="display: none;">
+          <div class="empty-state">
+            <div style="font-size: 4rem; margin-bottom: 1rem;">🎉</div>
+            <h2 data-i18n="matches.empty.title">Du har visat alla profiler!</h2>
+            <p data-i18n="matches.empty.text">Kom tillbaka senare för fler anslutningar.</p>
+            <button class="btn btn-primary btn-lg" onclick="showPage('home')" style="margin-top: 1.5rem;" data-i18n="matches.empty.back">
+              Tillbaka till Startsidan
+            </button>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons" id="actionButtons">
+          <button class="btn btn-ghost" onclick="undoProfile()" data-i18n="matches.undo">↩ Ångra</button>
+          <button class="btn btn-secondary" onclick="passProfile()" data-i18n="matches.pass">Passa</button>
+          <button class="btn btn-primary" onclick="likeProfile()" data-i18n="matches.like">❤️ Gilla</button>
+        </div>
+      </div>
+
+      <!-- Bottom Nav -->
+      <div class="matches-footer">
+        <button class="btn btn-secondary btn-sm" onclick="showPage('home')" data-i18n="matches.footer.home">← Hem</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Match Popup -->
+  <div id="matchPopup" class="match-popup" style="display: none;" onclick="closeMatchPopup()">
+    <div class="match-popup-content" onclick="event.stopPropagation()">
+      <div class="match-hearts">💕</div>
+      <h2 data-i18n="matches.popup.title">Det är en match!</h2>
+      <p id="matchPopupName"></p>
+      <button class="btn btn-primary" onclick="closeMatchPopup()" style="margin-top: 1.5rem;" data-i18n="matches.popup.btn">
+        Fortsätt Bläddra ❤️
+      </button>
+    </div>
+  </div>
+
   <!-- Footer -->
   <footer>
     <div class="container">
-      <p>&copy; 2026 Heartlux. <a href="#">Integritet</a> • <a href="#">Användarvillkor</a></p>
+      <p>&copy; 2026 Heartlux. <a href="#" data-i18n="footer.privacy">Integritet</a> • <a href="#" data-i18n="footer.terms">Användarvillkor</a></p>
     </div>
   </footer>
 
