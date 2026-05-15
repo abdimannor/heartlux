@@ -422,7 +422,7 @@ Want to improve Heartlux? Follow these steps:
 **MIT License** – Free for personal, educational, and commercial use
 
 ```
-Copyright (c) 2026 Jeddawi
+Copyright (c) 2026 Mahad Abdullahi
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -437,7 +437,7 @@ copies of the Software...
 
 ## 👤 Author & Contact
 
-**Jeddawi**
+**Mahad Abdullahi**
 - **GitHub:** [@abdimannor](https://github.com/abdimannor)
 - **Repository:** [heartlux](https://github.com/abdimannor/heartlux)
 - **Live Demo:** [GitHub Pages](https://abdimannor.github.io/heartlux) (when deployed)
