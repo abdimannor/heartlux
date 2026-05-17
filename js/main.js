@@ -121,6 +121,12 @@ const translations = {
     'chat.placeholder': 'Skriv ett meddelande...',
     'chat.send':        'Skicka',
     'chat.greeting':    'Hej! 😊 Kul att vi matchade!',
+
+    'discover.age.min':   'Min ålder',
+    'discover.age.max':   'Max ålder',
+
+    'matches.compat':     '💕 {n} gemensamma intressen',
+    'matches.new.badge':  'NY',
   },
   en: {
     'nav.home':     'Home',
@@ -242,6 +248,12 @@ const translations = {
     'chat.placeholder': 'Type a message...',
     'chat.send':        'Send',
     'chat.greeting':    'Hey! 😊 Great that we matched!',
+
+    'discover.age.min':   'Min age',
+    'discover.age.max':   'Max age',
+
+    'matches.compat':     '💕 {n} shared interests',
+    'matches.new.badge':  'NEW',
   }
 };
 
@@ -305,13 +317,30 @@ function switchAuthTab(tab) {
   if (gate && isReg === false) gate.style.display = 'none';
 }
 
-// ─── Age slider ───────────────────────────────────────────────────────────
+// ─── Age range sliders ────────────────────────────────────────────────────
 
-const ageRange = document.getElementById('ageRange');
-const ageDisplay = document.getElementById('ageDisplay');
-if (ageRange) {
-  ageRange.addEventListener('input', e => {
-    ageDisplay.textContent = e.target.value;
+function updateAgeRangeDisplay() {
+  const minEl  = document.getElementById('ageMin');
+  const maxEl  = document.getElementById('ageMax');
+  const dispEl = document.getElementById('ageRangeDisplay');
+  if (!minEl || !maxEl || !dispEl) return;
+  dispEl.textContent = `${minEl.value} – ${maxEl.value} ${t('discover.age.unit')}`;
+}
+
+const ageMinEl = document.getElementById('ageMin');
+const ageMaxEl = document.getElementById('ageMax');
+if (ageMinEl) {
+  ageMinEl.addEventListener('input', () => {
+    if (parseInt(ageMinEl.value) >= parseInt(ageMaxEl.value))
+      ageMinEl.value = parseInt(ageMaxEl.value) - 1;
+    updateAgeRangeDisplay();
+  });
+}
+if (ageMaxEl) {
+  ageMaxEl.addEventListener('input', () => {
+    if (parseInt(ageMaxEl.value) <= parseInt(ageMinEl.value))
+      ageMaxEl.value = parseInt(ageMinEl.value) + 1;
+    updateAgeRangeDisplay();
   });
 }
 
@@ -387,7 +416,8 @@ function handleLogin(event) {
 
 function finishSetup() {
   const interest  = localStorage.getItem('heartlux_interest');
-  const age       = document.getElementById('ageRange').value;
+  const minAge    = parseInt(document.getElementById('ageMin')?.value || 18);
+  const maxAge    = parseInt(document.getElementById('ageMax')?.value || 80);
   const interests = Array.from(document.querySelectorAll('input[name="interests"]:checked'))
     .map(cb => cb.value);
 
@@ -395,7 +425,7 @@ function finishSetup() {
   if (!interests.length)  { alert(t('discover.alert.interests')); return; }
 
   localStorage.setItem('heartlux_preferences', JSON.stringify({
-    interest, age, interests, completedAt: new Date().toISOString()
+    interest, minAge, maxAge, interests, completedAt: new Date().toISOString()
   }));
 
   matchState = { currentProfileIndex: 0, profiles: [], likes: [], passes: [], shown: [], history: [], matchedProfiles: [] };
@@ -454,10 +484,21 @@ function updateNavbar() {
 function logout() {
   ['heartlux_user', 'heartlux_preferences', 'heartlux_likes', 'heartlux_passes',
    'heartlux_interest', 'heartlux_matches_list', 'heartlux_chats',
-   'heartlux_user_avatar', 'heartlux_user_bio'].forEach(k => localStorage.removeItem(k));
+   'heartlux_user_avatar', 'heartlux_user_bio',
+   'heartlux_unread', 'heartlux_seen_matches'].forEach(k => localStorage.removeItem(k));
   matchState = { currentProfileIndex: 0, profiles: [], likes: [], passes: [], shown: [], history: [], matchedProfiles: [] };
   updateNavbar();
   showPage('home');
+}
+
+// ─── Notification badge ───────────────────────────────────────────────────
+
+function updateMatchBadge() {
+  const badge  = document.getElementById('matchesBadge');
+  if (!badge) return;
+  const unread = parseInt(localStorage.getItem('heartlux_unread') || '0');
+  badge.textContent = unread > 9 ? '9+' : unread;
+  badge.style.display = unread > 0 ? 'inline-flex' : 'none';
 }
 
 // ─── Init ─────────────────────────────────────────────────────────────────
@@ -471,8 +512,16 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   applyDarkMode();
   applyTranslations();
+  updateMatchBadge();
   initMatches();
 });
+
+// ─── Compatibility score ──────────────────────────────────────────────────
+
+function compatScore(profile, userInterests) {
+  const shared = profile.interests.filter(i => userInterests.includes(i)).length;
+  return Math.round((shared / Math.max(profile.interests.length, userInterests.length, 1)) * 100);
+}
 
 // ─── Matches system ───────────────────────────────────────────────────────
 
@@ -577,11 +626,18 @@ function initMatches() {
     matchState.likes          = JSON.parse(localStorage.getItem('heartlux_likes'))         || [];
     matchState.passes         = JSON.parse(localStorage.getItem('heartlux_passes'))        || [];
     matchState.matchedProfiles = JSON.parse(localStorage.getItem('heartlux_matches_list')) || [];
-    matchState.profiles = generateProfiles().filter(p => {
-      return (parseInt(p.age) <= parseInt(prefs.age))
-        && p.interests.some(i => prefs.interests.includes(i))
-        && (prefs.interest === 'everyone' || p.gender === prefs.interest);
-    });
+    const userInts = prefs.interests || [];
+    const minAge   = parseInt(prefs.minAge || 18);
+    const maxAge   = parseInt(prefs.maxAge || prefs.age || 80);
+    matchState.profiles = generateProfiles()
+      .filter(p =>
+        parseInt(p.age) >= minAge
+        && parseInt(p.age) <= maxAge
+        && p.interests.some(i => userInts.includes(i))
+        && (prefs.interest === 'everyone' || p.gender === prefs.interest)
+      )
+      .map(p => ({ ...p, compat: compatScore(p, userInts) }))
+      .sort((a, b) => b.compat - a.compat);
   }
 
   updateStats();
@@ -621,6 +677,18 @@ function loadProfile() {
     interestsList.appendChild(tag);
   });
 
+  const compatEl = document.getElementById('cardCompat');
+  if (compatEl) {
+    const prefs    = JSON.parse(localStorage.getItem('heartlux_preferences') || '{}');
+    const shared   = profile.interests.filter(i => (prefs.interests || []).includes(i)).length;
+    if (shared > 0) {
+      compatEl.textContent = t('matches.compat', { n: shared });
+      compatEl.style.display = '';
+    } else {
+      compatEl.style.display = 'none';
+    }
+  }
+
   profileCard.classList.remove('card-appear');
   void profileCard.offsetWidth;
   profileCard.classList.add('card-appear');
@@ -648,6 +716,9 @@ function likeProfile(fromSwipe = false) {
     if (isMatch) {
       matchState.matchedProfiles.push(profile);
       localStorage.setItem('heartlux_matches_list', JSON.stringify(matchState.matchedProfiles));
+      const unread = parseInt(localStorage.getItem('heartlux_unread') || '0');
+      localStorage.setItem('heartlux_unread', unread + 1);
+      updateMatchBadge();
       setTimeout(() => showMatchPopup(profile.name), 200);
     }
   }, fromSwipe ? 50 : 500);
@@ -865,7 +936,9 @@ function loadProfilePage() {
       everyone: `🌍 ${t('discover.interest.everyone')}`,
     };
     el('profilePrefInterest').textContent   = intMap[prefs.interest] || '—';
-    el('profilePrefAge').textContent        = prefs.age ? `≤ ${prefs.age} ${t('discover.age.unit')}` : '—';
+    el('profilePrefAge').textContent        = (prefs.minAge || prefs.maxAge)
+      ? `${prefs.minAge || 18} – ${prefs.maxAge || 80} ${t('discover.age.unit')}`
+      : prefs.age ? `≤ ${prefs.age} ${t('discover.age.unit')}` : '—';
     el('profilePrefInterests').textContent  = prefs.interests
       ? prefs.interests.map(i => t(`interest.${i}`)).join(', ')
       : '—';
@@ -923,6 +996,8 @@ function showMatchesTab(tab) {
     myMatchesEl.style.display = '';
     tabBrowse.classList.remove('active');
     tabMy.classList.add('active');
+    localStorage.setItem('heartlux_unread', '0');
+    updateMatchBadge();
     renderMatchesList();
   }
 }
@@ -945,16 +1020,21 @@ function renderMatchesList() {
     return;
   }
 
-  grid.innerHTML = matched.map((p, idx) => `
+  const seen = JSON.parse(localStorage.getItem('heartlux_seen_matches') || '[]');
+
+  grid.innerHTML = matched.map((p, idx) => {
+    const isNew = !seen.includes(String(p.id));
+    return `
     <div class="match-list-card" data-idx="${idx}">
       <div class="match-list-avatar">${p.avatar}</div>
       <div class="match-list-info">
-        <strong>${p.name}, ${p.age}</strong>
+        <strong>${p.name}, ${p.age} ${isNew ? `<span class="match-new-badge">${t('matches.new.badge')}</span>` : ''}</strong>
         <span>📍 ${p.city}</span>
         <div class="match-list-tags">${p.interests.slice(0, 2).map(i => t(`interest.${i}`)).join(' · ')}</div>
       </div>
       <button class="btn btn-primary btn-sm">${t('matches.list.chat')}</button>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 
   grid.querySelectorAll('.match-list-card').forEach((card, idx) => {
     card.addEventListener('click', () => openChat(matched[idx]));
@@ -970,6 +1050,14 @@ function openChat(profile) {
   document.getElementById('chatPartnerAvatar').textContent = profile.avatar;
   document.getElementById('chatPartnerName').textContent   = `${profile.name}, ${profile.age}`;
   document.getElementById('chatModal').style.display = 'flex';
+
+  const seen = JSON.parse(localStorage.getItem('heartlux_seen_matches') || '[]');
+  if (!seen.includes(String(profile.id))) {
+    seen.push(String(profile.id));
+    localStorage.setItem('heartlux_seen_matches', JSON.stringify(seen));
+    renderMatchesList();
+  }
+
   renderChatMessages();
   setTimeout(() => document.getElementById('chatInput').focus(), 50);
 }

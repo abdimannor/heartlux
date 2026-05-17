@@ -1256,6 +1256,110 @@ footer a:hover {
   }
 }
 
+/* ── Nav notification badge ─────────────────────────────────────────────── */
+
+.navbar-link {
+  position: relative;
+}
+
+.nav-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #e74c3c;
+  color: white;
+  font-size: 0.65rem;
+  font-weight: 700;
+  min-width: 1.1rem;
+  height: 1.1rem;
+  border-radius: 1rem;
+  padding: 0 0.25rem;
+  margin-left: 0.3rem;
+  vertical-align: middle;
+  line-height: 1;
+  animation: badgePop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes badgePop {
+  from { transform: scale(0); }
+  to   { transform: scale(1); }
+}
+
+/* ── Compatibility tag on profile card ───────────────────────────────────── */
+
+.compat-tag {
+  display: inline-block;
+  background: linear-gradient(135deg, rgba(204, 50, 140, 0.1), rgba(232, 75, 154, 0.15));
+  color: var(--heart-primary);
+  border: 1.5px solid rgba(204, 50, 140, 0.35);
+  border-radius: 2rem;
+  padding: 0.35rem 0.875rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+/* ── NEW badge in matches list ───────────────────────────────────────────── */
+
+.match-new-badge {
+  display: inline-flex;
+  align-items: center;
+  background: var(--heart-primary);
+  color: white;
+  font-size: 0.6rem;
+  font-weight: 700;
+  padding: 0.15rem 0.4rem;
+  border-radius: 0.25rem;
+  margin-left: 0.5rem;
+  vertical-align: middle;
+  letter-spacing: 0.04em;
+}
+
+/* ── Age range sliders ───────────────────────────────────────────────────── */
+
+.age-range-display {
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--heart-primary);
+  margin-bottom: 1.5rem;
+}
+
+.age-sliders {
+  max-width: 400px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.age-slider-row {
+  display: grid;
+  grid-template-columns: 90px 1fr 2.5rem;
+  align-items: center;
+  gap: 1rem;
+}
+
+.age-slider-row label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin: 0;
+}
+
+.age-slider-row input[type="range"] {
+  width: 100%;
+}
+
+.age-slider-row span {
+  font-weight: 700;
+  color: var(--heart-primary);
+  font-size: 1rem;
+  text-align: right;
+}
+
 /* ── Dark mode ──────────────────────────────────────────────────────────── */
 
 body.dark-mode {

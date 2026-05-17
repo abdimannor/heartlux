@@ -16,7 +16,7 @@
         <div class="navbar-nav">
           <a href="#" class="navbar-link" data-page="home" onclick="showPage('home')" data-i18n="nav.home">Hem</a>
           <a href="#" class="navbar-link" data-page="discover" onclick="showPage('discover')" data-i18n="nav.discover">Utforska</a>
-          <a href="#" class="navbar-link" data-page="matches" onclick="showPage('matches')" data-i18n="nav.matches">Matchningar</a>
+          <a href="#" class="navbar-link" data-page="matches" onclick="showPage('matches')" data-i18n="nav.matches">Matchningar<span id="matchesBadge" class="nav-badge" style="display:none;"></span></a>
           <a href="#" class="navbar-link" data-page="register" onclick="showPage('register')" data-i18n="nav.join">Gå med</a>
           <button class="lang-toggle" id="langToggle" onclick="toggleLanguage()">EN</button>
           <button class="lang-toggle" id="darkModeBtn" onclick="toggleDarkMode()" title="Dark mode">🌙</button>
@@ -199,11 +199,19 @@
 
         <!-- Age Range -->
         <div style="margin: 3rem 0;">
-          <h3 style="text-align: center; margin-bottom: 1.5rem;" data-i18n="discover.age.heading">Åldersintervall</h3>
-          <div class="age-slider">
-            <input type="range" id="ageRange" min="18" max="80" value="25">
-            <div id="ageDisplay">25</div>
-            <p style="font-size: 0.875rem; margin-top: 0.5rem; color: #999;" data-i18n="discover.age.unit">år</p>
+          <h3 style="text-align: center; margin-bottom: 1rem;" data-i18n="discover.age.heading">Åldersintervall</h3>
+          <div id="ageRangeDisplay" class="age-range-display">18 – 35 år</div>
+          <div class="age-sliders">
+            <div class="age-slider-row">
+              <label data-i18n="discover.age.min">Min ålder</label>
+              <input type="range" id="ageMin" min="18" max="79" value="18">
+              <span id="ageMinVal">18</span>
+            </div>
+            <div class="age-slider-row">
+              <label data-i18n="discover.age.max">Max ålder</label>
+              <input type="range" id="ageMax" min="19" max="80" value="35">
+              <span id="ageMaxVal">35</span>
+            </div>
           </div>
         </div>
 
@@ -296,6 +304,7 @@
               </div>
             </div>
             <div class="card-info">
+              <div id="cardCompat" class="compat-tag" style="display:none;"></div>
               <p id="cardBio" class="card-bio"></p>
               <div class="interests-tags">
                 <div id="interestsList"></div>
