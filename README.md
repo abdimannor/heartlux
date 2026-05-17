@@ -33,7 +33,7 @@ Heartlux demonstrates professional frontend development practices by combining:
 
 ### 🎯 Discovery & Preferences
 - **Preference Selection** – Choose who you'd like to meet (Men, Women, Everyone)
-- **Interactive Age Slider** – Real-time age range selection (18-80 years)
+- **Age Range Slider** – Dual min–max slider for precise age filtering (18–80 years)
 - **Interest Tagging** – Multi-select from 6 interest categories
   - ✈️ Travel
   - 🎵 Music
@@ -41,17 +41,20 @@ Heartlux demonstrates professional frontend development practices by combining:
   - 🍳 Cooking
   - 📚 Books
   - 🎨 Art
+- **Advanced Matching** – Profiles sorted by compatibility score (shared interests)
 
 ### 🎨 Design & UX
 - **Responsive Layout** – Perfectly optimized for mobile, tablet, and desktop
 - **Smooth Animations** – Fade transitions, hover effects, micro-interactions
 - **Modern Aesthetic** – Heart-themed magenta/pink color scheme with romantic design
-- **Swedish Interface** – Full localization for Swedish users
+- **Dark Mode** – One-click dark/light theme toggle, persisted across sessions
+- **Bilingual** – Full Swedish/English interface with instant language switching
 
 ### ⚡ Technical Features
 - **Single Page App** – No page reloads, instant navigation between sections
 - **Vanilla JavaScript** – No dependencies, lightweight and fast
 - **Form Validation** – Client-side validation with user feedback
+- **Notification Badges** – Real-time unread match counter in the navbar
 - **Accessibility** – Semantic HTML, proper contrast ratios, keyboard navigation
 
 ---
@@ -160,12 +163,12 @@ npx serve
 
 ```
 heartlux/
-├── index.html              # Main app (8 KB, all-in-one SPA)
+├── index.html              # Main app — all pages in one SPA
 ├── css/
-│   └── style.css          # Complete styling (15 KB, responsive)
+│   └── style.css          # Complete styling — responsive + dark mode
 ├── js/
-│   └── main.js            # App logic (5 KB, vanilla JS)
-├── images/                # Assets directory (for future use)
+│   └── main.js            # App logic — i18n, matching, chat, notifications
+├── server.js              # Minimal Node static-file server (port 8080)
 ├── README.md              # This documentation
 ├── .gitignore             # Git configuration
 └── LICENSE                # MIT License
@@ -175,21 +178,24 @@ heartlux/
 
 **index.html**
 - Semantic HTML5 structure
-- Three main pages: Home, Register, Discover
-- Form elements with labels and validation
+- Five pages: Home, Register/Login, Discover, Matches, Profile
+- Chat modal and match popup overlays
 - Accessible markup with proper hierarchy
 
 **css/style.css**
-- CSS custom properties (variables)
+- CSS custom properties (variables) with full dark-mode override
 - Mobile-first responsive design
 - Flexbox and CSS Grid layouts
-- Smooth animations (fade, hover, transitions)
+- Smooth animations (swipe, popup, badge, card transitions)
 
 **js/main.js**
-- Page navigation system
-- Form validation and error handling
-- localStorage integration
-- Event listeners and interactivity
+- Page navigation and auth guard system
+- Swedish/English i18n with instant switching
+- Swipe gesture engine (mouse + touch)
+- Compatibility-scored matching algorithm
+- Chat with persistent message history
+- Notification badge and seen-match tracking
+- localStorage integration throughout
 
 ---
 
@@ -208,9 +214,19 @@ heartlux/
 
 ### What Gets Stored?
 ```javascript
-heartlux_user          // { username, email, gender, createdAt }
-heartlux_interest      // "male" | "female" | "everyone"
-heartlux_preferences   // { interest, age, interests[], completedAt }
+heartlux_user           // { username, email, gender, createdAt }
+heartlux_interest       // "male" | "female" | "everyone"
+heartlux_preferences    // { interest, minAge, maxAge, interests[], completedAt }
+heartlux_likes          // profile ID array
+heartlux_passes         // profile ID array
+heartlux_matches_list   // matched profile objects array
+heartlux_chats          // { [profileId]: [{ from, text, ts }] }
+heartlux_seen_matches   // profile IDs opened in chat
+heartlux_unread         // unread match count (number)
+heartlux_user_avatar    // chosen emoji string
+heartlux_user_bio       // profile bio text
+heartlux_dark           // "1" | "0" (dark mode preference)
+heartlux_lang           // "sv" | "en"
 ```
 
 ### Browser Storage
@@ -257,19 +273,19 @@ heartlux_preferences   // { interest, age, interests[], completedAt }
 - [x] Data persistence (localStorage)
 - [x] Responsive design (mobile to desktop)
 
-### 🔄 Phase 2: Matches & Profiles (In Progress)
-- [ ] Profile browsing system
-- [ ] Match algorithm based on preferences
-- [ ] Swipe or click interaction
-- [ ] Like/Pass functionality
-- [ ] Match history
+### ✅ Phase 2: Matches & Profiles (Complete)
+- [x] Profile browsing system
+- [x] Match algorithm based on preferences
+- [x] Swipe or click interaction
+- [x] Like/Pass functionality
+- [x] Match history
 
-### 📋 Phase 3: Enhanced Features
-- [ ] User avatars and profile images
-- [ ] Direct messaging system
-- [ ] Notification system
-- [ ] Dark mode toggle
-- [ ] Advanced matching algorithm
+### ✅ Phase 3: Enhanced Features (Complete)
+- [x] User avatars and profile images
+- [x] Direct messaging system
+- [x] Notification system
+- [x] Dark mode toggle
+- [x] Advanced matching algorithm
 
 ### 🎯 Phase 4: Production Ready
 - [ ] Backend API integration
@@ -351,11 +367,11 @@ Want to improve Heartlux? Follow these steps:
 
 ## 📊 Project Statistics
 
-- **Total Lines:** ~1,500 (HTML + CSS + JS)
-- **Total Size:** ~28 KB (all files)
-- **CSS:** ~15 KB (2,500+ lines)
-- **JavaScript:** ~5 KB (200+ lines)
-- **HTML:** ~8 KB (200+ lines)
+- **Total Lines:** ~3,375 (HTML + CSS + JS)
+- **Total Size:** ~108 KB (all files)
+- **CSS:** ~36 KB (1,792 lines)
+- **JavaScript:** ~48 KB (1,117 lines)
+- **HTML:** ~24 KB (466 lines)
 - **Load Time:** <100ms (local), <500ms (hosted)
 - **Browser Support:** 95%+ of users
 - **Mobile Responsive:** 100%
@@ -366,18 +382,17 @@ Want to improve Heartlux? Follow these steps:
 ## 🐛 Known Limitations
 
 ### Current Constraints
-- No backend database (local storage only)
-- No real user matching display yet
-- No messaging system
-- No image uploads (emoji placeholders)
-- localStorage limited to ~5-10MB
+- No backend database (localStorage only — data is device-specific)
+- No real user accounts or server-side matching
+- No image uploads (emoji avatars as placeholders)
+- localStorage limited to ~5-10MB per domain
 
-### Future Solutions
+### Future Solutions (Phase 4)
 - [ ] Backend API integration
-- [ ] Real database
-- [ ] Image hosting
-- [ ] Messaging infrastructure
+- [ ] Real database (Firebase / PostgreSQL)
+- [ ] Image uploads and hosting
 - [ ] Push notifications
+- [ ] PWA — installable, offline-capable
 
 ---
 
