@@ -19,6 +19,7 @@
           <a href="#" class="navbar-link" data-page="matches" onclick="showPage('matches')" data-i18n="nav.matches">Matchningar</a>
           <a href="#" class="navbar-link" data-page="register" onclick="showPage('register')" data-i18n="nav.join">Gå med</a>
           <button class="lang-toggle" id="langToggle" onclick="toggleLanguage()">EN</button>
+          <button class="lang-toggle" id="darkModeBtn" onclick="toggleDarkMode()" title="Dark mode">🌙</button>
         </div>
       </div>
     </div>
@@ -248,69 +249,84 @@
   <!-- Matches Page -->
   <section id="matches" class="page">
     <div class="matches-container">
-      <!-- Stats Bar -->
-      <div class="matches-header">
-        <div class="stat">
-          <span class="stat-icon">❤️</span>
-          <div>
-            <p class="stat-label" data-i18n="matches.stat.likes">Antal Likes</p>
-            <p class="stat-value" id="likesCount">0</p>
+
+      <!-- Tab Bar -->
+      <div class="matches-tabs-bar">
+        <button class="matches-tab active" id="tabBrowse" onclick="showMatchesTab('browse')" data-i18n="matches.tab.browse">🃏 Bläddra</button>
+        <button class="matches-tab" id="tabMyMatches" onclick="showMatchesTab('mymatches')" data-i18n="matches.tab.mymatches">💕 Matchningar</button>
+      </div>
+
+      <!-- Browse Tab -->
+      <div id="browseContent">
+        <!-- Stats Bar -->
+        <div class="matches-header">
+          <div class="stat">
+            <span class="stat-icon">❤️</span>
+            <div>
+              <p class="stat-label" data-i18n="matches.stat.likes">Antal Likes</p>
+              <p class="stat-value" id="likesCount">0</p>
+            </div>
+          </div>
+          <div class="stat">
+            <span class="stat-icon">💕</span>
+            <div>
+              <p class="stat-label" data-i18n="matches.stat.matches">Matchningar</p>
+              <p class="stat-value" id="matchesCount">0</p>
+            </div>
+          </div>
+          <div class="stat">
+            <span class="stat-icon">👤</span>
+            <div>
+              <p class="stat-label" data-i18n="matches.stat.shown">Visade</p>
+              <p class="stat-value" id="shownCount">0</p>
+            </div>
           </div>
         </div>
-        <div class="stat">
-          <span class="stat-icon">💕</span>
-          <div>
-            <p class="stat-label" data-i18n="matches.stat.matches">Matchningar</p>
-            <p class="stat-value" id="matchesCount">0</p>
+
+        <!-- Profile Card -->
+        <div class="matches-content">
+          <div id="profileCard" class="profile-card">
+            <div class="card-image">
+              <div id="cardAvatar" class="card-avatar">👤</div>
+              <div class="swipe-indicator swipe-like" id="swipeLike">LIKE ❤️</div>
+              <div class="swipe-indicator swipe-pass" id="swipePass">NOPE ✕</div>
+              <div class="card-overlay">
+                <h2 id="cardName">—</h2>
+                <p id="cardLocation"></p>
+              </div>
+            </div>
+            <div class="card-info">
+              <p id="cardBio" class="card-bio"></p>
+              <div class="interests-tags">
+                <div id="interestsList"></div>
+              </div>
+            </div>
           </div>
-        </div>
-        <div class="stat">
-          <span class="stat-icon">👤</span>
-          <div>
-            <p class="stat-label" data-i18n="matches.stat.shown">Visade</p>
-            <p class="stat-value" id="shownCount">0</p>
+
+          <!-- No More / No Preferences -->
+          <div id="noMoreProfiles" class="no-more-profiles" style="display: none;">
+            <div class="empty-state">
+              <div style="font-size: 4rem; margin-bottom: 1rem;">🎉</div>
+              <h2 data-i18n="matches.empty.title">Du har visat alla profiler!</h2>
+              <p data-i18n="matches.empty.text">Kom tillbaka senare för fler anslutningar.</p>
+              <button class="btn btn-primary btn-lg" onclick="showPage('home')" style="margin-top: 1.5rem;" data-i18n="matches.empty.back">
+                Tillbaka till Startsidan
+              </button>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="action-buttons" id="actionButtons">
+            <button class="btn btn-ghost" onclick="undoProfile()" data-i18n="matches.undo">↩ Ångra</button>
+            <button class="btn btn-secondary" onclick="passProfile()" data-i18n="matches.pass">Passa</button>
+            <button class="btn btn-primary" onclick="likeProfile()" data-i18n="matches.like">❤️ Gilla</button>
           </div>
         </div>
       </div>
 
-      <!-- Profile Card -->
-      <div class="matches-content">
-        <div id="profileCard" class="profile-card">
-          <div class="card-image">
-            <div id="cardAvatar" class="card-avatar">👤</div>
-            <div class="swipe-indicator swipe-like" id="swipeLike">LIKE ❤️</div>
-            <div class="swipe-indicator swipe-pass" id="swipePass">NOPE ✕</div>
-            <div class="card-overlay">
-              <h2 id="cardName">—</h2>
-              <p id="cardLocation"></p>
-            </div>
-          </div>
-          <div class="card-info">
-            <p id="cardBio" class="card-bio"></p>
-            <div class="interests-tags">
-              <div id="interestsList"></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- No More / No Preferences -->
-        <div id="noMoreProfiles" class="no-more-profiles" style="display: none;">
-          <div class="empty-state">
-            <div style="font-size: 4rem; margin-bottom: 1rem;">🎉</div>
-            <h2 data-i18n="matches.empty.title">Du har visat alla profiler!</h2>
-            <p data-i18n="matches.empty.text">Kom tillbaka senare för fler anslutningar.</p>
-            <button class="btn btn-primary btn-lg" onclick="showPage('home')" style="margin-top: 1.5rem;" data-i18n="matches.empty.back">
-              Tillbaka till Startsidan
-            </button>
-          </div>
-        </div>
-
-        <!-- Action Buttons -->
-        <div class="action-buttons" id="actionButtons">
-          <button class="btn btn-ghost" onclick="undoProfile()" data-i18n="matches.undo">↩ Ångra</button>
-          <button class="btn btn-secondary" onclick="passProfile()" data-i18n="matches.pass">Passa</button>
-          <button class="btn btn-primary" onclick="likeProfile()" data-i18n="matches.like">❤️ Gilla</button>
-        </div>
+      <!-- My Matches Tab -->
+      <div id="matchesListContent" style="display: none;">
+        <div class="matches-list-grid" id="matchesListGrid"></div>
       </div>
 
       <!-- Bottom Nav -->
@@ -319,6 +335,103 @@
       </div>
     </div>
   </section>
+
+  <!-- Profile Page -->
+  <section id="profile" class="page">
+    <div class="container" style="padding: 2rem 0;">
+      <h2 class="profile-page-title" data-i18n="profile.title">Min Profil</h2>
+      <div class="profile-page-grid">
+
+        <!-- Left: Avatar + Basic Info -->
+        <div class="profile-main-card">
+          <div class="profile-display-avatar" id="profileDisplayAvatar">👤</div>
+          <h2 id="profileUsername" style="color: var(--heart-primary); margin: 0.75rem 0 0.25rem;"></h2>
+          <p id="profileEmail" style="font-size: 0.875rem;"></p>
+          <p id="profileGender" style="font-size: 0.875rem; margin-top: 0.25rem;"></p>
+          <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem;">
+            <span data-i18n="profile.member">Medlem sedan</span>
+            <span id="profileMemberSince" style="display:block; font-weight:600;"></span>
+          </p>
+
+          <div class="profile-avatar-section">
+            <h3 style="font-size: 0.95rem; margin-bottom: 0.75rem;" data-i18n="profile.avatar.heading">Välj Avatar</h3>
+            <div class="avatar-picker" id="profileAvatarPicker"></div>
+          </div>
+        </div>
+
+        <!-- Right: Bio + Stats + Prefs -->
+        <div class="profile-side">
+          <!-- Bio -->
+          <div class="profile-section-card">
+            <h3 data-i18n="profile.bio.label">Om mig</h3>
+            <textarea id="profileBioInput" rows="4"
+              data-i18n-placeholder="profile.bio.placeholder"
+              placeholder="Berätta om dig själv..."></textarea>
+            <button class="btn btn-primary" onclick="saveProfileBio()" style="margin-top: 1rem;" data-i18n="profile.save">Spara Profil</button>
+            <div id="profileSaveMsg" class="success-message"></div>
+          </div>
+
+          <!-- Stats -->
+          <div class="profile-section-card">
+            <h3 data-i18n="profile.stats.heading">Statistik</h3>
+            <div class="profile-stats-grid">
+              <div class="profile-stat-item">
+                <span style="font-size: 1.5rem;">❤️</span>
+                <span class="stat-value" id="profileLikesCount">0</span>
+                <span class="stat-label" data-i18n="matches.stat.likes">Likes</span>
+              </div>
+              <div class="profile-stat-item">
+                <span style="font-size: 1.5rem;">💕</span>
+                <span class="stat-value" id="profileMatchesCount">0</span>
+                <span class="stat-label" data-i18n="matches.stat.matches">Matchningar</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Preferences -->
+          <div class="profile-section-card">
+            <h3 data-i18n="profile.prefs.heading">Mina Preferenser</h3>
+            <div class="profile-prefs-list">
+              <div class="profile-pref-row">
+                <span data-i18n="discover.interest.heading">Intresserad av</span>
+                <strong id="profilePrefInterest">—</strong>
+              </div>
+              <div class="profile-pref-row">
+                <span data-i18n="discover.age.heading">Åldersintervall</span>
+                <strong id="profilePrefAge">—</strong>
+              </div>
+              <div class="profile-pref-row">
+                <span data-i18n="discover.interests.heading">Intressen</span>
+                <strong id="profilePrefInterests">—</strong>
+              </div>
+            </div>
+            <button class="btn btn-secondary" onclick="showPage('discover')" style="margin-top: 1rem;" data-i18n="profile.prefs.edit">Ändra Preferenser</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Chat Modal -->
+  <div id="chatModal" class="chat-modal" style="display: none;">
+    <div class="chat-container">
+      <div class="chat-header">
+        <button class="btn btn-ghost btn-sm chat-back-btn" onclick="closeChat()">←</button>
+        <div class="chat-header-info">
+          <span id="chatPartnerAvatar" style="font-size: 2rem;">👤</span>
+          <strong id="chatPartnerName"></strong>
+        </div>
+      </div>
+      <div class="chat-messages" id="chatMessages"></div>
+      <div class="chat-input-bar">
+        <input type="text" id="chatInput"
+          data-i18n-placeholder="chat.placeholder"
+          placeholder="Skriv ett meddelande..."
+          onkeydown="if(event.key==='Enter')sendChatMessage()">
+        <button class="btn btn-primary" onclick="sendChatMessage()" data-i18n="chat.send">Skicka</button>
+      </div>
+    </div>
+  </div>
 
   <!-- Match Popup -->
   <div id="matchPopup" class="match-popup" style="display: none;" onclick="closeMatchPopup()">

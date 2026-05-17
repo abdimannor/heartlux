@@ -98,6 +98,29 @@ const translations = {
     'login.success':                '✓ Välkommen tillbaka, {name}!',
     'login.alert.notfound':         'Inget konto hittades. Registrera dig först.',
     'login.alert.invalid':          'Fel e-post/användarnamn eller lösenord.',
+
+    'nav.profile': 'Min Profil',
+
+    'profile.title':          'Min Profil',
+    'profile.bio.label':      'Om mig',
+    'profile.bio.placeholder':'Berätta om dig själv...',
+    'profile.save':           'Spara Profil',
+    'profile.saved':          '✓ Profilen är sparad!',
+    'profile.prefs.edit':     'Ändra Preferenser',
+    'profile.prefs.heading':  'Mina Preferenser',
+    'profile.avatar.heading': 'Välj Avatar',
+    'profile.stats.heading':  'Statistik',
+    'profile.member':         'Medlem sedan',
+
+    'matches.tab.browse':         '🃏 Bläddra',
+    'matches.tab.mymatches':      '💕 Matchningar',
+    'matches.list.empty.title':   'Inga matchningar ännu',
+    'matches.list.empty.text':    'Fortsätt bläddra för att hitta matchningar!',
+    'matches.list.chat':          '💬 Chatta',
+
+    'chat.placeholder': 'Skriv ett meddelande...',
+    'chat.send':        'Skicka',
+    'chat.greeting':    'Hej! 😊 Kul att vi matchade!',
   },
   en: {
     'nav.home':     'Home',
@@ -196,6 +219,29 @@ const translations = {
     'login.success':                '✓ Welcome back, {name}!',
     'login.alert.notfound':         'No account found. Please register first.',
     'login.alert.invalid':          'Incorrect email/username or password.',
+
+    'nav.profile': 'My Profile',
+
+    'profile.title':          'My Profile',
+    'profile.bio.label':      'About me',
+    'profile.bio.placeholder':'Tell us about yourself...',
+    'profile.save':           'Save Profile',
+    'profile.saved':          '✓ Profile saved!',
+    'profile.prefs.edit':     'Edit Preferences',
+    'profile.prefs.heading':  'My Preferences',
+    'profile.avatar.heading': 'Choose Avatar',
+    'profile.stats.heading':  'Statistics',
+    'profile.member':         'Member since',
+
+    'matches.tab.browse':         '🃏 Browse',
+    'matches.tab.mymatches':      '💕 My Matches',
+    'matches.list.empty.title':   'No matches yet',
+    'matches.list.empty.text':    'Keep browsing to find matches!',
+    'matches.list.chat':          '💬 Chat',
+
+    'chat.placeholder': 'Type a message...',
+    'chat.send':        'Send',
+    'chat.greeting':    'Hey! 😊 Great that we matched!',
   }
 };
 
@@ -232,7 +278,7 @@ function toggleLanguage() {
 function showPage(pageId) {
   const user = JSON.parse(localStorage.getItem('heartlux_user'));
 
-  if ((pageId === 'discover' || pageId === 'matches') && !user) {
+  if ((pageId === 'discover' || pageId === 'matches' || pageId === 'profile') && !user) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.getElementById('register').classList.add('active');
     window.scrollTo(0, 0);
@@ -245,7 +291,8 @@ function showPage(pageId) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById(pageId).classList.add('active');
   window.scrollTo(0, 0);
-  if (pageId === 'matches') initMatches();
+  if (pageId === 'matches') { showMatchesTab('browse'); initMatches(); }
+  if (pageId === 'profile') loadProfilePage();
 }
 
 function switchAuthTab(tab) {
@@ -351,7 +398,7 @@ function finishSetup() {
     interest, age, interests, completedAt: new Date().toISOString()
   }));
 
-  matchState = { currentProfileIndex: 0, profiles: [], likes: [], passes: [], shown: [], history: [], matches: 0 };
+  matchState = { currentProfileIndex: 0, profiles: [], likes: [], passes: [], shown: [], history: [], matchedProfiles: [] };
 
   document.querySelector('.selector-section').innerHTML = `
     <div style="text-align: center; padding: 3rem 2rem;">
@@ -373,7 +420,18 @@ function updateNavbar() {
 
   if (user) {
     joinLink.textContent = `${t('nav.hello')}, ${user.username}`;
-    joinLink.onclick = null;
+    joinLink.onclick = () => showPage('profile');
+
+    let profileLink = document.getElementById('profileNavLink');
+    if (!profileLink) {
+      profileLink = document.createElement('a');
+      profileLink.id        = 'profileNavLink';
+      profileLink.href      = '#';
+      profileLink.className = 'navbar-link';
+      joinLink.parentElement.insertBefore(profileLink, joinLink);
+    }
+    profileLink.textContent = t('nav.profile');
+    profileLink.onclick = () => showPage('profile');
 
     let logoutLink = document.getElementById('logoutLink');
     if (!logoutLink) {
@@ -388,15 +446,16 @@ function updateNavbar() {
   } else {
     joinLink.textContent = t('nav.join');
     joinLink.onclick = () => showPage('register');
-    const logoutLink = document.getElementById('logoutLink');
-    if (logoutLink) logoutLink.remove();
+    document.getElementById('logoutLink')?.remove();
+    document.getElementById('profileNavLink')?.remove();
   }
 }
 
 function logout() {
-  ['heartlux_user', 'heartlux_preferences', 'heartlux_likes',
-   'heartlux_passes', 'heartlux_interest'].forEach(k => localStorage.removeItem(k));
-  matchState = { currentProfileIndex: 0, profiles: [], likes: [], passes: [], shown: [], history: [], matches: 0 };
+  ['heartlux_user', 'heartlux_preferences', 'heartlux_likes', 'heartlux_passes',
+   'heartlux_interest', 'heartlux_matches_list', 'heartlux_chats',
+   'heartlux_user_avatar', 'heartlux_user_bio'].forEach(k => localStorage.removeItem(k));
+  matchState = { currentProfileIndex: 0, profiles: [], likes: [], passes: [], shown: [], history: [], matchedProfiles: [] };
   updateNavbar();
   showPage('home');
 }
@@ -410,6 +469,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (card.dataset.value === storedInterest) card.classList.add('selected');
     });
   }
+  applyDarkMode();
   applyTranslations();
   initMatches();
 });
@@ -454,7 +514,7 @@ let matchState = {
   passes: [],
   shown: [],
   history: [],
-  matches: 0
+  matchedProfiles: [],
 };
 
 function generateProfiles() {
@@ -514,8 +574,9 @@ function initMatches() {
 
   if (matchState.profiles.length === 0) {
     const prefs = JSON.parse(preferences);
-    matchState.likes  = JSON.parse(localStorage.getItem('heartlux_likes'))  || [];
-    matchState.passes = JSON.parse(localStorage.getItem('heartlux_passes')) || [];
+    matchState.likes          = JSON.parse(localStorage.getItem('heartlux_likes'))         || [];
+    matchState.passes         = JSON.parse(localStorage.getItem('heartlux_passes'))        || [];
+    matchState.matchedProfiles = JSON.parse(localStorage.getItem('heartlux_matches_list')) || [];
     matchState.profiles = generateProfiles().filter(p => {
       return (parseInt(p.age) <= parseInt(prefs.age))
         && p.interests.some(i => prefs.interests.includes(i))
@@ -585,7 +646,8 @@ function likeProfile(fromSwipe = false) {
     localStorage.setItem('heartlux_likes', JSON.stringify(matchState.likes));
     loadProfile();
     if (isMatch) {
-      matchState.matches++;
+      matchState.matchedProfiles.push(profile);
+      localStorage.setItem('heartlux_matches_list', JSON.stringify(matchState.matchedProfiles));
       setTimeout(() => showMatchPopup(profile.name), 200);
     }
   }, fromSwipe ? 50 : 500);
@@ -745,6 +807,223 @@ function updateStats() {
   const m = document.getElementById('matchesCount');
   const s = document.getElementById('shownCount');
   if (l) l.textContent = matchState.likes.length;
-  if (m) m.textContent = matchState.matches;
+  if (m) m.textContent = matchState.matchedProfiles.length;
   if (s) s.textContent = matchState.shown.length;
+}
+
+// ─── Dark mode ────────────────────────────────────────────────────────────
+
+function toggleDarkMode() {
+  const isDark = document.body.classList.toggle('dark-mode');
+  localStorage.setItem('heartlux_dark', isDark ? '1' : '0');
+  const btn = document.getElementById('darkModeBtn');
+  if (btn) btn.textContent = isDark ? '☀️' : '🌙';
+}
+
+function applyDarkMode() {
+  const isDark = localStorage.getItem('heartlux_dark') === '1';
+  if (isDark) document.body.classList.add('dark-mode');
+  const btn = document.getElementById('darkModeBtn');
+  if (btn) btn.textContent = isDark ? '☀️' : '🌙';
+}
+
+// ─── Profile page ─────────────────────────────────────────────────────────
+
+const AVATAR_OPTIONS = ['👩','👨','👩‍🦱','👨‍🦱','👩‍🦰','👨‍🦰','👩‍🦳','👨‍🦳','🧕','👱‍♀️','👱','😊','😎','🌸','💫','⭐'];
+
+function loadProfilePage() {
+  const user = JSON.parse(localStorage.getItem('heartlux_user'));
+  if (!user) return;
+  const prefs  = JSON.parse(localStorage.getItem('heartlux_preferences')) || {};
+  const avatar = localStorage.getItem('heartlux_user_avatar')
+    || (user.gender === 'female' ? '👩' : user.gender === 'male' ? '👨' : '😊');
+  const bio = localStorage.getItem('heartlux_user_bio') || '';
+
+  const el = id => document.getElementById(id);
+  if (!el('profileDisplayAvatar')) return;
+
+  el('profileDisplayAvatar').textContent = avatar;
+  el('profileUsername').textContent      = user.username;
+  el('profileEmail').textContent         = user.email;
+  el('profileGender').textContent        = t(`register.gender.${user.gender}`);
+  el('profileBioInput').value            = bio;
+
+  const lang       = localStorage.getItem('heartlux_lang') || 'sv';
+  const locale     = lang === 'en' ? 'en-SE' : 'sv-SE';
+  const memberDate = new Date(user.createdAt).toLocaleDateString(locale, { year: 'numeric', month: 'long', day: 'numeric' });
+  el('profileMemberSince').textContent = memberDate;
+
+  const likes   = JSON.parse(localStorage.getItem('heartlux_likes'))         || [];
+  const matched = JSON.parse(localStorage.getItem('heartlux_matches_list'))  || [];
+  el('profileLikesCount').textContent   = likes.length;
+  el('profileMatchesCount').textContent = matched.length;
+
+  if (prefs.interest) {
+    const intMap = {
+      male:     `👨 ${t('discover.interest.male')}`,
+      female:   `👩 ${t('discover.interest.female')}`,
+      everyone: `🌍 ${t('discover.interest.everyone')}`,
+    };
+    el('profilePrefInterest').textContent   = intMap[prefs.interest] || '—';
+    el('profilePrefAge').textContent        = prefs.age ? `≤ ${prefs.age} ${t('discover.age.unit')}` : '—';
+    el('profilePrefInterests').textContent  = prefs.interests
+      ? prefs.interests.map(i => t(`interest.${i}`)).join(', ')
+      : '—';
+  }
+
+  renderAvatarPicker(avatar);
+}
+
+function renderAvatarPicker(current) {
+  const picker = document.getElementById('profileAvatarPicker');
+  if (!picker) return;
+  picker.innerHTML = '';
+  AVATAR_OPTIONS.forEach(em => {
+    const btn = document.createElement('button');
+    btn.className   = 'avatar-option' + (em === current ? ' selected' : '');
+    btn.textContent = em;
+    btn.onclick = () => {
+      picker.querySelectorAll('.avatar-option').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      document.getElementById('profileDisplayAvatar').textContent = em;
+      localStorage.setItem('heartlux_user_avatar', em);
+    };
+    picker.appendChild(btn);
+  });
+}
+
+function saveProfileBio() {
+  const bio = document.getElementById('profileBioInput').value;
+  localStorage.setItem('heartlux_user_bio', bio);
+  const msg = document.getElementById('profileSaveMsg');
+  msg.textContent = t('profile.saved');
+  msg.classList.add('show');
+  setTimeout(() => msg.classList.remove('show'), 2000);
+}
+
+// ─── Matches list tab ─────────────────────────────────────────────────────
+
+let currentMatchesTab = 'browse';
+
+function showMatchesTab(tab) {
+  currentMatchesTab = tab;
+  const browseEl    = document.getElementById('browseContent');
+  const myMatchesEl = document.getElementById('matchesListContent');
+  const tabBrowse   = document.getElementById('tabBrowse');
+  const tabMy       = document.getElementById('tabMyMatches');
+  if (!browseEl) return;
+
+  if (tab === 'browse') {
+    browseEl.style.display    = '';
+    myMatchesEl.style.display = 'none';
+    tabBrowse.classList.add('active');
+    tabMy.classList.remove('active');
+  } else {
+    browseEl.style.display    = 'none';
+    myMatchesEl.style.display = '';
+    tabBrowse.classList.remove('active');
+    tabMy.classList.add('active');
+    renderMatchesList();
+  }
+}
+
+function renderMatchesList() {
+  const grid = document.getElementById('matchesListGrid');
+  if (!grid) return;
+  const matched = JSON.parse(localStorage.getItem('heartlux_matches_list')) || [];
+
+  if (matched.length === 0) {
+    grid.innerHTML = `
+      <div class="empty-state matches-list-empty">
+        <div style="font-size:3rem;margin-bottom:1rem;">💕</div>
+        <h2>${t('matches.list.empty.title')}</h2>
+        <p>${t('matches.list.empty.text')}</p>
+        <button class="btn btn-primary" onclick="showMatchesTab('browse')" style="margin-top:1rem;">
+          ${t('matches.tab.browse')}
+        </button>
+      </div>`;
+    return;
+  }
+
+  grid.innerHTML = matched.map((p, idx) => `
+    <div class="match-list-card" data-idx="${idx}">
+      <div class="match-list-avatar">${p.avatar}</div>
+      <div class="match-list-info">
+        <strong>${p.name}, ${p.age}</strong>
+        <span>📍 ${p.city}</span>
+        <div class="match-list-tags">${p.interests.slice(0, 2).map(i => t(`interest.${i}`)).join(' · ')}</div>
+      </div>
+      <button class="btn btn-primary btn-sm">${t('matches.list.chat')}</button>
+    </div>`).join('');
+
+  grid.querySelectorAll('.match-list-card').forEach((card, idx) => {
+    card.addEventListener('click', () => openChat(matched[idx]));
+  });
+}
+
+// ─── Chat ─────────────────────────────────────────────────────────────────
+
+let currentChatProfile = null;
+
+function openChat(profile) {
+  currentChatProfile = profile;
+  document.getElementById('chatPartnerAvatar').textContent = profile.avatar;
+  document.getElementById('chatPartnerName').textContent   = `${profile.name}, ${profile.age}`;
+  document.getElementById('chatModal').style.display = 'flex';
+  renderChatMessages();
+  setTimeout(() => document.getElementById('chatInput').focus(), 50);
+}
+
+function closeChat() {
+  document.getElementById('chatModal').style.display = 'none';
+  currentChatProfile = null;
+}
+
+function getChats() {
+  return JSON.parse(localStorage.getItem('heartlux_chats') || '{}');
+}
+
+function renderChatMessages() {
+  const chats     = getChats();
+  const pid       = String(currentChatProfile.id);
+  let   messages  = chats[pid];
+  if (!messages) {
+    messages  = [{ from: 'match', text: t('chat.greeting'), ts: Date.now() - 60000 }];
+    chats[pid] = messages;
+    localStorage.setItem('heartlux_chats', JSON.stringify(chats));
+  }
+  const container = document.getElementById('chatMessages');
+  container.innerHTML = messages.map(msg => `
+    <div class="chat-bubble ${msg.from === 'user' ? 'bubble-user' : 'bubble-match'}">
+      <span>${msg.text}</span>
+    </div>`).join('');
+  container.scrollTop = container.scrollHeight;
+}
+
+function sendChatMessage() {
+  const input = document.getElementById('chatInput');
+  const text  = input.value.trim();
+  if (!text || !currentChatProfile) return;
+
+  const chats = getChats();
+  const pid   = String(currentChatProfile.id);
+  if (!chats[pid]) chats[pid] = [];
+  chats[pid].push({ from: 'user', text, ts: Date.now() });
+  localStorage.setItem('heartlux_chats', JSON.stringify(chats));
+  input.value = '';
+  renderChatMessages();
+
+  const lang    = localStorage.getItem('heartlux_lang') || 'sv';
+  const replies = lang === 'en'
+    ? ['😊', "That's fun!", 'I agree!', '❤️', 'Absolutely!', 'Tell me more!', 'Haha!', 'Definitely 😄', 'Same here!', '🌸']
+    : ['😊', 'Haha, det är kul!', 'Håller med!', '❤️', 'Absolut!', 'Berätta mer!', 'Vad roligt!', 'Helt klart 😄', 'Ja, det tycker jag med!', '🌸'];
+  const reply = replies[Math.floor(Math.random() * replies.length)];
+
+  setTimeout(() => {
+    const updated = getChats();
+    if (!updated[pid]) return;
+    updated[pid].push({ from: 'match', text: reply, ts: Date.now() });
+    localStorage.setItem('heartlux_chats', JSON.stringify(updated));
+    if (currentChatProfile && String(currentChatProfile.id) === pid) renderChatMessages();
+  }, 800 + Math.random() * 1000);
 }
