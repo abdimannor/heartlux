@@ -115,10 +115,18 @@ python -m http.server 8000
 python -m SimpleHTTPServer 8000
 
 # Node.js
-npx serve
+npm start
 
-# Then visit: http://localhost:8000
+# Then visit: http://localhost:8080
 ```
+
+
+### Quality Checks
+```bash
+npm run check
+```
+
+This validates JavaScript syntax and verifies that key HTML-to-JavaScript wiring remains intact.
 
 ---
 
@@ -169,6 +177,10 @@ heartlux/
 ├── js/
 │   └── main.js            # App logic — i18n, matching, chat, notifications
 ├── server.js              # Minimal Node static-file server (port 8080)
+├── scripts/
+│   └── smoke-test.js      # Lightweight project checks
+├── package.json           # npm scripts and project metadata
+├── .nojekyll              # GitHub Pages passthrough config
 ├── README.md              # This documentation
 ├── .gitignore             # Git configuration
 └── LICENSE                # MIT License
