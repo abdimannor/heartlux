@@ -127,6 +127,12 @@ const translations = {
 
     'matches.compat':     '💕 {n} gemensamma intressen',
     'matches.new.badge':  'NY',
+
+    'swipe.like':         'GILLA ❤️',
+    'swipe.pass':         'NOPE ✕',
+
+    'profile.pref.interest':  'Intresserad av',
+    'profile.pref.interests': 'Intressen',
   },
   en: {
     'nav.home':     'Home',
@@ -254,6 +260,12 @@ const translations = {
 
     'matches.compat':     '💕 {n} shared interests',
     'matches.new.badge':  'NEW',
+
+    'swipe.like':         'LIKE ❤️',
+    'swipe.pass':         'NOPE ✕',
+
+    'profile.pref.interest':  'Interested in',
+    'profile.pref.interests': 'Interests',
   }
 };
 
@@ -277,6 +289,7 @@ function applyTranslations() {
   if (toggle) toggle.textContent = lang === 'sv' ? 'EN' : 'SV';
   document.documentElement.lang = lang;
   updateNavbar();
+  updateAgeRangeDisplay();
 }
 
 function toggleLanguage() {
