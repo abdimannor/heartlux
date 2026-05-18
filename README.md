@@ -3,6 +3,7 @@
 > **Modern dating and social discovery app** — Where meaningful connections flow.
 
 [![Status](https://img.shields.io/badge/status-active-brightgreen)](https://github.com/abdimannor/heartlux)
+[![Checks](https://github.com/abdimannor/heartlux/actions/workflows/checks.yml/badge.svg)](https://github.com/abdimannor/heartlux/actions/workflows/checks.yml)
 [![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 [![Built with](https://img.shields.io/badge/built%20with-HTML%20CSS%20JS-orange)](https://developer.mozilla.org)
 [![GitHub](https://img.shields.io/badge/github-abdimannor%2Fheartlux-black?logo=github)](https://github.com/abdimannor/heartlux)
