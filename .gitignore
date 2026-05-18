@@ -24,7 +24,6 @@ build/
 .env.*.local
 
 # Dependencies
-package-lock.json
 yarn.lock
 
 # Testing
@@ -34,3 +33,7 @@ coverage/
 # Misc
 .DS_Store
 *.pem
+
+# Playwright
+test-results/
+playwright-report/

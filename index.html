@@ -9,17 +9,17 @@
 </head>
 <body>
   <!-- Navigation -->
-  <nav class="navbar">
+  <nav class="navbar" aria-label="Primary navigation">
     <div class="container">
       <div class="navbar-content">
-        <a href="#" class="navbar-brand" onclick="showPage('home')">Heartlux</a>
+        <a href="#home" class="navbar-brand" onclick="showPage('home')">Heartlux</a>
         <div class="navbar-nav">
-          <a href="#" class="navbar-link" data-page="home" onclick="showPage('home')" data-i18n="nav.home">Hem</a>
-          <a href="#" class="navbar-link" data-page="discover" onclick="showPage('discover')" data-i18n="nav.discover">Utforska</a>
-          <a href="#" class="navbar-link" data-page="matches" onclick="showPage('matches')" data-i18n="nav.matches">Matchningar<span id="matchesBadge" class="nav-badge" style="display:none;"></span></a>
-          <a href="#" class="navbar-link" data-page="register" onclick="showPage('register')" data-i18n="nav.join">Gå med</a>
-          <button class="lang-toggle" id="langToggle" onclick="toggleLanguage()">EN</button>
-          <button class="lang-toggle" id="darkModeBtn" onclick="toggleDarkMode()" title="Dark mode">🌙</button>
+          <a href="#home" class="navbar-link" data-page="home" onclick="showPage('home')" data-i18n="nav.home">Hem</a>
+          <a href="#discover" class="navbar-link" data-page="discover" onclick="showPage('discover')" data-i18n="nav.discover">Utforska</a>
+          <a href="#matches" class="navbar-link" data-page="matches" onclick="showPage('matches')" data-i18n="nav.matches">Matchningar<span id="matchesBadge" class="nav-badge" style="display:none;" aria-label="Unread matches"></span></a>
+          <a href="#register" class="navbar-link" data-page="register" onclick="showPage('register')" data-i18n="nav.join">Gå med</a>
+          <button type="button" class="lang-toggle" id="langToggle" onclick="toggleLanguage()" aria-label="Switch language">EN</button>
+          <button type="button" class="lang-toggle" id="darkModeBtn" onclick="toggleDarkMode()" title="Dark mode" aria-label="Toggle dark mode">🌙</button>
         </div>
       </div>
     </div>
@@ -35,10 +35,10 @@
             <p data-i18n="hero.tagline">Där meningsfulla kontakter skapas. Möt människor som verkligen förstår dig.</p>
             <p style="font-size: 0.95rem; margin-bottom: 1.5rem; color: #999;" data-i18n="hero.description">Hitta genuina kontakter baserat på gemensamma intressen och värderingar.</p>
             <div>
-              <button class="btn btn-primary btn-lg" onclick="showPage('discover')" data-i18n="hero.cta.discover">
+              <button type="button" class="btn btn-primary btn-lg" onclick="showPage('discover')" data-i18n="hero.cta.discover">
                 Börja Utforska
               </button>
-              <button class="btn btn-secondary btn-lg" onclick="showPage('register')" data-i18n="hero.cta.register">
+              <button type="button" class="btn btn-secondary btn-lg" onclick="showPage('register')" data-i18n="hero.cta.register">
                 Skapa Konto
               </button>
             </div>
@@ -71,8 +71,8 @@
 
         <!-- Flikar: Skapa konto / Logga in -->
         <div class="auth-tabs">
-          <button class="auth-tab active" id="tabRegister" onclick="switchAuthTab('register')" data-i18n="auth.tab.register">Skapa konto</button>
-          <button class="auth-tab" id="tabLogin" onclick="switchAuthTab('login')" data-i18n="auth.tab.login">Logga in</button>
+          <button type="button" class="auth-tab active" id="tabRegister" onclick="switchAuthTab('register')" data-i18n="auth.tab.register">Skapa konto</button>
+          <button type="button" class="auth-tab" id="tabLogin" onclick="switchAuthTab('login')" data-i18n="auth.tab.login">Logga in</button>
         </div>
 
         <!-- ── Registreringsformulär ── -->
@@ -131,7 +131,7 @@
 
           <div class="auth-link">
             <span data-i18n="register.login">Redan medlem?</span>
-            <a href="#" onclick="switchAuthTab('login')" data-i18n="register.login.link">Logga in</a>
+            <a href="#login" onclick="switchAuthTab('login')" data-i18n="register.login.link">Logga in</a>
           </div>
         </div>
 
@@ -160,7 +160,7 @@
 
           <div class="auth-link">
             <span data-i18n="login.register">Inte registrerad?</span>
-            <a href="#" onclick="switchAuthTab('register')" data-i18n="login.register.link">Skapa konto</a>
+            <a href="#register" onclick="switchAuthTab('register')" data-i18n="login.register.link">Skapa konto</a>
           </div>
         </div>
 
@@ -247,8 +247,8 @@
         </div>
 
         <div class="action-buttons">
-          <button class="btn btn-secondary" onclick="showPage('home')" data-i18n="discover.back">← Tillbaka</button>
-          <button class="btn btn-primary btn-lg" onclick="finishSetup()" data-i18n="discover.finish">Slutför Profilen</button>
+          <button type="button" class="btn btn-secondary" onclick="showPage('home')" data-i18n="discover.back">← Tillbaka</button>
+          <button type="button" class="btn btn-primary btn-lg" onclick="finishSetup()" data-i18n="discover.finish">Slutför Profilen</button>
         </div>
       </div>
     </div>
@@ -260,8 +260,8 @@
 
       <!-- Tab Bar -->
       <div class="matches-tabs-bar">
-        <button class="matches-tab active" id="tabBrowse" onclick="showMatchesTab('browse')" data-i18n="matches.tab.browse">🃏 Bläddra</button>
-        <button class="matches-tab" id="tabMyMatches" onclick="showMatchesTab('mymatches')" data-i18n="matches.tab.mymatches">💕 Matchningar</button>
+        <button type="button" class="matches-tab active" id="tabBrowse" onclick="showMatchesTab('browse')" data-i18n="matches.tab.browse">🃏 Bläddra</button>
+        <button type="button" class="matches-tab" id="tabMyMatches" onclick="showMatchesTab('mymatches')" data-i18n="matches.tab.mymatches">💕 Matchningar</button>
       </div>
 
       <!-- Browse Tab -->
@@ -318,7 +318,7 @@
               <div style="font-size: 4rem; margin-bottom: 1rem;">🎉</div>
               <h2 data-i18n="matches.empty.title">Du har visat alla profiler!</h2>
               <p data-i18n="matches.empty.text">Kom tillbaka senare för fler anslutningar.</p>
-              <button class="btn btn-primary btn-lg" onclick="showPage('home')" style="margin-top: 1.5rem;" data-i18n="matches.empty.back">
+              <button type="button" class="btn btn-primary btn-lg" onclick="showPage('home')" style="margin-top: 1.5rem;" data-i18n="matches.empty.back">
                 Tillbaka till Startsidan
               </button>
             </div>
@@ -326,9 +326,9 @@
 
           <!-- Action Buttons -->
           <div class="action-buttons" id="actionButtons">
-            <button class="btn btn-ghost" onclick="undoProfile()" data-i18n="matches.undo">↩ Ångra</button>
-            <button class="btn btn-secondary" onclick="passProfile()" data-i18n="matches.pass">Passa</button>
-            <button class="btn btn-primary" onclick="likeProfile()" data-i18n="matches.like">❤️ Gilla</button>
+            <button type="button" class="btn btn-ghost" onclick="undoProfile()" data-i18n="matches.undo">↩ Ångra</button>
+            <button type="button" class="btn btn-secondary" onclick="passProfile()" data-i18n="matches.pass">Passa</button>
+            <button type="button" class="btn btn-primary" onclick="likeProfile()" data-i18n="matches.like">❤️ Gilla</button>
           </div>
         </div>
       </div>
@@ -340,7 +340,7 @@
 
       <!-- Bottom Nav -->
       <div class="matches-footer">
-        <button class="btn btn-secondary btn-sm" onclick="showPage('home')" data-i18n="matches.footer.home">← Hem</button>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="showPage('home')" data-i18n="matches.footer.home">← Hem</button>
       </div>
     </div>
   </section>
@@ -376,7 +376,7 @@
             <textarea id="profileBioInput" rows="4"
               data-i18n-placeholder="profile.bio.placeholder"
               placeholder="Berätta om dig själv..."></textarea>
-            <button class="btn btn-primary" onclick="saveProfileBio()" style="margin-top: 1rem;" data-i18n="profile.save">Spara Profil</button>
+            <button type="button" class="btn btn-primary" onclick="saveProfileBio()" style="margin-top: 1rem;" data-i18n="profile.save">Spara Profil</button>
             <div id="profileSaveMsg" class="success-message"></div>
           </div>
 
@@ -414,7 +414,7 @@
                 <strong id="profilePrefInterests">—</strong>
               </div>
             </div>
-            <button class="btn btn-secondary" onclick="showPage('discover')" style="margin-top: 1rem;" data-i18n="profile.prefs.edit">Ändra Preferenser</button>
+            <button type="button" class="btn btn-secondary" onclick="showPage('discover')" style="margin-top: 1rem;" data-i18n="profile.prefs.edit">Ändra Preferenser</button>
           </div>
         </div>
       </div>
@@ -422,10 +422,10 @@
   </section>
 
   <!-- Chat Modal -->
-  <div id="chatModal" class="chat-modal" style="display: none;">
+  <div id="chatModal" class="chat-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="chatPartnerName">
     <div class="chat-container">
       <div class="chat-header">
-        <button class="btn btn-ghost btn-sm chat-back-btn" onclick="closeChat()">←</button>
+        <button type="button" class="btn btn-ghost btn-sm chat-back-btn" onclick="closeChat()">←</button>
         <div class="chat-header-info">
           <span id="chatPartnerAvatar" style="font-size: 2rem;">👤</span>
           <strong id="chatPartnerName"></strong>
@@ -437,18 +437,18 @@
           data-i18n-placeholder="chat.placeholder"
           placeholder="Skriv ett meddelande..."
           onkeydown="if(event.key==='Enter')sendChatMessage()">
-        <button class="btn btn-primary" onclick="sendChatMessage()" data-i18n="chat.send">Skicka</button>
+        <button type="button" class="btn btn-primary" onclick="sendChatMessage()" data-i18n="chat.send">Skicka</button>
       </div>
     </div>
   </div>
 
   <!-- Match Popup -->
-  <div id="matchPopup" class="match-popup" style="display: none;" onclick="closeMatchPopup()">
+  <div id="matchPopup" class="match-popup" style="display: none;" onclick="closeMatchPopup()" role="dialog" aria-modal="true" aria-labelledby="matchPopupTitle">
     <div class="match-popup-content" onclick="event.stopPropagation()">
       <div class="match-hearts">💕</div>
-      <h2 data-i18n="matches.popup.title">Det är en match!</h2>
+      <h2 id="matchPopupTitle" data-i18n="matches.popup.title">Det är en match!</h2>
       <p id="matchPopupName"></p>
-      <button class="btn btn-primary" onclick="closeMatchPopup()" style="margin-top: 1.5rem;" data-i18n="matches.popup.btn">
+      <button type="button" class="btn btn-primary" onclick="closeMatchPopup()" style="margin-top: 1.5rem;" data-i18n="matches.popup.btn">
         Fortsätt Bläddra ❤️
       </button>
     </div>
@@ -457,7 +457,7 @@
   <!-- Footer -->
   <footer>
     <div class="container">
-      <p>&copy; 2026 Heartlux. <a href="#" data-i18n="footer.privacy">Integritet</a> • <a href="#" data-i18n="footer.terms">Användarvillkor</a></p>
+      <p>&copy; 2026 Heartlux. <a href="https://github.com/abdimannor/heartlux" data-i18n="footer.privacy">Integritet</a> • <a href="https://github.com/abdimannor/heartlux" data-i18n="footer.terms">Användarvillkor</a></p>
     </div>
   </footer>
 

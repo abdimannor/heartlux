@@ -1,19 +1,23 @@
 {
-  "name": "heartlux",
-  "version": "1.0.0",
-  "private": true,
-  "description": "Modern dating and social discovery app built with HTML, CSS, and vanilla JavaScript.",
-  "scripts": {
-    "start": "node server.js",
-    "serve": "node server.js",
-    "check": "node --check js/main.js && node --check server.js && node scripts/smoke-test.js"
-  },
-  "keywords": [
-    "dating-app",
-    "social-discovery",
-    "vanilla-javascript",
-    "github-pages"
-  ],
-  "author": "Mahad Abdullahi <131860684+abdimannor@users.noreply.github.com>",
-  "license": "MIT"
+    "name":  "heartlux",
+    "version":  "1.0.0",
+    "private":  true,
+    "description":  "Modern dating and social discovery app built with HTML, CSS, and vanilla JavaScript.",
+    "scripts":  {
+                    "start":  "node server.js",
+                    "serve":  "node server.js",
+                    "check":  "node --check js/main.js \u0026\u0026 node --check server.js \u0026\u0026 node --check playwright.config.js \u0026\u0026 node --check tests/app.spec.js \u0026\u0026 node --check scripts/run-e2e.js \u0026\u0026 node scripts/smoke-test.js",
+                    "check:e2e":  "node scripts/run-e2e.js"
+                },
+    "keywords":  [
+                     "dating-app",
+                     "social-discovery",
+                     "vanilla-javascript",
+                     "github-pages"
+                 ],
+    "author":  "Mahad Abdullahi \u003c131860684+abdimannor@users.noreply.github.com\u003e",
+    "license":  "MIT",
+    "devDependencies":  {
+                            "@playwright/test":  "^1.60.0"
+                        }
 }

@@ -10,6 +10,10 @@
 
 A beautifully designed, fully responsive web application for discovering and connecting with people who share your interests. Built with modern web standards (HTML5, CSS3, vanilla JavaScript) and inspired by contemporary dating app design.
 
+**Live Demo:** https://abdimannor.github.io/heartlux/
+
+![Heartlux app preview](images/heartlux-preview.svg)
+
 ---
 
 ## 🎯 About This Project
@@ -125,9 +129,10 @@ npm start
 ### Quality Checks
 ```bash
 npm run check
+npm run check:e2e
 ```
 
-This validates JavaScript syntax and verifies that key HTML-to-JavaScript wiring remains intact.
+This validates JavaScript syntax, key HTML-to-JavaScript wiring, i18n coverage, and the main browser flow with Playwright.
 
 ---
 
@@ -178,6 +183,12 @@ heartlux/
 ├── js/
 │   └── main.js            # App logic — i18n, matching, chat, notifications
 ├── server.js              # Minimal Node static-file server (port 8080)
+├── 404.html               # GitHub Pages fallback page
+├── playwright.config.js   # Browser test configuration
+├── tests/
+│   └── app.spec.js        # Playwright end-to-end flow
+├── images/
+│   └── heartlux-preview.svg # Repository preview image
 ├── scripts/
 │   └── smoke-test.js      # Lightweight project checks
 ├── package.json           # npm scripts and project metadata
@@ -468,7 +479,7 @@ copies of the Software...
 - **Author:** Mahad Abdullahi (Mahad Abdullahi Mohamed Noor)
 - **GitHub:** [@abdimannor](https://github.com/abdimannor)
 - **Repository:** [heartlux](https://github.com/abdimannor/heartlux)
-- **Live Demo:** [GitHub Pages](https://abdimannor.github.io/heartlux) (when deployed)
+- **Live Demo:** [GitHub Pages](https://abdimannor.github.io/heartlux/)
 
 ---
 
