@@ -15,7 +15,16 @@ const TYPES = {
 };
 
 http.createServer((req, res) => {
-  const filePath = path.join(ROOT, req.url === '/' ? 'index.html' : req.url.split('?')[0]);
+  const rawPath = decodeURIComponent(req.url.split('?')[0]);
+  const safePath = rawPath === '/' ? 'index.html' : rawPath.replace(/^\/+/, '');
+  const filePath = path.resolve(ROOT, safePath);
+
+  if (!filePath.startsWith(ROOT + path.sep) && filePath !== path.join(ROOT, 'index.html')) {
+    res.writeHead(403);
+    res.end('Forbidden');
+    return;
+  }
+
   const ext = path.extname(filePath);
 
   fs.readFile(filePath, (err, data) => {
@@ -30,3 +39,4 @@ http.createServer((req, res) => {
 }).listen(PORT, () => {
   console.log(`Heartlux running at http://localhost:${PORT}`);
 });
+
