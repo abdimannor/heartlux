@@ -61,6 +61,7 @@ Heartlux demonstrates professional frontend development practices by combining:
 - **Form Validation** – Client-side validation with user feedback
 - **Notification Badges** – Real-time unread match counter in the navbar
 - **PWA Ready** – Installable app metadata and offline shell caching
+- **SEO & Sharing** – Canonical URL, Open Graph/Twitter cards, structured data, robots, and sitemap
 - **Accessibility** – Semantic HTML, proper contrast ratios, keyboard navigation
 
 ---
@@ -133,7 +134,7 @@ npm run check
 npm run check:e2e
 ```
 
-This validates JavaScript syntax, key HTML-to-JavaScript wiring, i18n coverage, PWA wiring, and the main browser flow with Playwright.
+This validates JavaScript syntax, key HTML-to-JavaScript wiring, i18n coverage, PWA/SEO wiring, and the main browser flow with Playwright.
 
 ---
 
@@ -186,6 +187,8 @@ heartlux/
 ├── server.js              # Minimal Node static-file server (port 8080)
 ├── manifest.webmanifest   # PWA install metadata
 ├── sw.js                  # Offline app shell cache
+├── robots.txt             # Search crawler policy
+├── sitemap.xml            # Public URL sitemap
 ├── 404.html               # GitHub Pages fallback page
 ├── playwright.config.js   # Browser test configuration
 ├── tests/
@@ -354,6 +357,13 @@ git push origin master
 - GitHub Pages
 - AWS S3 + CloudFront
 - Custom server
+
+
+### SEO & Deployment Metadata
+- Canonical URL: `https://abdimannor.github.io/heartlux/`
+- Open Graph and Twitter card metadata for richer sharing
+- Structured data (`SoftwareApplication`) for search engines
+- `robots.txt` and `sitemap.xml` for public indexing
 
 ---
 

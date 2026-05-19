@@ -14,6 +14,9 @@ test('core onboarding, matching, language, dark mode, profile, and chat flow wor
   await expect(page.locator('link[rel="manifest"]')).toHaveAttribute('href', 'manifest.webmanifest');
   await expect.poll(async () => (await page.request.get('/manifest.webmanifest')).status()).toBe(200);
   await expect.poll(async () => (await page.request.get('/sw.js')).status()).toBe(200);
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://abdimannor.github.io/heartlux/');
+  await expect.poll(async () => (await page.request.get('/robots.txt')).status()).toBe(200);
+  await expect.poll(async () => (await page.request.get('/sitemap.xml')).status()).toBe(200);
 
   await page.locator('[data-page="register"]').click();
   const registerForm = page.locator('#registerForm');

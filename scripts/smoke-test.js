@@ -126,6 +126,23 @@ const serviceWorker = fs.readFileSync(serviceWorkerPath, 'utf8');
 for (const asset of ['index.html', 'css/style.css', 'js/main.js', 'manifest.webmanifest']) {
   if (!serviceWorker.includes(asset)) fail(`Service worker cache list missing: ${asset}`);
 }
+
+const robotsPath = path.join(root, 'robots.txt');
+const sitemapPath = path.join(root, 'sitemap.xml');
+const robots = fs.readFileSync(robotsPath, 'utf8');
+const sitemap = fs.readFileSync(sitemapPath, 'utf8');
+
+for (const requiredMeta of ['rel="canonical"', 'og:title', 'og:description', 'twitter:card', 'application/ld+json']) {
+  if (!html.includes(requiredMeta)) fail(`index.html missing SEO metadata: ${requiredMeta}`);
+}
+
+if (!robots.includes('Sitemap: https://abdimannor.github.io/heartlux/sitemap.xml')) {
+  fail('robots.txt must reference the production sitemap URL');
+}
+
+if (!sitemap.includes('<loc>https://abdimannor.github.io/heartlux/</loc>')) {
+  fail('sitemap.xml must include the production GitHub Pages URL');
+}
 const dynamicIds = new Set(['logoutLink', 'profileNavLink']);
 
 for (const id of referencedIds) {
