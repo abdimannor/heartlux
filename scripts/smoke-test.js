@@ -95,6 +95,37 @@ for (const language of ['sv', 'en']) {
 
 const referencedIds = unique([...js.matchAll(/getElementById\('([^']+)'\)/g)].map(match => match[1]));
 const htmlIds = new Set([...html.matchAll(/id="([^"]+)"/g)].map(match => match[1]));
+
+const manifestPath = path.join(root, 'manifest.webmanifest');
+const serviceWorkerPath = path.join(root, 'sw.js');
+const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+
+if (!html.includes('rel="manifest"') || !html.includes('manifest.webmanifest')) {
+  fail('index.html must link manifest.webmanifest');
+}
+
+if (!js.includes('navigator.serviceWorker.register')) {
+  fail('main.js must register the service worker');
+}
+
+for (const required of ['name', 'short_name', 'start_url', 'display', 'theme_color', 'icons']) {
+  if (!manifest[required]) fail(`manifest.webmanifest missing required field: ${required}`);
+}
+
+if (!Array.isArray(manifest.icons) || manifest.icons.length < 2) {
+  fail('manifest.webmanifest must define regular and maskable icons');
+}
+
+for (const icon of manifest.icons || []) {
+  if (!fs.existsSync(path.join(root, icon.src))) {
+    fail(`Manifest icon does not exist: ${icon.src}`);
+  }
+}
+
+const serviceWorker = fs.readFileSync(serviceWorkerPath, 'utf8');
+for (const asset of ['index.html', 'css/style.css', 'js/main.js', 'manifest.webmanifest']) {
+  if (!serviceWorker.includes(asset)) fail(`Service worker cache list missing: ${asset}`);
+}
 const dynamicIds = new Set(['logoutLink', 'profileNavLink']);
 
 for (const id of referencedIds) {

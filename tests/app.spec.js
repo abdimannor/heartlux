@@ -11,6 +11,9 @@ test('core onboarding, matching, language, dark mode, profile, and chat flow wor
 
   await expect(page).toHaveTitle('Heartlux');
   await expect(page.locator('#home.page.active')).toBeVisible();
+  await expect(page.locator('link[rel="manifest"]')).toHaveAttribute('href', 'manifest.webmanifest');
+  await expect.poll(async () => (await page.request.get('/manifest.webmanifest')).status()).toBe(200);
+  await expect.poll(async () => (await page.request.get('/sw.js')).status()).toBe(200);
 
   await page.locator('[data-page="register"]').click();
   const registerForm = page.locator('#registerForm');

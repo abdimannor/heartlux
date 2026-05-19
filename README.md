@@ -60,6 +60,7 @@ Heartlux demonstrates professional frontend development practices by combining:
 - **Vanilla JavaScript** – No dependencies, lightweight and fast
 - **Form Validation** – Client-side validation with user feedback
 - **Notification Badges** – Real-time unread match counter in the navbar
+- **PWA Ready** – Installable app metadata and offline shell caching
 - **Accessibility** – Semantic HTML, proper contrast ratios, keyboard navigation
 
 ---
@@ -132,7 +133,7 @@ npm run check
 npm run check:e2e
 ```
 
-This validates JavaScript syntax, key HTML-to-JavaScript wiring, i18n coverage, and the main browser flow with Playwright.
+This validates JavaScript syntax, key HTML-to-JavaScript wiring, i18n coverage, PWA wiring, and the main browser flow with Playwright.
 
 ---
 
@@ -183,6 +184,8 @@ heartlux/
 ├── js/
 │   └── main.js            # App logic — i18n, matching, chat, notifications
 ├── server.js              # Minimal Node static-file server (port 8080)
+├── manifest.webmanifest   # PWA install metadata
+├── sw.js                  # Offline app shell cache
 ├── 404.html               # GitHub Pages fallback page
 ├── playwright.config.js   # Browser test configuration
 ├── tests/
@@ -315,7 +318,7 @@ heartlux_lang           // "sv" | "en"
 - [ ] Backend API integration
 - [ ] User authentication (real passwords)
 - [ ] Database (Firebase/MongoDB/PostgreSQL)
-- [ ] PWA capabilities (offline, installable)
+- [x] PWA capabilities (offline, installable)
 - [ ] Performance optimization
 - [ ] Analytics and metrics
 
@@ -416,7 +419,7 @@ Want to improve Heartlux? Follow these steps:
 - [ ] Real database (Firebase / PostgreSQL)
 - [ ] Image uploads and hosting
 - [ ] Push notifications
-- [ ] PWA — installable, offline-capable
+- [x] PWA — installable, offline-capable
 
 ---
 

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">Heartlux icon</title>
+  <desc id="desc">A magenta heart mark for the Heartlux app.</desc>
+  <rect width="512" height="512" rx="112" fill="#fff9fb"/>
+  <circle cx="256" cy="256" r="196" fill="#cc328c"/>
+  <path fill="#ffffff" d="M256 377c-10-9-29-24-57-45-33-25-57-48-72-69-16-22-23-45-20-69 3-25 16-45 37-59 31-20 70-13 96 17 26-30 65-37 96-17 21 14 34 34 37 59 3 24-4 47-20 69-15 21-39 44-72 69-28 21-47 36-57 45z"/>
+</svg>

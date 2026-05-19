@@ -514,6 +514,18 @@ function updateMatchBadge() {
   badge.style.display = unread > 0 ? 'inline-flex' : 'none';
 }
 
+// ─── PWA ──────────────────────────────────────────────────────────────────
+
+function registerServiceWorker() {
+  if (!('serviceWorker' in navigator)) return;
+
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {
+      // Service workers are optional; the app still works as a regular site.
+    });
+  });
+}
+
 // ─── Init ─────────────────────────────────────────────────────────────────
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -527,6 +539,7 @@ document.addEventListener('DOMContentLoaded', () => {
   applyTranslations();
   updateMatchBadge();
   initMatches();
+  registerServiceWorker();
 });
 
 // ─── Compatibility score ──────────────────────────────────────────────────
