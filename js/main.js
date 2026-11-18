@@ -13,6 +13,7 @@ const translations = {
     'hero.description':  'Hitta genuina kontakter baserat på gemensamma intressen och värderingar.',
     'hero.cta.discover': 'Börja Utforska',
     'hero.cta.register': 'Skapa Konto',
+    'hero.cta.demo':     'Testa demo',
 
     'register.title':                 '❤️ Gå med i Heartlux',
     'register.subtitle':              'Skapa ett konto och börja hitta meningsfulla kontakter',
@@ -81,6 +82,7 @@ const translations = {
 
     'footer.privacy': 'Integritet',
     'footer.terms':   'Användarvillkor',
+    'footer.note':    'Demoapp: allt sparas lokalt i din webbläsare.',
 
     'auth.tab.register': 'Skapa konto',
     'auth.tab.login':    'Logga in',
@@ -146,6 +148,7 @@ const translations = {
     'hero.description':  'Discover genuine connections based on shared interests and values.',
     'hero.cta.discover': 'Start Discovering',
     'hero.cta.register': 'Create Account',
+    'hero.cta.demo':     'Try demo',
 
     'register.title':                 '❤️ Join Heartlux',
     'register.subtitle':              'Create an account and start finding meaningful connections',
@@ -214,6 +217,7 @@ const translations = {
 
     'footer.privacy': 'Privacy',
     'footer.terms':   'Terms of Service',
+    'footer.note':    'Demo app: everything is saved locally in your browser.',
 
     'auth.tab.register': 'Create account',
     'auth.tab.login':    'Log in',
@@ -502,6 +506,50 @@ function logout() {
   matchState = { currentProfileIndex: 0, profiles: [], likes: [], passes: [], shown: [], history: [], matchedProfiles: [] };
   updateNavbar();
   showPage('home');
+}
+
+function startDemo() {
+  const demoUser = {
+    username: 'Demo',
+    email: 'demo@heartlux.local',
+    password: 'demo-mode',
+    gender: 'other',
+    createdAt: new Date().toISOString()
+  };
+  const demoPreferences = {
+    interest: 'everyone',
+    minAge: 22,
+    maxAge: 38,
+    interests: ['travel', 'music', 'books', 'art'],
+    completedAt: new Date().toISOString()
+  };
+
+  localStorage.setItem('heartlux_user', JSON.stringify(demoUser));
+  localStorage.setItem('heartlux_interest', demoPreferences.interest);
+  localStorage.setItem('heartlux_preferences', JSON.stringify(demoPreferences));
+  localStorage.setItem('heartlux_likes', JSON.stringify([]));
+  localStorage.setItem('heartlux_passes', JSON.stringify([]));
+  localStorage.setItem('heartlux_seen_matches', JSON.stringify([]));
+
+  const demoMatches = generateProfiles()
+    .filter(profile => profile.interests.some(interest => demoPreferences.interests.includes(interest)))
+    .slice(0, 3);
+  localStorage.setItem('heartlux_matches_list', JSON.stringify(demoMatches));
+  localStorage.setItem('heartlux_unread', String(demoMatches.length));
+
+  matchState = {
+    currentProfileIndex: 0,
+    profiles: [],
+    likes: [],
+    passes: [],
+    shown: [],
+    history: [],
+    matchedProfiles: demoMatches,
+  };
+
+  updateNavbar();
+  updateMatchBadge();
+  showPage('matches');
 }
 
 // ─── Notification badge ───────────────────────────────────────────────────
