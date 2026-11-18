@@ -14,6 +14,7 @@ const translations = {
     'hero.cta.discover': 'Börja Utforska',
     'hero.cta.register': 'Skapa Konto',
     'hero.cta.demo':     'Testa demo',
+    'demo.confirm':      'Det finns redan ett konto i den här webbläsaren. Ersätta det med demokontot?',
 
     'register.title':                 '❤️ Gå med i Heartlux',
     'register.subtitle':              'Skapa ett konto och börja hitta meningsfulla kontakter',
@@ -149,6 +150,7 @@ const translations = {
     'hero.cta.discover': 'Start Discovering',
     'hero.cta.register': 'Create Account',
     'hero.cta.demo':     'Try demo',
+    'demo.confirm':      'There is already an account in this browser. Replace it with the demo account?',
 
     'register.title':                 '❤️ Join Heartlux',
     'register.subtitle':              'Create an account and start finding meaningful connections',
@@ -499,29 +501,40 @@ function updateNavbar() {
 }
 
 function logout() {
-  ['heartlux_user', 'heartlux_preferences', 'heartlux_likes', 'heartlux_passes',
-   'heartlux_interest', 'heartlux_matches_list', 'heartlux_chats',
-   'heartlux_user_avatar', 'heartlux_user_bio',
-   'heartlux_unread', 'heartlux_seen_matches'].forEach(k => localStorage.removeItem(k));
+  USER_STORAGE_KEYS.forEach(k => localStorage.removeItem(k));
   matchState = { currentProfileIndex: 0, profiles: [], likes: [], passes: [], shown: [], history: [], matchedProfiles: [] };
   updateNavbar();
   showPage('home');
 }
 
+const USER_STORAGE_KEYS = [
+  'heartlux_user', 'heartlux_preferences', 'heartlux_likes', 'heartlux_passes',
+  'heartlux_interest', 'heartlux_matches_list', 'heartlux_chats',
+  'heartlux_user_avatar', 'heartlux_user_bio',
+  'heartlux_unread', 'heartlux_seen_matches'
+];
+
 function startDemo() {
+  // Never silently overwrite a real local account.
+  const existing = JSON.parse(localStorage.getItem('heartlux_user') || 'null');
+  if (existing && !existing.demo && !confirm(t('demo.confirm'))) return;
+
+  USER_STORAGE_KEYS.forEach(k => localStorage.removeItem(k));
+
+  const now = new Date().toISOString();
   const demoUser = {
     username: 'Demo',
     email: 'demo@heartlux.local',
-    password: 'demo-mode',
     gender: 'other',
-    createdAt: new Date().toISOString()
+    demo: true,
+    createdAt: now
   };
   const demoPreferences = {
     interest: 'everyone',
     minAge: 22,
     maxAge: 38,
     interests: ['travel', 'music', 'books', 'art'],
-    completedAt: new Date().toISOString()
+    completedAt: now
   };
 
   localStorage.setItem('heartlux_user', JSON.stringify(demoUser));
@@ -531,9 +544,14 @@ function startDemo() {
   localStorage.setItem('heartlux_passes', JSON.stringify([]));
   localStorage.setItem('heartlux_seen_matches', JSON.stringify([]));
 
+  // Seed three matches that fit the demo preferences. They get their own ids
+  // so they never collide with the generated browse profiles (ids 0-19),
+  // which share chat history and "seen" state by id.
   const demoMatches = generateProfiles()
-    .filter(profile => profile.interests.some(interest => demoPreferences.interests.includes(interest)))
-    .slice(0, 3);
+    .filter(p => p.age >= demoPreferences.minAge && p.age <= demoPreferences.maxAge
+      && p.interests.some(i => demoPreferences.interests.includes(i)))
+    .slice(0, 3)
+    .map((p, i) => ({ ...p, id: `demo-${i}`, compat: compatScore(p, demoPreferences.interests) }));
   localStorage.setItem('heartlux_matches_list', JSON.stringify(demoMatches));
   localStorage.setItem('heartlux_unread', String(demoMatches.length));
 
