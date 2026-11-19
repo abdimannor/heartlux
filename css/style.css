@@ -1418,6 +1418,14 @@ body.dark-mode .auth-gate {
   color: #f0c060;
 }
 
+/* Surfaces that are white in light mode */
+body.dark-mode .stat,
+body.dark-mode .profile-card,
+body.dark-mode .empty-state,
+body.dark-mode .match-popup-content {
+  background: var(--bg-white);
+}
+
 body.dark-mode .option-card {
   background: var(--bg-white);
   border-color: rgba(204, 50, 140, 0.3);
