@@ -60,13 +60,14 @@
           <a href="#discover" class="navbar-link" data-page="discover" onclick="showPage('discover')" data-i18n="nav.discover">Utforska</a>
           <a href="#matches" class="navbar-link" data-page="matches" onclick="showPage('matches')"><span data-i18n="nav.matches">Matchningar</span><span id="matchesBadge" class="nav-badge" style="display:none;" aria-label="Unread matches"></span></a>
           <a href="#register" class="navbar-link" data-page="register" onclick="showPage('register')" data-i18n="nav.join">Gå med</a>
-          <button type="button" class="lang-toggle" id="langToggle" onclick="toggleLanguage()" aria-label="Switch language">EN</button>
+          <button type="button" class="lang-toggle" id="langToggle" onclick="toggleLanguage()" aria-label="EN, byt språk till engelska">EN</button>
           <button type="button" class="lang-toggle" id="darkModeBtn" onclick="toggleDarkMode()" title="Dark mode" aria-label="Toggle dark mode">🌙</button>
         </div>
       </div>
     </div>
   </nav>
 
+  <main id="main">
   <!-- Home Page -->
   <section id="home" class="page active">
     <div class="hero">
@@ -75,7 +76,7 @@
           <div class="hero-left">
             <h1>Heartlux</h1>
             <p data-i18n="hero.tagline">Där meningsfulla kontakter skapas. Möt människor som verkligen förstår dig.</p>
-            <p style="font-size: 0.95rem; margin-bottom: 1.5rem; color: #999;" data-i18n="hero.description">Hitta genuina kontakter baserat på gemensamma intressen och värderingar.</p>
+            <p class="hero-description" data-i18n="hero.description">Hitta genuina kontakter baserat på gemensamma intressen och värderingar.</p>
             <div>
               <button type="button" class="btn btn-primary btn-lg" onclick="showPage('discover')" data-i18n="hero.cta.discover">
                 Börja Utforska
@@ -302,6 +303,7 @@
   <!-- Matches Page -->
   <section id="matches" class="page">
     <div class="matches-container">
+      <h1 class="visually-hidden" data-i18n="nav.matches">Matchningar</h1>
 
       <!-- Tab Bar -->
       <div class="matches-tabs-bar">
@@ -500,6 +502,8 @@
   </div>
 
   <!-- Footer -->
+  </main>
+
   <footer>
     <div class="container">
       <p>&copy; 2026 Heartlux. <span data-i18n="footer.note">Demoapp: allt sparas lokalt i din webbläsare.</span></p>

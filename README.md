@@ -117,7 +117,11 @@ requests to `master`.
   counting shared interests.
 - No server means no messaging between people, no moderation, no photos and no
   privacy controls.
-- Accessibility and browser support have not been audited.
+- Accessibility has had an automated check only: Lighthouse accessibility
+  scores 100 and axe-core reports no violations on the landing page and the
+  demo matches view, in light and dark mode. No screen reader or keyboard-only
+  testing has been done, and browser support beyond Chromium has not been
+  tested.
 
 ## License
 

@@ -3,6 +3,7 @@
 const translations = {
   sv: {
     'nav.home':     'Hem',
+    'nav.langLabel': 'EN, byt språk till engelska',
     'nav.discover': 'Utforska',
     'nav.matches':  'Matchningar',
     'nav.join':     'Gå med',
@@ -139,6 +140,7 @@ const translations = {
   },
   en: {
     'nav.home':     'Home',
+    'nav.langLabel': 'SV, switch language to Swedish',
     'nav.discover': 'Discover',
     'nav.matches':  'Matches',
     'nav.join':     'Join',
@@ -292,7 +294,10 @@ function applyTranslations() {
   });
   const toggle = document.getElementById('langToggle');
   const lang = localStorage.getItem('heartlux_lang') || 'sv';
-  if (toggle) toggle.textContent = lang === 'sv' ? 'EN' : 'SV';
+  if (toggle) {
+    toggle.textContent = lang === 'sv' ? 'EN' : 'SV';
+    toggle.setAttribute('aria-label', t('nav.langLabel'));
+  }
   document.documentElement.lang = lang;
   updateNavbar();
   updateAgeRangeDisplay();
@@ -693,7 +698,7 @@ function initMatches() {
   if (!profileCard) return;
 
   if (!preferences) {
-    matchState = { currentProfileIndex: 0, profiles: [], likes: [], passes: [], shown: [], history: [], matches: 0 };
+    matchState = { currentProfileIndex: 0, profiles: [], likes: [], passes: [], shown: [], history: [], matches: 0, matchedProfiles: [] };
     updateStats();
     profileCard.style.display = 'none';
     if (actionButtons) actionButtons.style.display = 'none';
@@ -970,7 +975,7 @@ function updateStats() {
   const m = document.getElementById('matchesCount');
   const s = document.getElementById('shownCount');
   if (l) l.textContent = matchState.likes.length;
-  if (m) m.textContent = matchState.matchedProfiles.length;
+  if (m) m.textContent = (matchState.matchedProfiles || []).length;
   if (s) s.textContent = matchState.shown.length;
 }
 
