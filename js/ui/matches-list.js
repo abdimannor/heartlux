@@ -1,0 +1,60 @@
+// "My matches" tab: the list of matched profiles.
+import { KEYS, readJSON, setItem } from '../state.js';
+import { t } from '../i18n.js';
+import { byId, h, setVisible } from '../dom.js';
+import { updateMatchBadge } from './navigation.js';
+import { openChat } from './chat.js';
+
+export function showMatchesTab(tab) {
+  const browseEl    = byId('browseContent');
+  const myMatchesEl = byId('matchesListContent');
+  if (!browseEl) return;
+
+  const isBrowse = tab === 'browse';
+  setVisible(browseEl, isBrowse);
+  setVisible(myMatchesEl, !isBrowse);
+  byId('tabBrowse').classList.toggle('active', isBrowse);
+  byId('tabMyMatches').classList.toggle('active', !isBrowse);
+
+  if (!isBrowse) {
+    setItem(KEYS.unread, '0');
+    updateMatchBadge();
+    renderMatchesList();
+  }
+}
+
+function matchCard(profile, isNew) {
+  const card = h('div', { className: 'match-list-card' },
+    h('div', { className: 'match-list-avatar' }, profile.avatar),
+    h('div', { className: 'match-list-info' },
+      h('strong', {}, `${profile.name}, ${profile.age} `,
+        isNew && h('span', { className: 'match-new-badge' }, t('matches.new.badge'))),
+      h('span', {}, `📍 ${profile.city}`),
+      h('div', { className: 'match-list-tags' },
+        profile.interests.slice(0, 2).map(i => t(`interest.${i}`)).join(' · '))),
+    h('button', { className: 'btn btn-primary btn-sm' }, t('matches.list.chat')));
+  card.addEventListener('click', () => openChat(profile));
+  return card;
+}
+
+export function renderMatchesList() {
+  const grid = byId('matchesListGrid');
+  if (!grid) return;
+  const matched = readJSON(KEYS.matches, []);
+
+  if (matched.length === 0) {
+    grid.replaceChildren(
+      h('div', { className: 'empty-state matches-list-empty' },
+        h('div', { className: 'empty-emoji' }, '💕'),
+        h('h2', {}, t('matches.list.empty.title')),
+        h('p', {}, t('matches.list.empty.text')),
+        h('button', {
+          className: 'btn btn-primary u-mt-1',
+          dataset: { action: 'showMatchesTab', arg: 'browse' },
+        }, t('matches.tab.browse'))));
+    return;
+  }
+
+  const seen = readJSON(KEYS.seen, []);
+  grid.replaceChildren(...matched.map(p => matchCard(p, !seen.includes(String(p.id)))));
+}

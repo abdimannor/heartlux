@@ -3,7 +3,17 @@ const path = require('path');
 
 const root = path.resolve(__dirname, '..');
 const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
-const js = fs.readFileSync(path.join(root, 'js', 'main.js'), 'utf8');
+function listJs(dir) {
+  return fs.readdirSync(dir, { withFileTypes: true }).flatMap(entry => {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) return listJs(full);
+    return entry.name.endsWith('.js') ? [full] : [];
+  });
+}
+const jsFiles = listJs(path.join(root, 'js'));
+const js = jsFiles.map(file => fs.readFileSync(file, 'utf8')).join('\n');
+const appJs = fs.readFileSync(path.join(root, 'js', 'app.js'), 'utf8');
+const i18nJs = fs.readFileSync(path.join(root, 'js', 'i18n.js'), 'utf8');
 
 const failures = [];
 
@@ -15,20 +25,33 @@ function fail(message) {
   failures.push(message);
 }
 
-const handlerAttributes = [...html.matchAll(/\son(?:click|submit|keydown)="([^"]+)"/g)].map(match => match[1]);
-const handlerCalls = unique(
-  handlerAttributes
-    .flatMap(value => [...value.matchAll(/\b([A-Za-z_$][\w$]*)\s*\(/g)].map(match => match[1]))
-    .filter(name => !['if', 'stopPropagation'].includes(name))
-);
-
-for (const name of handlerCalls) {
-  const declaration = new RegExp(`\\bfunction\\s+${name}\\s*\\(`);
-  const assignment = new RegExp(`\\b(?:const|let|var)\\s+${name}\\s*=`);
-  if (!declaration.test(js) && !assignment.test(js)) {
-    fail(`Missing JavaScript handler referenced by HTML: ${name}()`);
-  }
+// No inline handlers or inline styles: behaviour lives in modules, styling in CSS.
+for (const match of html.matchAll(/<[^>]*\son(?:click|submit|keydown|change|input)="/g)) {
+  fail(`Inline event handler left in index.html: ${match[0].slice(0, 60)}`);
 }
+for (const match of html.matchAll(/<[^>]*\sstyle="/g)) {
+  fail(`Inline style attribute left in index.html: ${match[0].slice(0, 60)}`);
+}
+for (const file of jsFiles) {
+  const source = fs.readFileSync(file, 'utf8');
+  if (/\sstyle="/.test(source)) fail(`Inline style in template string: ${path.relative(root, file)}`);
+  if (/\son(?:click|change|input|keydown)="/.test(source)) fail(`Inline handler in template string: ${path.relative(root, file)}`);
+  if (/\.innerHTML\s*=/.test(source)) fail(`innerHTML assignment (use textContent / h()): ${path.relative(root, file)}`);
+}
+
+// Every data-action / data-submit used in the HTML or the modules must be registered in app.js.
+const actionNames = unique([...html.matchAll(/data-action="([^"]+)"/g), ...js.matchAll(/dataset: \{ action: '([^']+)'/g)].map(m => m[1]));
+const actionsBlock = appJs.slice(appJs.indexOf('const actions = {'), appJs.indexOf('const submitActions'));
+const handlerCalls = actionNames;
+for (const name of actionNames) {
+  if (!new RegExp(`^\\s*${name}:`, 'm').test(actionsBlock)) fail(`data-action without a handler in app.js: ${name}`);
+}
+const submitBlock = appJs.slice(appJs.indexOf('const submitActions'));
+for (const [, name] of html.matchAll(/data-submit="([^"]+)"/g)) {
+  if (!new RegExp(`^\\s*${name}:`, 'm').test(submitBlock)) fail(`data-submit without a handler in app.js: ${name}`);
+}
+
+if (!html.includes('<script type="module" src="js/app.js"></script>')) fail('index.html must load js/app.js as a module');
 
 const htmlI18nKeys = unique([
   ...[...html.matchAll(/data-i18n="([^"]+)"/g)].map(match => match[1]),
@@ -36,7 +59,7 @@ const htmlI18nKeys = unique([
 ]);
 
 function extractLanguageBlock(language) {
-  const start = js.indexOf(`  ${language}: {`);
+  const start = i18nJs.indexOf(`  ${language}: {`);
   if (start === -1) return '';
 
   let depth = 0;
@@ -44,8 +67,8 @@ function extractLanguageBlock(language) {
   let quote = '';
   let escaped = false;
 
-  for (let i = start; i < js.length; i++) {
-    const char = js[i];
+  for (let i = start; i < i18nJs.length; i++) {
+    const char = i18nJs[i];
 
     if (inString) {
       if (escaped) {
@@ -67,7 +90,7 @@ function extractLanguageBlock(language) {
     if (char === '{') depth++;
     if (char === '}') {
       depth--;
-      if (depth === 0) return js.slice(start, i + 1);
+      if (depth === 0) return i18nJs.slice(start, i + 1);
     }
   }
 
@@ -105,7 +128,7 @@ if (!html.includes('rel="manifest"') || !html.includes('manifest.webmanifest')) 
 }
 
 if (!js.includes('navigator.serviceWorker.register')) {
-  fail('main.js must register the service worker');
+  fail('js/pwa.js must register the service worker');
 }
 
 for (const required of ['name', 'short_name', 'start_url', 'display', 'theme_color', 'icons']) {
@@ -123,7 +146,7 @@ for (const icon of manifest.icons || []) {
 }
 
 const serviceWorker = fs.readFileSync(serviceWorkerPath, 'utf8');
-for (const asset of ['index.html', 'css/style.css', 'js/main.js', 'manifest.webmanifest']) {
+for (const asset of ['index.html', 'css/style.css', 'manifest.webmanifest', ...jsFiles.map(file => path.relative(root, file))]) {
   if (!serviceWorker.includes(asset)) fail(`Service worker cache list missing: ${asset}`);
 }
 
@@ -157,4 +180,4 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log(`Smoke test passed: ${handlerCalls.length} handlers, ${htmlI18nKeys.length} i18n keys, ${referencedIds.length} DOM ids checked.`);
+console.log(`Smoke test passed: ${handlerCalls.length} actions, ${jsFiles.length} modules, ${htmlI18nKeys.length} i18n keys, ${referencedIds.length} DOM ids checked.`);

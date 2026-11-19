@@ -1,0 +1,72 @@
+// Storage keys, localStorage access and the in-memory session state.
+
+export const KEYS = Object.freeze({
+  user:      'heartlux_user',
+  prefs:     'heartlux_preferences',
+  likes:     'heartlux_likes',
+  passes:    'heartlux_passes',
+  interest:  'heartlux_interest',
+  matches:   'heartlux_matches_list',
+  chats:     'heartlux_chats',
+  avatar:    'heartlux_user_avatar',
+  bio:       'heartlux_user_bio',
+  unread:    'heartlux_unread',
+  seen:      'heartlux_seen_matches',
+  lang:      'heartlux_lang',
+  dark:      'heartlux_dark',
+});
+
+/** Everything that belongs to one local account (cleared on logout / demo). */
+export const USER_STORAGE_KEYS = [
+  KEYS.user, KEYS.prefs, KEYS.likes, KEYS.passes,
+  KEYS.interest, KEYS.matches, KEYS.chats,
+  KEYS.avatar, KEYS.bio,
+  KEYS.unread, KEYS.seen,
+];
+
+export const getItem    = key => localStorage.getItem(key);
+export const setItem    = (key, value) => localStorage.setItem(key, String(value));
+export const removeItem = key => localStorage.removeItem(key);
+
+export function readJSON(key, fallback = null) {
+  try {
+    const value = JSON.parse(localStorage.getItem(key));
+    return value ?? fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+export function writeJSON(key, value) {
+  localStorage.setItem(key, JSON.stringify(value));
+}
+
+export function clearUserData() {
+  USER_STORAGE_KEYS.forEach(removeItem);
+}
+
+export const getUser  = () => readJSON(KEYS.user);
+export const getPrefs = () => readJSON(KEYS.prefs);
+export const getUnread = () => parseInt(getItem(KEYS.unread) || '0', 10);
+
+export function emptyMatchState() {
+  return {
+    currentProfileIndex: 0,
+    profiles: [],
+    likes: [],
+    passes: [],
+    shown: [],
+    history: [],
+    matchedProfiles: [],
+  };
+}
+
+/** Mutable session state shared by the views. */
+export const session = {
+  match: emptyMatchState(),
+  chatProfile: null,
+};
+
+export function resetMatchState(overrides = {}) {
+  session.match = { ...emptyMatchState(), ...overrides };
+}
