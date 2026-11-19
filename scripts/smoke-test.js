@@ -116,7 +116,7 @@ for (const language of ['sv', 'en']) {
   }
 }
 
-const referencedIds = unique([...js.matchAll(/getElementById\('([^']+)'\)/g)].map(match => match[1]));
+const referencedIds = unique([...js.matchAll(/(?:getElementById|byId)\('([^']+)'\)/g)].map(match => match[1]));
 const htmlIds = new Set([...html.matchAll(/id="([^"]+)"/g)].map(match => match[1]));
 
 const manifestPath = path.join(root, 'manifest.webmanifest');
