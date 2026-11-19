@@ -85,6 +85,14 @@ test('core onboarding, matching, language, dark mode, profile, and chat flow wor
   await page.locator('#chatInput').fill('Hello!');
   await page.locator('button[data-action="sendChatMessage"]').click();
   await expect(page.locator('#chatMessages')).toContainText('Hello!');
+
+  // User text is rendered as text, never parsed as HTML.
+  const payload = '<img src=x onerror="window.__xss=1"><b>bold</b>';
+  await page.locator('#chatInput').fill(payload);
+  await page.locator('#chatInput').press('Enter');
+  await expect(page.locator('#chatMessages')).toContainText(payload);
+  await expect(page.locator('#chatMessages img, #chatMessages b')).toHaveCount(0);
+  expect(await page.evaluate(() => window.__xss)).toBeUndefined();
 });
 
 test('demo button signs in a local demo account and opens discovery', async ({ page }) => {
