@@ -1,6 +1,17 @@
 const { test, expect } = require('@playwright/test');
 
 test.beforeEach(async ({ page }) => {
+  // The app builds random profiles and random match outcomes. Seed Math.random
+  // so a run cannot fail just because no generated profile fits the filters.
+  await page.addInitScript(() => {
+    let seed = 20261119;
+    Math.random = () => {
+      seed = (seed + 0x6D2B79F5) | 0;
+      let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  });
   await page.goto('/');
   await page.evaluate(() => localStorage.clear());
   await page.reload();
