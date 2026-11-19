@@ -693,7 +693,7 @@ function initMatches() {
   if (!profileCard) return;
 
   if (!preferences) {
-    matchState = { currentProfileIndex: 0, profiles: [], likes: [], passes: [], shown: [], history: [], matches: 0 };
+    matchState = { currentProfileIndex: 0, profiles: [], likes: [], passes: [], shown: [], history: [], matches: 0, matchedProfiles: [] };
     updateStats();
     profileCard.style.display = 'none';
     if (actionButtons) actionButtons.style.display = 'none';
@@ -970,7 +970,7 @@ function updateStats() {
   const m = document.getElementById('matchesCount');
   const s = document.getElementById('shownCount');
   if (l) l.textContent = matchState.likes.length;
-  if (m) m.textContent = matchState.matchedProfiles.length;
+  if (m) m.textContent = (matchState.matchedProfiles || []).length;
   if (s) s.textContent = matchState.shown.length;
 }
 
