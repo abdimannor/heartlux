@@ -1,4 +1,4 @@
-const CACHE_NAME = 'heartlux-v3';
+const CACHE_NAME = 'heartlux-v4';
 const APP_SHELL = [
   './',
   './index.html',
