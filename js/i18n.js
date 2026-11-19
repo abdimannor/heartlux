@@ -85,7 +85,6 @@ export const translations = {
 
     'footer.privacy': 'Integritet',
     'footer.terms':   'Användarvillkor',
-    'footer.note':    'Demoapp: allt sparas lokalt i din webbläsare.',
 
     'auth.tab.register': 'Skapa konto',
     'auth.tab.login':    'Logga in',
@@ -222,7 +221,6 @@ export const translations = {
 
     'footer.privacy': 'Privacy',
     'footer.terms':   'Terms of Service',
-    'footer.note':    'Demo app: everything is saved locally in your browser.',
 
     'auth.tab.register': 'Create account',
     'auth.tab.login':    'Log in',
