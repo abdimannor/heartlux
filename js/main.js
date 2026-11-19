@@ -13,6 +13,8 @@ const translations = {
     'hero.description':  'Hitta genuina kontakter baserat på gemensamma intressen och värderingar.',
     'hero.cta.discover': 'Börja Utforska',
     'hero.cta.register': 'Skapa Konto',
+    'hero.cta.demo':     'Testa demo',
+    'demo.confirm':      'Det finns redan ett konto i den här webbläsaren. Ersätta det med demokontot?',
 
     'register.title':                 '❤️ Gå med i Heartlux',
     'register.subtitle':              'Skapa ett konto och börja hitta meningsfulla kontakter',
@@ -81,6 +83,7 @@ const translations = {
 
     'footer.privacy': 'Integritet',
     'footer.terms':   'Användarvillkor',
+    'footer.note':    'Demoapp: allt sparas lokalt i din webbläsare.',
 
     'auth.tab.register': 'Skapa konto',
     'auth.tab.login':    'Logga in',
@@ -146,6 +149,8 @@ const translations = {
     'hero.description':  'Discover genuine connections based on shared interests and values.',
     'hero.cta.discover': 'Start Discovering',
     'hero.cta.register': 'Create Account',
+    'hero.cta.demo':     'Try demo',
+    'demo.confirm':      'There is already an account in this browser. Replace it with the demo account?',
 
     'register.title':                 '❤️ Join Heartlux',
     'register.subtitle':              'Create an account and start finding meaningful connections',
@@ -214,6 +219,7 @@ const translations = {
 
     'footer.privacy': 'Privacy',
     'footer.terms':   'Terms of Service',
+    'footer.note':    'Demo app: everything is saved locally in your browser.',
 
     'auth.tab.register': 'Create account',
     'auth.tab.login':    'Log in',
@@ -495,13 +501,73 @@ function updateNavbar() {
 }
 
 function logout() {
-  ['heartlux_user', 'heartlux_preferences', 'heartlux_likes', 'heartlux_passes',
-   'heartlux_interest', 'heartlux_matches_list', 'heartlux_chats',
-   'heartlux_user_avatar', 'heartlux_user_bio',
-   'heartlux_unread', 'heartlux_seen_matches'].forEach(k => localStorage.removeItem(k));
+  USER_STORAGE_KEYS.forEach(k => localStorage.removeItem(k));
   matchState = { currentProfileIndex: 0, profiles: [], likes: [], passes: [], shown: [], history: [], matchedProfiles: [] };
   updateNavbar();
   showPage('home');
+}
+
+const USER_STORAGE_KEYS = [
+  'heartlux_user', 'heartlux_preferences', 'heartlux_likes', 'heartlux_passes',
+  'heartlux_interest', 'heartlux_matches_list', 'heartlux_chats',
+  'heartlux_user_avatar', 'heartlux_user_bio',
+  'heartlux_unread', 'heartlux_seen_matches'
+];
+
+function startDemo() {
+  // Never silently overwrite a real local account.
+  const existing = JSON.parse(localStorage.getItem('heartlux_user') || 'null');
+  if (existing && !existing.demo && !confirm(t('demo.confirm'))) return;
+
+  USER_STORAGE_KEYS.forEach(k => localStorage.removeItem(k));
+
+  const now = new Date().toISOString();
+  const demoUser = {
+    username: 'Demo',
+    email: 'demo@heartlux.local',
+    gender: 'other',
+    demo: true,
+    createdAt: now
+  };
+  const demoPreferences = {
+    interest: 'everyone',
+    minAge: 22,
+    maxAge: 38,
+    interests: ['travel', 'music', 'books', 'art'],
+    completedAt: now
+  };
+
+  localStorage.setItem('heartlux_user', JSON.stringify(demoUser));
+  localStorage.setItem('heartlux_interest', demoPreferences.interest);
+  localStorage.setItem('heartlux_preferences', JSON.stringify(demoPreferences));
+  localStorage.setItem('heartlux_likes', JSON.stringify([]));
+  localStorage.setItem('heartlux_passes', JSON.stringify([]));
+  localStorage.setItem('heartlux_seen_matches', JSON.stringify([]));
+
+  // Seed three matches that fit the demo preferences. They get their own ids
+  // so they never collide with the generated browse profiles (ids 0-19),
+  // which share chat history and "seen" state by id.
+  const demoMatches = generateProfiles()
+    .filter(p => p.age >= demoPreferences.minAge && p.age <= demoPreferences.maxAge
+      && p.interests.some(i => demoPreferences.interests.includes(i)))
+    .slice(0, 3)
+    .map((p, i) => ({ ...p, id: `demo-${i}`, compat: compatScore(p, demoPreferences.interests) }));
+  localStorage.setItem('heartlux_matches_list', JSON.stringify(demoMatches));
+  localStorage.setItem('heartlux_unread', String(demoMatches.length));
+
+  matchState = {
+    currentProfileIndex: 0,
+    profiles: [],
+    likes: [],
+    passes: [],
+    shown: [],
+    history: [],
+    matchedProfiles: demoMatches,
+  };
+
+  updateNavbar();
+  updateMatchBadge();
+  showPage('matches');
 }
 
 // ─── Notification badge ───────────────────────────────────────────────────

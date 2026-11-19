@@ -58,7 +58,7 @@
         <div class="navbar-nav">
           <a href="#home" class="navbar-link" data-page="home" onclick="showPage('home')" data-i18n="nav.home">Hem</a>
           <a href="#discover" class="navbar-link" data-page="discover" onclick="showPage('discover')" data-i18n="nav.discover">Utforska</a>
-          <a href="#matches" class="navbar-link" data-page="matches" onclick="showPage('matches')" data-i18n="nav.matches">Matchningar<span id="matchesBadge" class="nav-badge" style="display:none;" aria-label="Unread matches"></span></a>
+          <a href="#matches" class="navbar-link" data-page="matches" onclick="showPage('matches')"><span data-i18n="nav.matches">Matchningar</span><span id="matchesBadge" class="nav-badge" style="display:none;" aria-label="Unread matches"></span></a>
           <a href="#register" class="navbar-link" data-page="register" onclick="showPage('register')" data-i18n="nav.join">Gå med</a>
           <button type="button" class="lang-toggle" id="langToggle" onclick="toggleLanguage()" aria-label="Switch language">EN</button>
           <button type="button" class="lang-toggle" id="darkModeBtn" onclick="toggleDarkMode()" title="Dark mode" aria-label="Toggle dark mode">🌙</button>
@@ -82,6 +82,9 @@
               </button>
               <button type="button" class="btn btn-secondary btn-lg" onclick="showPage('register')" data-i18n="hero.cta.register">
                 Skapa Konto
+              </button>
+              <button type="button" class="btn btn-ghost btn-lg" onclick="startDemo()" data-i18n="hero.cta.demo">
+                Testa demo
               </button>
             </div>
           </div>
@@ -499,7 +502,7 @@
   <!-- Footer -->
   <footer>
     <div class="container">
-      <p>&copy; 2026 Heartlux. <a href="https://github.com/abdimannor/heartlux" data-i18n="footer.privacy">Integritet</a> • <a href="https://github.com/abdimannor/heartlux" data-i18n="footer.terms">Användarvillkor</a></p>
+      <p>&copy; 2026 Heartlux. <span data-i18n="footer.note">Demoapp: allt sparas lokalt i din webbläsare.</span></p>
     </div>
   </footer>
 

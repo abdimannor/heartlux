@@ -1,520 +1,124 @@
-# ❤️ Heartlux
+# Heartlux
 
-> **Modern dating and social discovery app** — Where meaningful connections flow.
-
-[![Status](https://img.shields.io/badge/status-active-brightgreen)](https://github.com/abdimannor/heartlux)
 [![Checks](https://github.com/abdimannor/heartlux/actions/workflows/checks.yml/badge.svg)](https://github.com/abdimannor/heartlux/actions/workflows/checks.yml)
-[![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
-[![Built with](https://img.shields.io/badge/built%20with-HTML%20CSS%20JS-orange)](https://developer.mozilla.org)
-[![GitHub](https://img.shields.io/badge/github-abdimannor%2Fheartlux-black?logo=github)](https://github.com/abdimannor/heartlux)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-A beautifully designed, fully responsive web application for discovering and connecting with people who share your interests. Built with modern web standards (HTML5, CSS3, vanilla JavaScript) and inspired by contemporary dating app design.
+Heartlux is a front-end concept of a dating and social discovery app. It runs
+entirely in the browser: there is no backend, and everything you enter is kept
+in your browser's `localStorage`. The interface is in Swedish by default, with
+an English toggle.
 
-**Live Demo:** https://abdimannor.github.io/heartlux/
+It is a design and interaction study, not a service. Nobody else sees your
+profile, the people you browse are generated at random, and their chat replies
+are canned.
 
-![Heartlux app preview](images/heartlux-preview.svg)
+## Try it
 
----
+Live version: https://abdimannor.github.io/heartlux/
 
-## 🎯 About This Project
+The quickest way in is the **Testa demo / Try demo** button on the start page.
+It creates a local demo account with preferences already filled in, adds three
+example matches and takes you straight to discovery. If an account already
+exists in the browser, it asks before replacing it.
 
-Heartlux demonstrates professional frontend development practices by combining:
-- **Original Design Concept** – Built upon and modernized from an earlier dating app design
-- **Clean Code** – No frameworks, no build tools — pure, efficient web technologies
-- **Modern Standards** – Responsive design, semantic HTML, CSS Grid/Flexbox
-- **Professional Structure** – Well-organized, maintainable, production-ready code
+You can also register a local account and go through the setup steps yourself.
 
-**Perfect for:** Portfolio projects, learning web development, dating app concepts, or as a starting point for your own social app.
+## What is implemented
 
----
+Everything below is in `index.html` and `js/main.js`:
 
-## ✨ Core Features
+- **Register and log in.** A local account (username, email, password,
+  gender) is saved in `localStorage`. Login compares the input with that one
+  stored record. Discovery, matches and profile redirect to registration when
+  no account exists.
+- **Setup.** Choose who you want to see (women, men or everyone), an age range
+  and a set of interests (travel, music, fitness, cooking, books, art).
+- **Discovery.** Twenty profiles are generated with random names, ages, Swedish
+  cities, bios and interests, filtered by your preferences and sorted by how
+  many interests you share. You can like, pass, undo, or swipe the card with
+  mouse or touch.
+- **Matches.** A like turns into a match about a third of the time (random).
+  Matches are listed in their own tab with a "new" marker, and the nav link
+  shows an unread count.
+- **Chat.** Each match has a chat window. Messages are stored per match, and
+  the match answers with a random canned reply after a second or two.
+- **Profile page.** Pick an emoji avatar, write a short bio, and see simple
+  counts of likes and matches. Logout removes all Heartlux user data from
+  `localStorage`.
+- **Language and theme.** Swedish and English strings live in one
+  `translations` object; the language choice and a dark mode toggle are both
+  remembered.
+- **Installable app shell.** A web manifest and a service worker that caches
+  the app files, so the site loads offline after the first visit.
 
-### 👤 User Management
-- **Account Registration** – Create account with email, password, and gender identity
-- **Secure Validation** – Password strength checking (min 8 characters), email format validation
-- **Profile Setup** – Configure interests, age range, and connection preferences
-- **Data Persistence** – All user data saved locally (localStorage)
+## How it is built
 
-### 🎯 Discovery & Preferences
-- **Preference Selection** – Choose who you'd like to meet (Men, Women, Everyone)
-- **Age Range Slider** – Dual min–max slider for precise age filtering (18–80 years)
-- **Interest Tagging** – Multi-select from 6 interest categories
-  - ✈️ Travel
-  - 🎵 Music
-  - 💪 Fitness
-  - 🍳 Cooking
-  - 📚 Books
-  - 🎨 Art
-- **Advanced Matching** – Profiles sorted by compatibility score (shared interests)
+No framework and no build step. The site is plain files served as they are:
 
-### 🎨 Design & UX
-- **Responsive Layout** – Perfectly optimized for mobile, tablet, and desktop
-- **Smooth Animations** – Fade transitions, hover effects, micro-interactions
-- **Modern Aesthetic** – Heart-themed magenta/pink color scheme with romantic design
-- **Dark Mode** – One-click dark/light theme toggle, persisted across sessions
-- **Bilingual** – Full Swedish/English interface with instant language switching
+| File | Purpose |
+| --- | --- |
+| `index.html` | All pages as sections; only one is shown at a time |
+| `css/style.css` | Layout, components, dark mode |
+| `js/main.js` | Translations, navigation, accounts, matching, chat, profile |
+| `sw.js` | Service worker: cache-first for the app shell, `index.html` as offline fallback |
+| `manifest.webmanifest` | PWA metadata and icons (`images/`) |
+| `404.html`, `robots.txt`, `sitemap.xml` | GitHub Pages extras |
+| `server.js` | Small Node static server for local use, port 8080 |
 
-### ⚡ Technical Features
-- **Single Page App** – No page reloads, instant navigation between sections
-- **Vanilla JavaScript** – No dependencies, lightweight and fast
-- **Form Validation** – Client-side validation with user feedback
-- **Notification Badges** – Real-time unread match counter in the navbar
-- **PWA Ready** – Installable app metadata and offline shell caching
-- **SEO & Sharing** – Canonical URL, Open Graph/Twitter cards, structured data, robots, and sitemap
-- **Accessibility** – Semantic HTML, proper contrast ratios, keyboard navigation
+Some choices worth knowing about:
 
----
+- **Single page, no router.** `showPage(id)` toggles an `active` class on a
+  section. Inline `onclick` handlers in the HTML call global functions.
+- **Translations by attribute.** Elements carry `data-i18n` or
+  `data-i18n-placeholder`; `applyTranslations()` fills them from the current
+  language. Text built in JavaScript uses `t(key)`. Because the attribute
+  replaces the element's text, anything that must survive (such as the unread
+  badge) sits next to the translated span, not inside it.
+- **State in `localStorage`.** Keys are prefixed `heartlux_` (user,
+  preferences, likes, passes, matches, chats, avatar, bio, language, theme).
 
-## 🎨 Design Highlights
+## Run it locally
 
-### Color Palette
-| Color | Hex | Usage |
-|-------|-----|-------|
-| Heart Primary | `#cc328c` | Buttons, accents, headers |
-| Heart Dark | `#a91f6a` | Hover states, shadows |
-| Heart Light | `#e84b9a` | Secondary accents |
-| Background | `#fff9fb` | Page background |
-| Text Dark | `#2d1b2e` | Primary text |
+Requires Node.js (CI uses version 22).
 
-### Responsive Design
-| Device | Width | Layout |
-|--------|-------|--------|
-| Desktop | 1200px+ | Two-column hero, full features |
-| Tablet | 768px-1199px | Optimized spacing, medium columns |
-| Mobile | <480px | Single column, touch-friendly |
-
----
-
-## 🚀 Quick Start
-
-### Prerequisites
-✓ Modern web browser (Chrome 90+, Firefox 88+, Safari 14+, Edge 90+)  
-✓ No installation or dependencies required
-
-### Installation
-
-**Option 1: Clone Repository**
-```bash
-git clone https://github.com/abdimannor/heartlux.git
-cd heartlux
+```sh
+npm ci
+npm start          # http://localhost:8080
 ```
 
-**Option 2: Download**
-- Visit https://github.com/abdimannor/heartlux
-- Click "Code" → "Download ZIP"
-- Extract and open folder
+Opening `index.html` directly mostly works too, but the service worker needs
+a server.
 
-### Run the App
+## Tests
 
-**Direct Open (Simplest)**
-```bash
-# Double-click index.html
-# Or right-click → Open with → Your browser
+```sh
+npm run check                      # syntax checks + scripts/smoke-test.js
+npx playwright install chromium    # once
+npm run check:e2e                  # starts server.js and runs Playwright
 ```
 
-**Local Server (Recommended)**
-```bash
-# Python 3
-python -m http.server 8000
-
-# Python 2
-python -m SimpleHTTPServer 8000
-
-# Node.js
-npm start
-
-# Then visit: http://localhost:8080
-```
-
-
-### Quality Checks
-```bash
-npm run check
-npm run check:e2e
-```
-
-This validates JavaScript syntax, key HTML-to-JavaScript wiring, i18n coverage, PWA/SEO wiring, and the main browser flow with Playwright.
-
----
-
-## 📖 Usage Guide
-
-### Step 1: Landing Page
-- Read the introduction
-- Click **"Start Discovering"** (jump to preferences)
-- Click **"Create Account"** (register first)
-
-### Step 2: Create Account
-```
-1. Enter unique username
-2. Enter email address
-3. Create password (min 8 characters)
-4. Confirm password
-5. Select gender identity (Man, Woman, Other)
-6. Click "Skapa Konto" → Success! ✓
-```
-
-### Step 3: Set Preferences
-```
-1. Choose who to meet:
-   • Men (👨)
-   • Women (👩)
-   • Everyone (🌍)
-2. Adjust age range with slider
-3. Select interests (minimum 1):
-   ✓ Multi-select checkbox
-   ✓ Visual feedback on select
-4. Click "Slutför Profilen" → Animated success! ✓
-```
-
-### Step 4: Navigation
-- Use navbar to switch pages
-- Smooth page transitions
-- Data persists across sessions
-
----
-
-## 🗂️ Project Structure
-
-```
-heartlux/
-├── index.html              # Main app — all pages in one SPA
-├── css/
-│   └── style.css          # Complete styling — responsive + dark mode
-├── js/
-│   └── main.js            # App logic — i18n, matching, chat, notifications
-├── server.js              # Minimal Node static-file server (port 8080)
-├── manifest.webmanifest   # PWA install metadata
-├── sw.js                  # Offline app shell cache
-├── robots.txt             # Search crawler policy
-├── sitemap.xml            # Public URL sitemap
-├── 404.html               # GitHub Pages fallback page
-├── playwright.config.js   # Browser test configuration
-├── tests/
-│   └── app.spec.js        # Playwright end-to-end flow
-├── images/
-│   └── heartlux-preview.svg # Repository preview image
-├── scripts/
-│   └── smoke-test.js      # Lightweight project checks
-├── package.json           # npm scripts and project metadata
-├── .nojekyll              # GitHub Pages passthrough config
-├── README.md              # This documentation
-├── .gitignore             # Git configuration
-└── LICENSE                # MIT License
-```
-
-### File Details
-
-**index.html**
-- Semantic HTML5 structure
-- Five pages: Home, Register/Login, Discover, Matches, Profile
-- Chat modal and match popup overlays
-- Accessible markup with proper hierarchy
-
-**css/style.css**
-- CSS custom properties (variables) with full dark-mode override
-- Mobile-first responsive design
-- Flexbox and CSS Grid layouts
-- Smooth animations (swipe, popup, badge, card transitions)
-
-**js/main.js**
-- Page navigation and auth guard system
-- Swedish/English i18n with instant switching
-- Swipe gesture engine (mouse + touch)
-- Compatibility-scored matching algorithm
-- Chat with persistent message history
-- Notification badge and seen-match tracking
-- localStorage integration throughout
-
----
-
-## 🔧 Technical Stack
-
-| Technology | Purpose | Details |
-|-----------|---------|---------|
-| **HTML5** | Structure | Semantic markup, form validation |
-| **CSS3** | Styling | Grid, Flexbox, custom properties, responsive |
-| **JavaScript (ES6+)** | Interactivity | Vanilla JS, no frameworks |
-| **localStorage** | Storage | Client-side data persistence |
-
----
-
-## 💾 Data Management
-
-### What Gets Stored?
-```javascript
-heartlux_user           // { username, email, gender, createdAt }
-heartlux_interest       // "male" | "female" | "everyone"
-heartlux_preferences    // { interest, minAge, maxAge, interests[], completedAt }
-heartlux_likes          // profile ID array
-heartlux_passes         // profile ID array
-heartlux_matches_list   // matched profile objects array
-heartlux_chats          // { [profileId]: [{ from, text, ts }] }
-heartlux_seen_matches   // profile IDs opened in chat
-heartlux_unread         // unread match count (number)
-heartlux_user_avatar    // chosen emoji string
-heartlux_user_bio       // profile bio text
-heartlux_dark           // "1" | "0" (dark mode preference)
-heartlux_lang           // "sv" | "en"
-```
-
-### Browser Storage
-- Data saved in `localStorage` (browser's local storage)
-- Persists across sessions and page refreshes
-- No server communication (client-side only)
-- Limited to ~5-10MB per domain
-
-### Privacy
-- ✓ No data sent to servers
-- ✓ No external API calls
-- ✓ No tracking or analytics
-- ✓ Passwords not stored (demo only)
-
----
-
-## 🎓 Learning Highlights
-
-### Concepts Demonstrated
-- ✓ Single Page Application (SPA) pattern
-- ✓ Responsive mobile-first design
-- ✓ Modern CSS (Grid, Flexbox, custom properties)
-- ✓ Vanilla JavaScript state management
-- ✓ Form handling and validation
-- ✓ localStorage API
-- ✓ Semantic HTML5
-- ✓ Event-driven architecture
-
-### Code Quality
-- Clean, readable code
-- Minimal comments (self-documenting)
-- Consistent formatting
-- No code duplication
-- Accessibility-first approach
-
----
-
-## 🚦 Development Roadmap
-
-### ✅ Phase 1: Foundation (Complete)
-- [x] Landing page with hero section
-- [x] User registration system
-- [x] Preference setup flow
-- [x] Data persistence (localStorage)
-- [x] Responsive design (mobile to desktop)
-
-### ✅ Phase 2: Matches & Profiles (Complete)
-- [x] Profile browsing system
-- [x] Match algorithm based on preferences
-- [x] Swipe or click interaction
-- [x] Like/Pass functionality
-- [x] Match history
-
-### ✅ Phase 3: Enhanced Features (Complete)
-- [x] User avatars and profile images
-- [x] Direct messaging system
-- [x] Notification system
-- [x] Dark mode toggle
-- [x] Advanced matching algorithm
-
-### 🎯 Phase 4: Production Ready
-- [ ] Backend API integration
-- [ ] User authentication (real passwords)
-- [ ] Database (Firebase/MongoDB/PostgreSQL)
-- [x] PWA capabilities (offline, installable)
-- [ ] Performance optimization
-- [ ] Analytics and metrics
-
----
-
-## 🌐 Deployment Options
-
-### Option 1: GitHub Pages (Free, Recommended)
-```bash
-# 1. Already pushed? Skip to step 3
-git add .
-git commit -m "Deploy to GitHub Pages"
-git push origin master
-
-# 2. Repository Settings → Pages
-# Source: master/main branch → Save
-
-# 3. Live at: https://abdimannor.github.io/heartlux
-```
-
-### Option 2: Netlify (Free)
-- Drag & drop the folder
-- Auto-deploys on git push
-- Custom domain support
-
-### Option 3: Vercel (Free)
-- Connect GitHub repo
-- Auto-deploys
-- Global CDN
-
-### Option 4: Any Static Hosting
-- Firebase Hosting
-- GitHub Pages
-- AWS S3 + CloudFront
-- Custom server
-
-
-### SEO & Deployment Metadata
-- Canonical URL: `https://abdimannor.github.io/heartlux/`
-- Open Graph and Twitter card metadata for richer sharing
-- Structured data (`SoftwareApplication`) for search engines
-- `robots.txt` and `sitemap.xml` for public indexing
-
----
-
-## 🤝 Contributing
-
-Want to improve Heartlux? Follow these steps:
-
-1. **Fork the repository**
-   ```bash
-   # Click "Fork" on GitHub
-   ```
-
-2. **Create feature branch**
-   ```bash
-   git checkout -b feature/amazing-feature
-   ```
-
-3. **Make improvements**
-   - Follow existing code style
-   - Test thoroughly
-   - Update documentation
-
-4. **Commit changes**
-   ```bash
-   git commit -m "Add: description of feature"
-   ```
-
-5. **Push to GitHub**
-   ```bash
-   git push origin feature/amazing-feature
-   ```
-
-6. **Open Pull Request**
-   - Describe changes clearly
-   - Link any related issues
-
----
-
-## 📊 Project Statistics
-
-- **Total Lines:** ~3,375 (HTML + CSS + JS)
-- **Total Size:** ~108 KB (all files)
-- **CSS:** ~36 KB (1,792 lines)
-- **JavaScript:** ~48 KB (1,117 lines)
-- **HTML:** ~24 KB (466 lines)
-- **Load Time:** <100ms (local), <500ms (hosted)
-- **Browser Support:** 95%+ of users
-- **Mobile Responsive:** 100%
-- **Accessibility:** 90+/100
-
----
-
-## 🐛 Known Limitations
-
-### Current Constraints
-- No backend database (localStorage only — data is device-specific)
-- No real user accounts or server-side matching
-- No image uploads (emoji avatars as placeholders)
-- localStorage limited to ~5-10MB per domain
-
-### Future Solutions (Phase 4)
-- [ ] Backend API integration
-- [ ] Real database (Firebase / PostgreSQL)
-- [ ] Image uploads and hosting
-- [ ] Push notifications
-- [x] PWA — installable, offline-capable
-
----
-
-## 🔐 Security Notes
-
-### Current (Demo Only)
-- ⚠️ Passwords stored as `***` (not real hashing)
-- ⚠️ No authentication server
-- ⚠️ All data stored locally (no encryption)
-
-### Production Recommendations
-- ✓ Use HTTPS
-- ✓ Hash passwords (bcrypt, Argon2)
-- ✓ Implement OAuth/JWT authentication
-- ✓ Encrypt sensitive data
-- ✓ Add rate limiting
-- ✓ Validate all inputs server-side
-
----
-
-## 📚 Resources & Learning
-
-### Web Development
-- [MDN Web Docs](https://developer.mozilla.org) – Complete web reference
-- [JavaScript Info](https://javascript.info) – Modern JavaScript guide
-- [CSS Tricks](https://css-tricks.com) – CSS techniques and tutorials
-
-### Design
-- [Dribbble](https://dribbble.com) – Design inspiration
-- [Behance](https://www.behance.net) – Creative showcase
-- [Color Hunt](https://colorhunt.co) – Color schemes
-
-### Responsive Design
-- [Mobile-First Approach](https://www.nngroup.com/articles/mobile-first-web-design/)
-- [CSS Grid Guide](https://css-tricks.com/snippets/css/complete-guide-grid/)
-- [Flexbox Guide](https://css-tricks.com/snippets/css/a-guide-to-flexbox/)
-
----
-
-## 📝 License
-
-**MIT License** – Free for personal, educational, and commercial use
-
-```
-Copyright (c) 2026 Mahad Abdullahi
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software...
-```
-
-[View Full License](LICENSE)
-
----
-
-## 👤 Author & Contact
-
-- **Author:** Mahad Abdullahi (Mahad Abdullahi Mohamed Noor)
-- **GitHub:** [@abdimannor](https://github.com/abdimannor)
-- **Repository:** [heartlux](https://github.com/abdimannor/heartlux)
-- **Live Demo:** [GitHub Pages](https://abdimannor.github.io/heartlux/)
-
----
-
-## 🙏 Acknowledgments
-
-- Original design concept from student web development project
-- Inspired by modern dating app interfaces
-- Built with modern web standards and best practices
-- Thanks to the open-source community
-
----
-
-## ⭐ Show Your Support
-
-If Heartlux helped you or you found it useful:
-
-- **Star the repo** ⭐ (on GitHub)
-- **Fork and contribute** 🍴
-- **Share with others** 📢
-- **Provide feedback** 💬
-
----
-
-**Built with ❤️ using HTML, CSS, and JavaScript**  
-*An evolution of web development — from student exercises to production-ready code.*
+`scripts/smoke-test.js` checks that every handler named in the HTML exists in
+`main.js`, that every translation key used in the HTML exists in both
+languages, and that every id the script looks up with `getElementById` exists
+in the HTML.
+
+`tests/app.spec.js` drives a real browser through registration, setup,
+discovery, language and theme switching, profile editing and chat, plus the
+demo button. The same two commands run in GitHub Actions on pushes and pull
+requests to `master`.
+
+## Limits
+
+- There are no real accounts. Only one account exists per browser, and
+  clearing site data deletes it.
+- The password is stored in plain text in `localStorage`. That is fine for a
+  concept and not acceptable anywhere real. Do not reuse a real password here.
+- Profiles, matches and replies are random. There is no matching logic beyond
+  counting shared interests.
+- No server means no messaging between people, no moderation, no photos and no
+  privacy controls.
+- Accessibility and browser support have not been audited.
+
+## License
+
+MIT. See [LICENSE](LICENSE).

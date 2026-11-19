@@ -75,3 +75,50 @@ test('core onboarding, matching, language, dark mode, profile, and chat flow wor
   await page.locator('button[onclick="sendChatMessage()"]').click();
   await expect(page.locator('#chatMessages')).toContainText('Hello!');
 });
+
+test('demo button signs in a local demo account and opens discovery', async ({ page }) => {
+  const demoButton = page.locator('#home button[onclick="startDemo()"]');
+  await expect(demoButton).toHaveText('Testa demo');
+
+  await demoButton.click();
+
+  await expect(page.locator('#matches.page.active')).toBeVisible();
+  await expect(page.locator('#profileCard')).toBeVisible();
+  await expect(page.locator('#matchesBadge')).toHaveText('3');
+
+  const stored = await page.evaluate(() => ({
+    user: JSON.parse(localStorage.getItem('heartlux_user')),
+    prefs: JSON.parse(localStorage.getItem('heartlux_preferences')),
+    matches: JSON.parse(localStorage.getItem('heartlux_matches_list')),
+  }));
+  expect(stored.user.demo).toBe(true);
+  expect(stored.user.password).toBeUndefined();
+  expect(stored.prefs.interests.length).toBeGreaterThan(0);
+  expect(stored.matches).toHaveLength(3);
+  for (const match of stored.matches) {
+    expect(String(match.id)).toMatch(/^demo-/);
+    expect(match.age).toBeGreaterThanOrEqual(stored.prefs.minAge);
+    expect(match.age).toBeLessThanOrEqual(stored.prefs.maxAge);
+  }
+
+  await page.locator('#tabMyMatches').click();
+  await expect(page.locator('#matchesListGrid .match-list-card')).toHaveCount(3);
+  await expect(page.locator('#matchesBadge')).toBeHidden();
+
+  await page.locator('#langToggle').click();
+  await page.locator('[data-page="home"]').first().click();
+  await expect(demoButton).toHaveText('Try demo');
+});
+
+test('demo button asks before replacing an existing account', async ({ page }) => {
+  await page.evaluate(() => {
+    localStorage.setItem('heartlux_user', JSON.stringify({ username: 'real', email: 'real@example.com', password: 'password123' }));
+  });
+  await page.reload();
+
+  page.once('dialog', dialog => dialog.dismiss());
+  await page.locator('#home button[onclick="startDemo()"]').click();
+
+  const user = await page.evaluate(() => JSON.parse(localStorage.getItem('heartlux_user')));
+  expect(user.username).toBe('real');
+});
