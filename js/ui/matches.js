@@ -7,6 +7,7 @@ import { updateMatchBadge } from './navigation.js';
 import { initSwipeGesture } from './swipe.js';
 import { later } from '../timers.js';
 import { paintAvatar } from '../avatars.js';
+import { heartBurst } from './match-burst.js';
 
 export { showMatchesTab } from './matches-list.js';
 
@@ -161,6 +162,8 @@ export function showMatchPopup(name) {
   popup.querySelector('[data-i18n="matches.popup.title"]').textContent = t('matches.popup.title');
   popup.querySelector('[data-i18n="matches.popup.btn"]').textContent   = t('matches.popup.btn');
   setVisible(popup, true);
+  heartBurst(popup);
+  popup.querySelector('[data-action="closeMatchPopup"]')?.focus();
   updateStats();
 }
 
