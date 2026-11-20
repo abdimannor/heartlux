@@ -57,3 +57,34 @@ test('leaving Discover cancels the pending redirect to Matches', async ({ page }
   await expect(page.locator('#home.page.active')).toBeVisible();
   await expect(page.locator('#matches.page.active')).toHaveCount(0);
 });
+
+test('arrow keys like and pass, and the swipe deck is built', async ({ page }) => {
+  await page.locator('#home button[data-action="startDemo"]').click();
+  await expect(page.locator('#matches.page.active')).toBeVisible();
+  await expect(page.locator('.deck .deck-ghost')).toHaveCount(2);
+  await expect(page.locator('#swipeKeyHint kbd')).toHaveCount(2);
+  await expect(page.locator('#cardAvatar svg.gen-avatar')).toHaveCount(1);
+  const shown = page.locator('#shownCount');
+  const before = Number(await shown.textContent());
+  await page.keyboard.press('ArrowLeft');
+  await expect.poll(async () => Number(await shown.textContent())).toBe(before + 1);
+  await page.keyboard.press('ArrowRight');
+  await expect.poll(async () => Number(await page.locator('#likesCount').textContent())).toBeGreaterThan(0);
+});
+
+test('a drag past the threshold passes the card, a short drag springs back', async ({ page }) => {
+  await page.locator('#home button[data-action="startDemo"]').click();
+  const card = page.locator('#profileCard');
+  await expect(card).toBeVisible();
+  const box = await card.boundingBox();
+  const cx = box.x + box.width / 2, cy = box.y + box.height / 3;
+  const name = await page.locator('#cardName').textContent();
+
+  await page.mouse.move(cx, cy); await page.mouse.down();
+  await page.mouse.move(cx - 20, cy, { steps: 4 }); await page.mouse.up();
+  await expect(page.locator('#cardName')).toHaveText(name);
+
+  await page.mouse.move(cx, cy); await page.mouse.down();
+  await page.mouse.move(cx - 220, cy, { steps: 8 }); await page.mouse.up();
+  await expect.poll(async () => Number(await page.locator('#shownCount').textContent())).toBeGreaterThan(1);
+});

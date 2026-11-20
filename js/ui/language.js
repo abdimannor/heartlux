@@ -3,6 +3,7 @@ import { getLang, setLang, t, translateDocument } from '../i18n.js';
 import { byId } from '../dom.js';
 import { updateNavbar } from './navigation.js';
 import { updateAgeRangeDisplay } from './register.js';
+import { renderHint } from './swipe.js';
 
 export function applyTranslations() {
   translateDocument();
@@ -15,6 +16,7 @@ export function applyTranslations() {
   document.documentElement.lang = lang;
   updateNavbar();
   updateAgeRangeDisplay();
+  renderHint();
 }
 
 export function toggleLanguage() {
