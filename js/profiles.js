@@ -121,6 +121,39 @@ export function matchProfiles(profiles, prefs) {
     .sort((a, b) => b.compat - a.compat);
 }
 
+export const NO_FILTERS = Object.freeze({ minAge: 18, maxAge: 80, interests: [], city: '', hasPrompt: false });
+
+/** Normalise stored filter values (bad or missing fields fall back to "no filter"). */
+export function normaliseFilters(raw = {}) {
+  const f = { ...NO_FILTERS, ...(raw || {}) };
+  let minAge = Math.min(Math.max(parseInt(f.minAge, 10) || 18, 18), 80);
+  let maxAge = Math.min(Math.max(parseInt(f.maxAge, 10) || 80, 18), 80);
+  if (minAge > maxAge) [minAge, maxAge] = [maxAge, minAge];
+  return {
+    minAge, maxAge,
+    interests: Array.isArray(f.interests) ? f.interests.filter(i => ALL_INTERESTS.includes(i)) : [],
+    city:      CITIES.includes(f.city) ? f.city : '',
+    hasPrompt: Boolean(f.hasPrompt),
+  };
+}
+
+/** How many filters differ from the defaults (shown on the Filter button). */
+export function activeFilterCount(raw) {
+  const f = normaliseFilters(raw);
+  return (f.minAge !== 18 || f.maxAge !== 80 ? 1 : 0)
+    + (f.interests.length ? 1 : 0) + (f.city ? 1 : 0) + (f.hasPrompt ? 1 : 0);
+}
+
+/** Discover deck filters: age range, any of the chosen interests, city, has a prompt. */
+export function applyFilters(profiles, raw) {
+  const f = normaliseFilters(raw);
+  return profiles.filter(p =>
+    p.age >= f.minAge && p.age <= f.maxAge
+    && (!f.interests.length || p.interests.some(i => f.interests.includes(i)))
+    && (!f.city || p.city === f.city)
+    && (!f.hasPrompt || Boolean(p.prompt)));
+}
+
 export function randomReply(lang, rng = Math.random) {
   return pick(lang === 'en' ? CHAT_REPLIES.en : CHAT_REPLIES.sv, rng);
 }
