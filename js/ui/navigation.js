@@ -9,11 +9,22 @@ import { cancelScope, PAGE } from '../timers.js';
 
 const PROTECTED_PAGES = ['discover', 'matches', 'profile'];
 
-function activatePage(pageId) {
-  cancelScope(PAGE);
+function swapPage(pageId) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   byId(pageId).classList.add('active');
   window.scrollTo(0, 0);
+}
+
+function activatePage(pageId) {
+  cancelScope(PAGE);
+  const current = document.querySelector('.page.active');
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // View Transitions where supported; a plain swap everywhere else.
+  if (document.startViewTransition && !reduced && current && current.id !== pageId) {
+    document.startViewTransition(() => swapPage(pageId));
+  } else {
+    swapPage(pageId);
+  }
 }
 
 export function showPage(pageId) {

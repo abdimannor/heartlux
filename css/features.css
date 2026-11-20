@@ -56,3 +56,12 @@
   .match-popup .match-popup-content, .match-popup .match-hearts { animation: none; }
   .match-popup .match-popup-content { box-shadow: 0 0 0 6px rgba(255, 77, 109, 0.35), 0 0 80px 10px rgba(255, 77, 109, 0.45); }
 }
+
+/* Page changes: View Transitions API where supported */
+::view-transition-old(root) { animation: hlx-out 0.22s cubic-bezier(0.4, 0, 1, 1) both; }
+::view-transition-new(root) { animation: hlx-in 0.38s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+@keyframes hlx-out { to { opacity: 0; transform: scale(0.98); filter: blur(4px); } }
+@keyframes hlx-in { from { opacity: 0; transform: translateY(18px) scale(1.01); filter: blur(6px); } }
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root), ::view-transition-new(root) { animation: none; }
+}
