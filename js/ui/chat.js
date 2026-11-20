@@ -5,12 +5,13 @@ import { byId, h, setVisible } from '../dom.js';
 import { randomReply } from '../profiles.js';
 import { renderMatchesList } from './matches-list.js';
 import { later, cancelScope } from '../timers.js';
+import { paintAvatar } from '../avatars.js';
 
 const getChats = () => readJSON(KEYS.chats, {});
 
 export function openChat(profile) {
   session.chatProfile = profile;
-  byId('chatPartnerAvatar').textContent = profile.avatar;
+  paintAvatar(byId('chatPartnerAvatar'), profile);
   byId('chatPartnerName').textContent   = `${profile.name}, ${profile.age}`;
   setVisible(byId('chatModal'), true);
 

@@ -6,6 +6,7 @@ import { generateProfiles, matchProfiles, sharedInterests } from '../profiles.js
 import { updateMatchBadge } from './navigation.js';
 import { initSwipeGesture } from './swipe.js';
 import { later } from '../timers.js';
+import { paintAvatar } from '../avatars.js';
 
 export { showMatchesTab } from './matches-list.js';
 
@@ -69,7 +70,7 @@ export function loadProfile() {
   byId('cardName').textContent     = `${profile.name}, ${profile.age}`;
   byId('cardLocation').textContent = `📍 ${profile.city}`;
   byId('cardBio').textContent      = profile.bio;
-  byId('cardAvatar').textContent   = profile.avatar;
+  paintAvatar(byId('cardAvatar'), profile);
 
   byId('interestsList').replaceChildren(
     ...profile.interests.map(i => h('div', { className: 'interest-tag' }, t(`interest.${i}`))));
