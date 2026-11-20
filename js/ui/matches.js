@@ -5,6 +5,7 @@ import { byId, h, setVisible } from '../dom.js';
 import { generateProfiles, matchProfiles, sharedInterests } from '../profiles.js';
 import { updateMatchBadge } from './navigation.js';
 import { initSwipeGesture } from './swipe.js';
+import { later } from '../timers.js';
 
 export { showMatchesTab } from './matches-list.js';
 
@@ -100,7 +101,7 @@ export function likeProfile(fromSwipe = false) {
   state.likes.push(profile.id);
   if (!fromSwipe) card.classList.add('card-swipe-right');
 
-  setTimeout(() => {
+  later('deck', () => {
     if (!fromSwipe) card.classList.remove('card-swipe-right');
     state.currentProfileIndex++;
     writeJSON(KEYS.likes, state.likes);
@@ -110,7 +111,7 @@ export function likeProfile(fromSwipe = false) {
       writeJSON(KEYS.matches, state.matchedProfiles);
       setItem(KEYS.unread, getUnread() + 1);
       updateMatchBadge();
-      setTimeout(() => showMatchPopup(profile.name), 200);
+      later('deck', () => showMatchPopup(profile.name), 200);
     }
   }, fromSwipe ? 50 : 500);
 }
@@ -125,7 +126,7 @@ export function passProfile(fromSwipe = false) {
   state.passes.push(profile.id);
   if (!fromSwipe) card.classList.add('card-swipe-left');
 
-  setTimeout(() => {
+  later('deck', () => {
     if (!fromSwipe) card.classList.remove('card-swipe-left');
     state.currentProfileIndex++;
     writeJSON(KEYS.passes, state.passes);

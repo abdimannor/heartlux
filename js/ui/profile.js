@@ -3,6 +3,7 @@ import { KEYS, getItem, setItem, getUser, readJSON } from '../state.js';
 import { t, getLang } from '../i18n.js';
 import { byId, h } from '../dom.js';
 import { AVATAR_OPTIONS } from '../profiles.js';
+import { later, cancelScope } from '../timers.js';
 
 const defaultAvatar = gender => (gender === 'female' ? '👩' : gender === 'male' ? '👨' : '😊');
 
@@ -67,5 +68,7 @@ export function saveProfileBio() {
   const msg = byId('profileSaveMsg');
   msg.textContent = t('profile.saved');
   msg.classList.add('show');
-  setTimeout(() => msg.classList.remove('show'), 2000);
+  // Restart the hide timer so a second save is not cut short by the first.
+  cancelScope('profile:msg');
+  later('profile:msg', () => msg.classList.remove('show'), 2000);
 }

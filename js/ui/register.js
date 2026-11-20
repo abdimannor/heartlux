@@ -3,6 +3,7 @@ import { KEYS, getItem, setItem, getUser, getPrefs, writeJSON } from '../state.j
 import { t } from '../i18n.js';
 import { byId, setVisible } from '../dom.js';
 import { showPage, updateNavbar } from './navigation.js';
+import { later } from '../timers.js';
 
 export function switchAuthTab(tab) {
   const isReg = tab === 'register';
@@ -73,12 +74,13 @@ export function handleRegister(event) {
   success.textContent = t('register.success');
   success.classList.add('show');
 
-  setTimeout(() => {
+  later('auth', () => {
     setVisible(form, true);
     success.classList.remove('show');
     form.reset();
     updateNavbar();
-    showPage('discover');
+    // Only redirect if the user is still on the sign-up page.
+    if (byId('register')?.classList.contains('active')) showPage('discover');
   }, 2000);
 }
 
@@ -98,10 +100,10 @@ export function handleLogin(event) {
   successEl.textContent = t('login.success', { name: stored.username });
   successEl.classList.add('show');
 
-  setTimeout(() => {
+  later('auth', () => {
     successEl.classList.remove('show');
     byId('loginForm').reset();
     updateNavbar();
-    showPage(getPrefs() ? 'matches' : 'discover');
+    if (byId('register')?.classList.contains('active')) showPage(getPrefs() ? 'matches' : 'discover');
   }, 1500);
 }

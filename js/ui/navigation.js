@@ -5,10 +5,12 @@ import { byId, h, setVisible } from '../dom.js';
 import { switchAuthTab } from './register.js';
 import { showMatchesTab, initMatches } from './matches.js';
 import { loadProfilePage } from './profile.js';
+import { cancelScope, PAGE } from '../timers.js';
 
 const PROTECTED_PAGES = ['discover', 'matches', 'profile'];
 
 function activatePage(pageId) {
+  cancelScope(PAGE);
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   byId(pageId).classList.add('active');
   window.scrollTo(0, 0);
