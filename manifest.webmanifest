@@ -6,9 +6,12 @@
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "background_color": "#fff9fb",
+  "background_color": "#fbf4fb",
   "theme_color": "#cc328c",
-  "categories": ["social", "lifestyle"],
+  "categories": [
+    "social",
+    "lifestyle"
+  ],
   "icons": [
     {
       "src": "images/icon.svg",
@@ -21,6 +24,50 @@
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Discover",
+      "short_name": "Discover",
+      "description": "Set what you are looking for",
+      "url": "./#discover",
+      "icons": [
+        {
+          "src": "images/icon.svg",
+          "sizes": "any",
+          "type": "image/svg+xml"
+        }
+      ]
+    },
+    {
+      "name": "Matches",
+      "short_name": "Matches",
+      "description": "Browse profiles and your matches",
+      "url": "./#matches",
+      "icons": [
+        {
+          "src": "images/icon.svg",
+          "sizes": "any",
+          "type": "image/svg+xml"
+        }
+      ]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "images/screenshot-narrow.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Discover deck with a prompt answer"
+    },
+    {
+      "src": "images/screenshot-wide.png",
+      "sizes": "1280x800",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Heartlux on a desktop"
     }
   ]
 }

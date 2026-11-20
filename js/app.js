@@ -70,4 +70,7 @@ applyTranslations();
 updateMatchBadge();
 initFilters(() => refilterDeck());
 initMatches();
+// Manifest shortcuts open ./#discover and ./#matches.
+const startPage = location.hash.slice(1);
+if (['discover', 'matches'].includes(startPage)) showPage(startPage);
 registerServiceWorker();
