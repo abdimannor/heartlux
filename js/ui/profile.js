@@ -94,12 +94,19 @@ async function onPhotoChosen(event) {
   status.textContent = t('profile.photo.saved');
   cancelScope('profile:photo');
   later('profile:photo', () => { status.textContent = ''; }, 2500);
-  loadProfilePage();
+  repaintPhotos();
 }
 
 export async function removeProfilePhoto() {
   await deletePhoto();
-  loadProfilePage();
+  repaintPhotos();
+}
+
+// Only the photos change: unsaved bio and prompt edits stay in their fields.
+async function repaintPhotos() {
+  const user = getUser();
+  await paintOwnAvatar(byId('profileDisplayAvatar'), getItem(KEYS.avatar) || defaultAvatar(user?.gender));
+  await renderOwnCard();
 }
 
 export function initProfileEditor() {
