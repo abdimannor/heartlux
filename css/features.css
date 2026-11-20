@@ -81,8 +81,9 @@ html[data-motion="reduce"]::view-transition-old(root), html[data-motion="reduce"
 }
 .own-card-photo { aspect-ratio: 3 / 4; border-radius: 0.9rem; overflow: hidden; display: grid; place-items: center; font-size: 3rem; background: rgba(255, 255, 255, 0.12); }
 .own-card-name { margin: 0 0 0.35rem; font-size: 1.15rem; font-weight: 800; }
+.own-card .card-prompt, .own-card-name { color: #fff; }
 .card-prompt { margin: 0; line-height: 1.35; }
-.card-prompt-q { display: block; font-size: 0.75rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.85; }
+.card-prompt-q { display: block; font-size: 0.75rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: #ffd1e8; }
 .card-prompt-a { font-size: 1.05rem; font-weight: 700; }
 .chat-self-photo { margin-inline-start: auto; inline-size: 2.25rem; block-size: 2.25rem; border-radius: 50%; overflow: hidden; border: 2px solid var(--heart); }
 
