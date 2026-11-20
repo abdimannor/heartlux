@@ -4,16 +4,54 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="refresh" content="0; url=/heartlux/">
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#cc328c">
   <title>Heartlux - Redirecting</title>
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="/heartlux/images/icon.svg" type="image/svg+xml">
+  <!-- Absolute paths: GitHub Pages serves this file at any missing depth. -->
+  <link rel="stylesheet" href="/heartlux/css/style.css">
 </head>
 <body>
-  <main class="container" style="min-height: 80vh; display: grid; place-items: center; text-align: center;">
-    <section>
-      <h1>Heartlux</h1>
-      <p>The page you requested was not found.</p>
-      <a class="btn btn-primary btn-lg" href="/heartlux/">Return to Heartlux</a>
-    </section>
+  <nav class="navbar" aria-label="Primary navigation">
+    <div class="container">
+      <div class="navbar-content">
+        <a href="/heartlux/" class="navbar-brand">Heartlux</a>
+      </div>
+    </div>
+  </nav>
+
+  <main id="main">
+    <div class="hero">
+      <div class="container">
+        <div class="hero-content">
+          <div class="hero-left">
+            <h1>Heartlux</h1>
+            <p>The page you requested was not found.</p>
+            <div>
+              <a class="btn btn-primary btn-lg" href="/heartlux/">Return to Heartlux</a>
+            </div>
+          </div>
+          <div class="hero-right" aria-hidden="true">
+            <div class="card-stack">
+              <div class="stack-card stack-card-3"></div>
+              <div class="stack-card stack-card-2"></div>
+              <div class="stack-card stack-card-1">
+                <div class="stack-avatar">💔</div>
+                <div class="stack-label">
+                  <strong>404</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </main>
+
+  <footer>
+    <div class="container">
+      <p>&copy; 2026 Mahad Abdullahi</p>
+    </div>
+  </footer>
 </body>
 </html>
