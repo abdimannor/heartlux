@@ -76,6 +76,8 @@ test('a drag past the threshold passes the card, a short drag springs back', asy
   await page.locator('#home button[data-action="startDemo"]').click();
   const card = page.locator('#profileCard');
   await expect(card).toBeVisible();
+  // Let the page view transition finish: its snapshot layer takes pointer hits.
+  await page.waitForTimeout(600);
   const box = await card.boundingBox();
   const cx = box.x + box.width / 2, cy = box.y + box.height / 3;
   const name = await page.locator('#cardName').textContent();
