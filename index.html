@@ -334,8 +334,65 @@
           </div>
         </div>
 
+        <div class="filter-bar">
+          <button type="button" class="btn btn-ghost filter-open" id="openFilters" data-action="openFilters" aria-haspopup="dialog" aria-controls="filterSheet">
+            <span aria-hidden="true">⚙︎</span> <span data-i18n="filters.button">Filter</span> <span id="filterCount" class="filter-count is-hidden"></span>
+          </button>
+        </div>
+
+        <dialog id="filterSheet" class="filter-sheet" aria-labelledby="filterTitle">
+          <form id="filterForm" class="filter-form">
+            <h2 id="filterTitle" data-i18n="filters.title">Filtrera profiler</h2>
+            <div class="filter-ages">
+              <label for="filterMinAge"><span data-i18n="filters.minAge">Ålder från</span>
+                <input type="number" id="filterMinAge" min="18" max="80" inputmode="numeric" value="18">
+              </label>
+              <label for="filterMaxAge"><span data-i18n="filters.maxAge">till</span>
+                <input type="number" id="filterMaxAge" min="18" max="80" inputmode="numeric" value="80">
+              </label>
+            </div>
+            <fieldset class="filter-interests">
+              <legend data-i18n="filters.interests">Intressen</legend>
+              <label class="filter-chip"><input type="checkbox" name="filterInterest" value="travel"> <span data-i18n="interest.travel">travel</span></label>
+              <label class="filter-chip"><input type="checkbox" name="filterInterest" value="music"> <span data-i18n="interest.music">music</span></label>
+              <label class="filter-chip"><input type="checkbox" name="filterInterest" value="fitness"> <span data-i18n="interest.fitness">fitness</span></label>
+              <label class="filter-chip"><input type="checkbox" name="filterInterest" value="cooking"> <span data-i18n="interest.cooking">cooking</span></label>
+              <label class="filter-chip"><input type="checkbox" name="filterInterest" value="books"> <span data-i18n="interest.books">books</span></label>
+              <label class="filter-chip"><input type="checkbox" name="filterInterest" value="art"> <span data-i18n="interest.art">art</span></label>
+            </fieldset>
+            <label for="filterCity" class="filter-city"><span data-i18n="filters.city">Stad</span>
+              <select id="filterCity">
+                <option value="" data-i18n="filters.anyCity">Alla städer</option>
+                <option value="Stockholm">Stockholm</option>
+                <option value="Göteborg">Göteborg</option>
+                <option value="Malmö">Malmö</option>
+                <option value="Uppsala">Uppsala</option>
+                <option value="Västerås">Västerås</option>
+                <option value="Örebro">Örebro</option>
+                <option value="Linköping">Linköping</option>
+                <option value="Helsingborg">Helsingborg</option>
+                <option value="Jönköping">Jönköping</option>
+                <option value="Norrköping">Norrköping</option>
+              </select>
+            </label>
+            <label class="filter-toggle"><input type="checkbox" id="filterHasPrompt"> <span data-i18n="filters.hasPrompt">Har en fråga på kortet</span></label>
+            <div class="filter-actions">
+              <button type="button" class="btn btn-ghost" data-action="resetFilters" data-i18n="filters.reset">Återställ filter</button>
+              <button type="button" class="btn btn-primary" data-action="closeFilters" data-i18n="filters.done">Klar</button>
+            </div>
+          </form>
+        </dialog>
+
         <!-- Profile Card -->
         <div class="matches-content">
+          <div id="noFilterMatch" class="no-more-profiles is-hidden">
+            <div class="empty-state">
+              <div class="empty-emoji empty-emoji--xl">🔍</div>
+              <h2 data-i18n="filters.empty.title">Ingen profil passar dina filter</h2>
+              <p data-i18n="filters.empty.text">Prova att vidga åldern eller välja fler intressen.</p>
+              <button type="button" class="btn btn-primary btn-lg u-mt-15" data-action="resetFilters" data-i18n="filters.reset">Återställ filter</button>
+            </div>
+          </div>
           <div id="profileCard" class="profile-card">
             <div class="card-image">
               <div id="cardAvatar" class="card-avatar">👤</div>
