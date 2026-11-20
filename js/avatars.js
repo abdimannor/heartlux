@@ -67,7 +67,7 @@ export function avatarSVG(profile, { title } = {}) {
   const t = avatarTraits(profile);
   const id = `av${hash(String(profile.id) + profile.name).toString(36)}`;
   const mouth = 66 + t.smile * 4;
-  return `<svg class="gen-avatar" viewBox="0 0 120 120" role="img" aria-label="${title ? title.replace(/[<>"&]/g, '') : ''}" xmlns="http://www.w3.org/2000/svg">
+  return `<svg class="gen-avatar" viewBox="0 0 120 120" preserveAspectRatio="xMidYMin slice" role="img" aria-label="${title ? title.replace(/[<>"&]/g, '') : ''}" xmlns="http://www.w3.org/2000/svg">
 <defs><linearGradient id="${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${t.sky[0]}"/><stop offset="1" stop-color="${t.sky[1]}"/></linearGradient></defs>
 <rect width="120" height="120" fill="url(#${id})"/>
 <circle cx="96" cy="22" r="26" fill="#fff" opacity="0.12"/>
