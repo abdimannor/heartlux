@@ -3,6 +3,7 @@ import { KEYS, getItem, writeJSON, resetMatchState } from '../state.js';
 import { t } from '../i18n.js';
 import { byId, h } from '../dom.js';
 import { showPage } from './navigation.js';
+import { later, PAGE } from '../timers.js';
 
 export function finishSetup() {
   const interest  = getItem(KEYS.interest);
@@ -23,5 +24,6 @@ export function finishSetup() {
       h('h2', { className: 'setup-done-title' }, t('setup.done.title')),
       h('p', { className: 'setup-done-text' }, t('setup.done.text'))));
 
-  setTimeout(() => showPage('matches'), 1500);
+  // Page-scoped: leaving Discover before it fires cancels the redirect.
+  later(PAGE, () => showPage('matches'), 1500);
 }

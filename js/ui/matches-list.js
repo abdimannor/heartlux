@@ -1,4 +1,5 @@
 // "My matches" tab: the list of matched profiles.
+import { paintAvatar } from '../avatars.js';
 import { KEYS, readJSON, setItem } from '../state.js';
 import { t } from '../i18n.js';
 import { byId, h, setVisible } from '../dom.js';
@@ -25,7 +26,7 @@ export function showMatchesTab(tab) {
 
 function matchCard(profile, isNew) {
   const card = h('div', { className: 'match-list-card' },
-    h('div', { className: 'match-list-avatar' }, profile.avatar),
+    h('div', { className: 'match-list-avatar' }),
     h('div', { className: 'match-list-info' },
       h('strong', {}, `${profile.name}, ${profile.age} `,
         isNew && h('span', { className: 'match-new-badge' }, t('matches.new.badge'))),
@@ -33,6 +34,7 @@ function matchCard(profile, isNew) {
       h('div', { className: 'match-list-tags' },
         profile.interests.slice(0, 2).map(i => t(`interest.${i}`)).join(' · '))),
     h('button', { className: 'btn btn-primary btn-sm' }, t('matches.list.chat')));
+  paintAvatar(card.querySelector('.match-list-avatar'), profile);
   card.addEventListener('click', () => openChat(profile));
   return card;
 }

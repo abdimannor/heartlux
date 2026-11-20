@@ -5,6 +5,9 @@ import { byId, h, setVisible } from '../dom.js';
 import { generateProfiles, matchProfiles, sharedInterests } from '../profiles.js';
 import { updateMatchBadge } from './navigation.js';
 import { initSwipeGesture } from './swipe.js';
+import { later } from '../timers.js';
+import { paintAvatar } from '../avatars.js';
+import { heartBurst } from './match-burst.js';
 
 export { showMatchesTab } from './matches-list.js';
 
@@ -68,7 +71,7 @@ export function loadProfile() {
   byId('cardName').textContent     = `${profile.name}, ${profile.age}`;
   byId('cardLocation').textContent = `📍 ${profile.city}`;
   byId('cardBio').textContent      = profile.bio;
-  byId('cardAvatar').textContent   = profile.avatar;
+  paintAvatar(byId('cardAvatar'), profile);
 
   byId('interestsList').replaceChildren(
     ...profile.interests.map(i => h('div', { className: 'interest-tag' }, t(`interest.${i}`))));
@@ -100,7 +103,7 @@ export function likeProfile(fromSwipe = false) {
   state.likes.push(profile.id);
   if (!fromSwipe) card.classList.add('card-swipe-right');
 
-  setTimeout(() => {
+  later('deck', () => {
     if (!fromSwipe) card.classList.remove('card-swipe-right');
     state.currentProfileIndex++;
     writeJSON(KEYS.likes, state.likes);
@@ -110,7 +113,7 @@ export function likeProfile(fromSwipe = false) {
       writeJSON(KEYS.matches, state.matchedProfiles);
       setItem(KEYS.unread, getUnread() + 1);
       updateMatchBadge();
-      setTimeout(() => showMatchPopup(profile.name), 200);
+      later('deck', () => showMatchPopup(profile.name), 200);
     }
   }, fromSwipe ? 50 : 500);
 }
@@ -125,7 +128,7 @@ export function passProfile(fromSwipe = false) {
   state.passes.push(profile.id);
   if (!fromSwipe) card.classList.add('card-swipe-left');
 
-  setTimeout(() => {
+  later('deck', () => {
     if (!fromSwipe) card.classList.remove('card-swipe-left');
     state.currentProfileIndex++;
     writeJSON(KEYS.passes, state.passes);
@@ -159,6 +162,8 @@ export function showMatchPopup(name) {
   popup.querySelector('[data-i18n="matches.popup.title"]').textContent = t('matches.popup.title');
   popup.querySelector('[data-i18n="matches.popup.btn"]').textContent   = t('matches.popup.btn');
   setVisible(popup, true);
+  heartBurst(popup);
+  popup.querySelector('[data-action="closeMatchPopup"]')?.focus();
   updateStats();
 }
 
