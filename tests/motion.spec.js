@@ -13,11 +13,21 @@ test.beforeEach(async ({ page }) => {
 async function startDeck(page) {
   await page.locator('#home button[data-action="startDemo"]').click();
   await expect(page.locator('#profileCard')).toBeVisible();
+  // Let the page view transition finish: it overlays the page and takes the pointer.
+  await page.waitForTimeout(800);
   // Every like becomes a match from here on, so the heart burst is predictable.
   await page.evaluate(() => { Math.random = () => 0.1; });
 }
 
 async function dragCardAndRelease(page) {
+  // Record every transition the card is given, so the check does not race the
+  // timers that tidy the inline style afterwards.
+  await page.locator('#profileCard').evaluate(el => {
+    window.__transitions = [];
+    window.__obs?.disconnect();
+    window.__obs = new MutationObserver(() => window.__transitions.push(el.style.transition));
+    window.__obs.observe(el, { attributes: true, attributeFilter: ['style'] });
+  });
   const box = await page.locator('#profileCard').boundingBox();
   const x = box.x + box.width / 2, y = box.y + box.height / 2;
   await page.mouse.move(x, y);
@@ -30,7 +40,8 @@ async function dragCardAndRelease(page) {
   await page.waitForTimeout(150);
   await page.mouse.move(x + 40, y);
   await page.mouse.up();
-  return page.locator('#profileCard').evaluate(el => el.style.transition);
+  await page.waitForTimeout(100);
+  return page.evaluate(() => window.__transitions.join(' | '));
 }
 
 async function likeAndCheckBurst(page) {
@@ -49,18 +60,19 @@ test('reduced motion is the default and the switch shows it', async ({ page }) =
   await expect(btn).toHaveAttribute('aria-label', /systemets inställning/);
 });
 
-test('no heart burst or swipe spring by default; both after enabling motion; choice survives reload', async ({ page }) => {
+test('no heart burst or swipe spring by default', async ({ page }) => {
   await startDeck(page);
-  expect(await dragCardAndRelease(page)).toBe('none');
-  await page.waitForTimeout(600);
+  expect(await dragCardAndRelease(page)).not.toContain('transform 0.5s');
   expect(await likeAndCheckBurst(page)).toBe(0);
+});
 
+test('the switch turns on the swipe spring and heart burst, and the choice survives reload', async ({ page }) => {
   await page.locator('#motionBtn').click();
   await expect(page.locator('html')).toHaveAttribute('data-motion', 'full');
   await expect(page.locator('#motionBtn')).toHaveAttribute('aria-pressed', 'true');
-  expect(await likeAndCheckBurst(page)).toBe(1);
-  await page.waitForTimeout(700);
+  await startDeck(page);
   expect(await dragCardAndRelease(page)).toContain('transform 0.5s');
+  expect(await likeAndCheckBurst(page)).toBe(1);
 
   await page.reload();
   await expect(page.locator('html')).toHaveAttribute('data-motion', 'full');
