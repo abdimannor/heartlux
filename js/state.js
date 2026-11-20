@@ -14,6 +14,7 @@ export const KEYS = Object.freeze({
   seen:      'heartlux_seen_matches',
   lang:      'heartlux_lang',
   dark:      'heartlux_dark',
+  motion:    'heartlux_motion',
 });
 
 /** Everything that belongs to one local account (cleared on logout / demo). */

@@ -1,3 +1,4 @@
+import { motionReduced } from '../motion.js';
 // The match moment: a canvas heart burst behind the popup. Reduced motion
 // gets a still glow instead (handled in css/features.css).
 const COLORS = ['#ff4d6d', '#ff8fab', '#ffd166', '#c77dff', '#ffffff'];
@@ -15,7 +16,7 @@ function heart(ctx, x, y, s, rot, color, alpha) {
 }
 
 export function heartBurst(host) {
-  if (!host || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (!host || motionReduced()) return;
   host.querySelector('canvas.match-burst')?.remove();
   const canvas = document.createElement('canvas');
   canvas.className = 'match-burst';

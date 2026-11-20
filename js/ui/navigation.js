@@ -6,6 +6,7 @@ import { switchAuthTab } from './register.js';
 import { showMatchesTab, initMatches } from './matches.js';
 import { loadProfilePage } from './profile.js';
 import { cancelScope, PAGE } from '../timers.js';
+import { motionReduced } from '../motion.js';
 
 const PROTECTED_PAGES = ['discover', 'matches', 'profile'];
 
@@ -18,7 +19,7 @@ function swapPage(pageId) {
 function activatePage(pageId) {
   cancelScope(PAGE);
   const current = document.querySelector('.page.active');
-  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const reduced = motionReduced();
   // View Transitions where supported; a plain swap everywhere else.
   if (document.startViewTransition && !reduced && current && current.id !== pageId) {
     document.startViewTransition(() => swapPage(pageId));

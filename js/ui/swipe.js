@@ -6,10 +6,11 @@ import { byId, h } from '../dom.js';
 import { t } from '../i18n.js';
 import { currentProfile, likeProfile, passProfile } from './matches.js';
 import { later } from '../timers.js';
+import { motionReduced } from '../motion.js';
 
 let initialized = false;
 
-const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const reducedMotion = motionReduced;
 const DISTANCE = 110;   // px past which a release always commits
 const FLING    = 0.55;  // px/ms release speed that commits a shorter drag
 

@@ -5,6 +5,11 @@ export const translations = {
   sv: {
     'nav.home':     'Hem',
     'nav.langLabel': 'EN, byt språk till engelska',
+    'nav.motion.on':  'Rörelse på',
+    'nav.motion.off': 'Rörelse av',
+    'nav.motion.labelOn':  'Animationer är på. Tryck för att stänga av.',
+    'nav.motion.labelOff': 'Animationer är av. Tryck för att slå på.',
+    'nav.motion.system':   '(följer systemets inställning)',
     'nav.discover': 'Utforska',
     'nav.matches':  'Matchningar',
     'nav.join':     'Gå med',
@@ -141,6 +146,11 @@ export const translations = {
   en: {
     'nav.home':     'Home',
     'nav.langLabel': 'SV, switch language to Swedish',
+    'nav.motion.on':  'Motion on',
+    'nav.motion.off': 'Motion off',
+    'nav.motion.labelOn':  'Animations are on. Press to turn them off.',
+    'nav.motion.labelOff': 'Animations are off. Press to turn them on.',
+    'nav.motion.system':   '(following the system setting)',
     'nav.discover': 'Discover',
     'nav.matches':  'Matches',
     'nav.join':     'Join',
