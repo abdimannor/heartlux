@@ -25,9 +25,11 @@ export function syncMotionButton() {
   const on = !motionReduced();
   btn.setAttribute('aria-pressed', String(on));
   btn.dataset.state = on ? 'on' : 'off';
-  btn.querySelector('.motion-label').textContent = t(on ? 'nav.motion.on' : 'nav.motion.off');
+  const label = t(on ? 'nav.motion.on' : 'nav.motion.off');
+  btn.querySelector('.motion-label').textContent = label;
+  // The accessible name starts with the visible text (WCAG 2.5.3).
   const source = motionChoice() ? '' : ` ${t('nav.motion.system')}`;
-  btn.setAttribute('aria-label', `${t(on ? 'nav.motion.labelOn' : 'nav.motion.labelOff')}${source}`);
+  btn.setAttribute('aria-label', `${label}. ${t(on ? 'nav.motion.labelOn' : 'nav.motion.labelOff')}${source}`);
   btn.title = btn.getAttribute('aria-label');
 }
 
