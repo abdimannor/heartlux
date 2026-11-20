@@ -1,4 +1,4 @@
-const CACHE_NAME = 'heartlux-v12';
+const CACHE_NAME = 'heartlux-v13';
 const APP_SHELL = [
   './',
   './index.html',
@@ -56,13 +56,13 @@ self.addEventListener('activate', event => {
 
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
+  const isPage = event.request.mode === 'navigate';
 
   event.respondWith(
-    caches.match(event.request)
+    // Pages ignore the query string, so ?utm=... links still hit the cached shell.
+    caches.match(event.request, { ignoreSearch: isPage })
       .then(cached => cached || fetch(event.request))
-      .catch(() => {
-        if (event.request.mode === 'navigate') return caches.match('./index.html');
-        return caches.match(event.request);
-      })
+      .catch(() => (isPage ? caches.match('./index.html') : caches.match(event.request)))
+      .then(response => response || Response.error())
   );
 });
