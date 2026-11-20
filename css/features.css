@@ -1,5 +1,6 @@
 /* Heartlux features layer: generated avatars, swipe deck, match moment,
    view transitions. Loaded after style.css. */
+@layer features {
 
 /* Generated avatars */
 .has-gen-avatar { display: grid; place-items: center; overflow: hidden; line-height: 0; }
@@ -64,4 +65,5 @@
 @keyframes hlx-in { from { opacity: 0; transform: translateY(18px) scale(1.01); filter: blur(6px); } }
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-old(root), ::view-transition-new(root) { animation: none; }
+}
 }

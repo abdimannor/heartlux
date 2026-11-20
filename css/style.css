@@ -1,7 +1,7 @@
 /* Heartlux — rebuilt stylesheet.
    Layers: reset < tokens < base < layout < components < utilities.
    Only selectors seen in a Playwright walk of every view, plus classes the JS adds. */
-@layer reset, tokens, base, layout, components, utilities;
+@layer reset, tokens, base, layout, components, features, utilities;
 
 @layer reset {
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
