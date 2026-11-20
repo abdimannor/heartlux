@@ -1,4 +1,5 @@
 // Storage keys, localStorage access and the in-memory session state.
+import { deletePhoto } from './photo-store.js';
 
 export const KEYS = Object.freeze({
   user:      'heartlux_user',
@@ -14,13 +15,15 @@ export const KEYS = Object.freeze({
   seen:      'heartlux_seen_matches',
   lang:      'heartlux_lang',
   dark:      'heartlux_dark',
+  motion:    'heartlux_motion',
+  prompt:    'heartlux_user_prompt',
 });
 
 /** Everything that belongs to one local account (cleared on logout / demo). */
 export const USER_STORAGE_KEYS = [
   KEYS.user, KEYS.prefs, KEYS.likes, KEYS.passes,
   KEYS.interest, KEYS.matches, KEYS.chats,
-  KEYS.avatar, KEYS.bio,
+  KEYS.avatar, KEYS.bio, KEYS.prompt,
   KEYS.unread, KEYS.seen,
 ];
 
@@ -43,6 +46,7 @@ export function writeJSON(key, value) {
 
 export function clearUserData() {
   USER_STORAGE_KEYS.forEach(removeItem);
+  deletePhoto();
 }
 
 export const getUser  = () => readJSON(KEYS.user);
@@ -65,6 +69,7 @@ export function emptyMatchState() {
 export const session = {
   match: emptyMatchState(),
   chatProfile: null,
+  typing: new Set(),   // conversation ids where the match is typing
 };
 
 export function resetMatchState(overrides = {}) {

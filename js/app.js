@@ -7,8 +7,9 @@ import { finishSetup } from './ui/discover.js';
 import { initMatches, likeProfile, passProfile, undoProfile, closeMatchPopup } from './ui/matches.js';
 import { showMatchesTab } from './ui/matches-list.js';
 import { closeChat, sendChatMessage, initChat } from './ui/chat.js';
-import { saveProfileBio, selectAvatar } from './ui/profile.js';
+import { saveProfileBio, selectAvatar, removeProfilePhoto, initProfileEditor } from './ui/profile.js';
 import { toggleDarkMode, applyDarkMode } from './ui/theme.js';
+import { applyMotion, toggleMotion, syncMotionButton } from './motion.js';
 import { startDemo } from './ui/demo.js';
 import { registerServiceWorker } from './pwa.js';
 
@@ -19,7 +20,8 @@ const actions = {
   showMatchesTab:  el => showMatchesTab(el.dataset.arg),
   selectOption:    el => selectOption(el),
   selectAvatar:    el => selectAvatar(el),
-  toggleLanguage:  () => toggleLanguage(),
+  toggleLanguage:  () => { toggleLanguage(); syncMotionButton(); },
+  toggleMotion:    () => toggleMotion(),
   toggleDarkMode:  () => toggleDarkMode(),
   startDemo:       () => startDemo(),
   finishSetup:     () => finishSetup(),
@@ -33,6 +35,7 @@ const actions = {
   closeChat:       () => closeChat(),
   sendChatMessage: () => sendChatMessage(),
   saveProfileBio:  () => saveProfileBio(),
+  removeProfilePhoto: () => removeProfilePhoto(),
 };
 
 const submitActions = {
@@ -54,7 +57,9 @@ document.addEventListener('submit', event => {
 
 initAgeRange();
 initChat();
+initProfileEditor();
 restoreInterestSelection();
+applyMotion();
 applyDarkMode();
 applyTranslations();
 updateMatchBadge();

@@ -31,8 +31,8 @@ test('core onboarding, matching, language, dark mode, profile, and chat flow wor
 
   await page.locator('[data-page="register"]').click();
   const registerForm = page.locator('#registerForm');
-  await registerForm.locator('#username').fill('mahad');
-  await registerForm.locator('#email').fill('mahad@example.com');
+  await registerForm.locator('#username').fill('demo');
+  await registerForm.locator('#email').fill('demo@example.com');
   await registerForm.locator('#password').fill('password123');
   await registerForm.locator('#confirmPassword').fill('password123');
   await registerForm.locator('#genderMale').check();

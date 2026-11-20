@@ -892,9 +892,17 @@
 @keyframes cardFloat { 50% { transform: translateY(-10px); } }
 @keyframes badgePop { from { transform: scale(0); } }
 
+/* Reduced motion: set by js/motion.js from the OS setting or the navbar switch.
+   The media query covers the moment before the script runs. */
+html[data-motion="reduce"] { scroll-behavior: auto; }
+html[data-motion="reduce"] *, html[data-motion="reduce"] *::before, html[data-motion="reduce"] *::after {
+  animation-duration: 0.01ms;
+  animation-iteration-count: 1;
+  transition-duration: 0.01ms;
+}
 @media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
-  *, *::before, *::after {
+  html:not([data-motion]) { scroll-behavior: auto; }
+  html:not([data-motion]) *, html:not([data-motion]) *::before, html:not([data-motion]) *::after {
     animation-duration: 0.01ms;
     animation-iteration-count: 1;
     transition-duration: 0.01ms;

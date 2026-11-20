@@ -43,9 +43,7 @@
 }
 .swipe-key-sep { opacity: 0.5; padding: 0 0.25rem; }
 @media (hover: none) { .swipe-key-hint { display: none; } }
-@media (prefers-reduced-motion: reduce) {
-  .deck-ghost { transition: none; }
-}
+html[data-motion="reduce"] .deck-ghost { transition: none; }
 
 /* Match moment */
 .match-popup .match-burst { position: fixed; inset: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 0; }
@@ -53,17 +51,46 @@
 .match-popup .match-hearts { animation: matchBeat 1.1s ease-in-out 0.3s infinite; display: inline-block; }
 @keyframes matchPop { from { transform: scale(0.6) rotate(-4deg); opacity: 0; } to { transform: none; opacity: 1; } }
 @keyframes matchBeat { 0%, 100% { transform: scale(1); } 15% { transform: scale(1.25); } 30% { transform: scale(1); } 45% { transform: scale(1.15); } }
-@media (prefers-reduced-motion: reduce) {
-  .match-popup .match-popup-content, .match-popup .match-hearts { animation: none; }
-  .match-popup .match-popup-content { box-shadow: 0 0 0 6px rgba(255, 77, 109, 0.35), 0 0 80px 10px rgba(255, 77, 109, 0.45); }
-}
+html[data-motion="reduce"] .match-popup .match-popup-content, html[data-motion="reduce"] .match-popup .match-hearts { animation: none; }
+html[data-motion="reduce"] .match-popup .match-popup-content { box-shadow: 0 0 0 6px rgba(255, 77, 109, 0.35), 0 0 80px 10px rgba(255, 77, 109, 0.45); }
 
 /* Page changes: View Transitions API where supported */
 ::view-transition-old(root) { animation: hlx-out 0.22s cubic-bezier(0.4, 0, 1, 1) both; }
 ::view-transition-new(root) { animation: hlx-in 0.38s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
 @keyframes hlx-out { to { opacity: 0; transform: scale(0.98); filter: blur(4px); } }
 @keyframes hlx-in { from { opacity: 0; transform: translateY(18px) scale(1.01); filter: blur(6px); } }
-@media (prefers-reduced-motion: reduce) {
-  ::view-transition-old(root), ::view-transition-new(root) { animation: none; }
+html[data-motion="reduce"]::view-transition-old(root), html[data-motion="reduce"]::view-transition-new(root) { animation: none; }
 }
+
+/* Motion switch in the navbar: the dot says on/off at a glance. */
+.motion-toggle { display: inline-flex; align-items: center; gap: 0.4rem; }
+.motion-dot { inline-size: 0.6rem; block-size: 0.6rem; border-radius: 50%; border: 2px solid currentColor; }
+.motion-toggle[data-state="on"] .motion-dot { background: currentColor; box-shadow: 0 0 0 3px color-mix(in srgb, currentColor 25%, transparent); }
+.motion-toggle[data-state="off"] { border-style: dashed; }
+
+/* Own photo: profile, card preview and chat */
+.own-photo, .own-card-photo img, .chat-self-photo img { inline-size: 100%; block-size: 100%; object-fit: cover; display: block; }
+.profile-display-avatar.has-photo { overflow: hidden; padding: 0; aspect-ratio: 3 / 4; border-radius: 1.25rem; font-size: 0; }
+.photo-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+.photo-upload { cursor: pointer; }
+.photo-upload:focus-within { outline: 3px solid var(--heart); outline-offset: 3px; }
+.photo-status:empty { display: none; }
+.own-card {
+  display: grid; grid-template-columns: 7rem 1fr; gap: 1rem; align-items: center; margin-block-start: 0.5rem;
+  padding: 0.75rem; border-radius: 1.25rem; background: linear-gradient(135deg, #2b0f2a, #5a1648 60%, #cc328c); color: #fff;
 }
+.own-card-photo { aspect-ratio: 3 / 4; border-radius: 0.9rem; overflow: hidden; display: grid; place-items: center; font-size: 3rem; background: rgba(255, 255, 255, 0.12); }
+.own-card-name { margin: 0 0 0.35rem; font-size: 1.15rem; font-weight: 800; }
+.own-card .card-prompt, .own-card-name { color: #fff; }
+.card-prompt { margin: 0; line-height: 1.35; }
+.card-prompt-q { display: block; font-size: 0.75rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: #ffd1e8; }
+.card-prompt-a { font-size: 1.05rem; font-weight: 700; }
+.chat-self-photo { margin-inline-start: auto; inline-size: 2.25rem; block-size: 2.25rem; border-radius: 50%; overflow: hidden; border: 2px solid var(--heart); }
+
+/* Typing indicator */
+.typing-indicator { display: inline-flex; gap: 0.3rem; align-items: center; padding-block: 0.85rem; }
+.typing-dot { inline-size: 0.45rem; block-size: 0.45rem; border-radius: 50%; background: currentColor; opacity: 0.5; animation: typingDot 1.1s ease-in-out infinite; }
+.typing-dot:nth-child(2) { animation-delay: 0.15s; }
+.typing-dot:nth-child(3) { animation-delay: 0.3s; }
+@keyframes typingDot { 0%, 60%, 100% { transform: translateY(0); opacity: 0.4; } 30% { transform: translateY(-4px); opacity: 1; } }
+html[data-motion="reduce"] .typing-dot { animation: none; opacity: 0.7; }

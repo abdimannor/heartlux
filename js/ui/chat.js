@@ -6,6 +6,7 @@ import { randomReply } from '../profiles.js';
 import { renderMatchesList } from './matches-list.js';
 import { later, cancelScope } from '../timers.js';
 import { paintAvatar } from '../avatars.js';
+import { photoUrl } from '../photo-store.js';
 
 const getChats = () => readJSON(KEYS.chats, {});
 
@@ -41,12 +42,31 @@ function renderChatMessages(pid = String(session.chatProfile.id)) {
     writeJSON(KEYS.chats, chats);
   }
   const container = byId('chatMessages');
-  container.replaceChildren(...messages.map(msg =>
+  const bubbles = messages.map(msg =>
     h('div', { className: `chat-bubble ${msg.from === 'user' ? 'bubble-user' : 'bubble-match'}` },
-      h('span', {}, msg.text))));
+      h('span', {}, msg.text)));
+  // Typing state belongs to a conversation, so it only shows in the chat it is for.
+  if (session.typing.has(pid)) {
+    bubbles.push(h('div', { className: 'chat-bubble bubble-match typing-indicator', role: 'status',
+      'aria-label': t('chat.typing', { name: session.chatProfile?.name || '' }) },
+      h('span', { className: 'typing-dot' }), h('span', { className: 'typing-dot' }), h('span', { className: 'typing-dot' })));
+  }
+  container.replaceChildren(...bubbles);
   container.dataset.chatId = pid;
   container.scrollTop = container.scrollHeight;
+  paintSelfPhoto();
 }
+
+/** Your own photo beside your messages, when you have uploaded one. */
+async function paintSelfPhoto() {
+  const url = await photoUrl();
+  const own = byId('chatSelfPhoto');
+  if (!own) return;
+  own.replaceChildren(...(url ? [h('img', { src: url, alt: t('profile.photo.alt') })] : []));
+  setVisible(own, Boolean(url));
+}
+
+const isOpenChat = pid => session.chatProfile && String(session.chatProfile.id) === pid;
 
 export function sendChatMessage() {
   const input = byId('chatInput');
@@ -64,13 +84,19 @@ export function sendChatMessage() {
   const reply = randomReply(getLang());
   // The reply is bound to the conversation it answers (pid), never to whichever
   // chat happens to be open when the timer fires.
+  const delay = 800 + Math.random() * 1000;
   later(`chat:${pid}`, () => {
+    session.typing.add(pid);
+    if (isOpenChat(pid)) renderChatMessages(pid);
+  }, 300);
+  later(`chat:${pid}`, () => {
+    session.typing.delete(pid);
     const updated = getChats();
     if (!updated[pid]) return;
     updated[pid].push({ from: 'match', text: reply, ts: Date.now() });
     writeJSON(KEYS.chats, updated);
-    if (session.chatProfile && String(session.chatProfile.id) === pid) renderChatMessages(pid);
-  }, 800 + Math.random() * 1000);
+    if (isOpenChat(pid)) renderChatMessages(pid);
+  }, Math.max(delay, 400));
 }
 
 export function initChat() {

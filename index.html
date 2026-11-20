@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Heartlux is a responsive dating and social discovery app demo for meaningful connections, matching, profiles, chat, dark mode, and bilingual UI.">
-  <meta name="author" content="Mahad Abdullahi">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://abdimannor.github.io/heartlux/">
   <meta property="og:type" content="website">
@@ -37,11 +36,6 @@
     "url": "https://abdimannor.github.io/heartlux/",
     "image": "https://abdimannor.github.io/heartlux/images/heartlux-preview.svg",
     "description": "Heartlux is a responsive dating and social discovery app demo with matching, profiles, chat, dark mode, bilingual UI, and PWA support.",
-    "author": {
-      "@type": "Person",
-      "name": "Mahad Abdullahi",
-      "url": "https://github.com/abdimannor"
-    },
     "offers": {
       "@type": "Offer",
       "price": "0",
@@ -63,6 +57,7 @@
           <a href="#register" class="navbar-link" data-page="register" data-action="showPage" data-arg="register" data-i18n="nav.join">Gå med</a>
           <button type="button" class="lang-toggle" id="langToggle" data-action="toggleLanguage" aria-label="EN, byt språk till engelska">EN</button>
           <button type="button" class="lang-toggle" id="darkModeBtn" data-action="toggleDarkMode" title="Dark mode" aria-label="Toggle dark mode">🌙</button>
+          <button type="button" class="lang-toggle motion-toggle" id="motionBtn" data-action="toggleMotion" aria-pressed="true"><span class="motion-dot" aria-hidden="true"></span><span class="motion-label">Rörelse</span></button>
         </div>
       </div>
     </div>
@@ -412,6 +407,19 @@
           </p>
 
           <div class="profile-avatar-section">
+            <h3 class="profile-subheading" data-i18n="profile.photo.heading">Ditt foto</h3>
+            <div class="photo-actions">
+              <label class="btn btn-primary btn-sm photo-upload">
+                <span data-i18n="profile.photo.upload">Ladda upp eget foto</span>
+                <input type="file" id="profilePhotoInput" class="visually-hidden" accept="image/*">
+              </label>
+              <button type="button" class="btn btn-secondary btn-sm is-hidden" id="profilePhotoRemove" data-action="removeProfilePhoto" data-i18n="profile.photo.remove">Ta bort foto</button>
+            </div>
+            <p class="u-text-sm u-mt-025 photo-note" data-i18n="profile.photo.note">Fotot beskärs till kortets form och sparas bara på den här enheten.</p>
+            <p class="u-text-sm photo-status" id="profilePhotoStatus" role="status"></p>
+          </div>
+
+          <div class="profile-avatar-section">
             <h3 class="profile-subheading" data-i18n="profile.avatar.heading">Välj Avatar</h3>
             <div class="avatar-picker" id="profileAvatarPicker"></div>
           </div>
@@ -425,6 +433,29 @@
             <textarea id="profileBioInput" rows="4"
               data-i18n-placeholder="profile.bio.placeholder"
               placeholder="Berätta om dig själv..."></textarea>
+            <h3 class="u-mt-1" data-i18n="profile.prompt.heading">Din fråga på kortet</h3>
+            <div class="form-group">
+              <label for="profilePromptSelect" data-i18n="profile.prompt.label">Välj en fråga</label>
+              <select id="profilePromptSelect">
+                <option value="sunday" data-i18n="prompt.sunday"></option>
+                <option value="green" data-i18n="prompt.green"></option>
+                <option value="dinner" data-i18n="prompt.dinner"></option>
+                <option value="secret" data-i18n="prompt.secret"></option>
+                <option value="together" data-i18n="prompt.together"></option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="profilePromptAnswer" data-i18n="profile.prompt.answer">Ditt svar</label>
+              <input type="text" id="profilePromptAnswer" maxlength="120">
+            </div>
+            <p class="u-text-sm" data-i18n="profile.prompt.preview">Så här ser ditt kort ut</p>
+            <article class="own-card" id="ownCard">
+              <div class="own-card-photo" id="ownCardPhoto"></div>
+              <div class="own-card-body">
+                <h4 class="own-card-name" id="ownCardName"></h4>
+                <p class="card-prompt" id="ownCardPrompt"><span class="card-prompt-q" id="ownCardPromptQ"></span> <span class="card-prompt-a" id="ownCardPromptA"></span></p>
+              </div>
+            </article>
             <button type="button" class="btn btn-primary u-mt-1" data-action="saveProfileBio" data-i18n="profile.save">Spara Profil</button>
             <div id="profileSaveMsg" class="success-message"></div>
           </div>
@@ -479,6 +510,7 @@
           <span class="chat-partner-avatar" id="chatPartnerAvatar">👤</span>
           <strong id="chatPartnerName"></strong>
         </div>
+        <span class="chat-self-photo is-hidden" id="chatSelfPhoto"></span>
       </div>
       <div class="chat-messages" id="chatMessages"></div>
       <div class="chat-input-bar">
@@ -507,7 +539,6 @@
 
   <footer>
     <div class="container">
-      <p>&copy; 2026 Mahad Abdullahi</p>
     </div>
   </footer>
 
