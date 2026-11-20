@@ -54,14 +54,14 @@
   <nav class="navbar" aria-label="Primary navigation">
     <div class="container">
       <div class="navbar-content">
-        <a href="#home" class="navbar-brand" onclick="showPage('home')">Heartlux</a>
+        <a href="#home" class="navbar-brand" data-action="showPage" data-arg="home">Heartlux</a>
         <div class="navbar-nav">
-          <a href="#home" class="navbar-link" data-page="home" onclick="showPage('home')" data-i18n="nav.home">Hem</a>
-          <a href="#discover" class="navbar-link" data-page="discover" onclick="showPage('discover')" data-i18n="nav.discover">Utforska</a>
-          <a href="#matches" class="navbar-link" data-page="matches" onclick="showPage('matches')"><span data-i18n="nav.matches">Matchningar</span><span id="matchesBadge" class="nav-badge" style="display:none;" aria-label="Unread matches"></span></a>
-          <a href="#register" class="navbar-link" data-page="register" onclick="showPage('register')" data-i18n="nav.join">Gå med</a>
-          <button type="button" class="lang-toggle" id="langToggle" onclick="toggleLanguage()" aria-label="EN, byt språk till engelska">EN</button>
-          <button type="button" class="lang-toggle" id="darkModeBtn" onclick="toggleDarkMode()" title="Dark mode" aria-label="Toggle dark mode">🌙</button>
+          <a href="#home" class="navbar-link" data-page="home" data-action="showPage" data-arg="home" data-i18n="nav.home">Hem</a>
+          <a href="#discover" class="navbar-link" data-page="discover" data-action="showPage" data-arg="discover" data-i18n="nav.discover">Utforska</a>
+          <a href="#matches" class="navbar-link" data-page="matches" data-action="showPage" data-arg="matches"><span data-i18n="nav.matches">Matchningar</span><span id="matchesBadge" class="nav-badge is-hidden" aria-label="Unread matches"></span></a>
+          <a href="#register" class="navbar-link" data-page="register" data-action="showPage" data-arg="register" data-i18n="nav.join">Gå med</a>
+          <button type="button" class="lang-toggle" id="langToggle" data-action="toggleLanguage" aria-label="EN, byt språk till engelska">EN</button>
+          <button type="button" class="lang-toggle" id="darkModeBtn" data-action="toggleDarkMode" title="Dark mode" aria-label="Toggle dark mode">🌙</button>
         </div>
       </div>
     </div>
@@ -78,13 +78,13 @@
             <p data-i18n="hero.tagline">Där meningsfulla kontakter skapas. Möt människor som verkligen förstår dig.</p>
             <p class="hero-description" data-i18n="hero.description">Hitta genuina kontakter baserat på gemensamma intressen och värderingar.</p>
             <div>
-              <button type="button" class="btn btn-primary btn-lg" onclick="showPage('discover')" data-i18n="hero.cta.discover">
+              <button type="button" class="btn btn-primary btn-lg" data-action="showPage" data-arg="discover" data-i18n="hero.cta.discover">
                 Börja Utforska
               </button>
-              <button type="button" class="btn btn-secondary btn-lg" onclick="showPage('register')" data-i18n="hero.cta.register">
+              <button type="button" class="btn btn-secondary btn-lg" data-action="showPage" data-arg="register" data-i18n="hero.cta.register">
                 Skapa Konto
               </button>
-              <button type="button" class="btn btn-ghost btn-lg" onclick="startDemo()" data-i18n="hero.cta.demo">
+              <button type="button" class="btn btn-ghost btn-lg" data-action="startDemo" data-i18n="hero.cta.demo">
                 Testa demo
               </button>
             </div>
@@ -109,16 +109,16 @@
 
   <!-- Register / Login Page -->
   <section id="register" class="page">
-    <div class="container" style="padding: 2rem 0;">
+    <div class="container u-pad-y-2">
       <div class="auth-container">
 
         <!-- Gate banner: visas när icke-inloggad försöker nå en skyddad sida -->
-        <div id="authGate" class="auth-gate" style="display:none;"></div>
+        <div id="authGate" class="auth-gate is-hidden"></div>
 
         <!-- Flikar: Skapa konto / Logga in -->
         <div class="auth-tabs">
-          <button type="button" class="auth-tab active" id="tabRegister" onclick="switchAuthTab('register')" data-i18n="auth.tab.register">Skapa konto</button>
-          <button type="button" class="auth-tab" id="tabLogin" onclick="switchAuthTab('login')" data-i18n="auth.tab.login">Logga in</button>
+          <button type="button" class="auth-tab active" id="tabRegister" data-action="switchAuthTab" data-arg="register" data-i18n="auth.tab.register">Skapa konto</button>
+          <button type="button" class="auth-tab" id="tabLogin" data-action="switchAuthTab" data-arg="login" data-i18n="auth.tab.login">Logga in</button>
         </div>
 
         <!-- ── Registreringsformulär ── -->
@@ -126,7 +126,7 @@
           <h2 data-i18n="register.title">❤️ Gå med i Heartlux</h2>
           <p class="auth-info" data-i18n="register.subtitle">Skapa ett konto och börja hitta meningsfulla kontakter</p>
 
-          <form id="registerForm" onsubmit="handleRegister(event)">
+          <form id="registerForm" data-submit="register">
             <div class="form-group">
               <label for="username" data-i18n="register.username">Användarnamn</label>
               <input type="text" id="username" name="username"
@@ -177,16 +177,16 @@
 
           <div class="auth-link">
             <span data-i18n="register.login">Redan medlem?</span>
-            <a href="#login" onclick="switchAuthTab('login')" data-i18n="register.login.link">Logga in</a>
+            <a href="#login" data-action="switchAuthTab" data-arg="login" data-i18n="register.login.link">Logga in</a>
           </div>
         </div>
 
         <!-- ── Inloggningsformulär ── -->
-        <div id="sectionLogin" style="display:none;">
+        <div class="is-hidden" id="sectionLogin">
           <h2 data-i18n="login.title">❤️ Logga in på Heartlux</h2>
           <p class="auth-info" data-i18n="login.subtitle">Välkommen tillbaka!</p>
 
-          <form id="loginForm" onsubmit="handleLogin(event)">
+          <form id="loginForm" data-submit="login">
             <div class="form-group">
               <label for="loginIdentifier" data-i18n="login.identifier">E-post eller användarnamn</label>
               <input type="text" id="loginIdentifier"
@@ -206,7 +206,7 @@
 
           <div class="auth-link">
             <span data-i18n="login.register">Inte registrerad?</span>
-            <a href="#register" onclick="switchAuthTab('register')" data-i18n="login.register.link">Skapa konto</a>
+            <a href="#register" data-action="switchAuthTab" data-arg="register" data-i18n="login.register.link">Skapa konto</a>
           </div>
         </div>
 
@@ -216,26 +216,26 @@
 
   <!-- Discover Page -->
   <section id="discover" class="page">
-    <div class="discover-container" style="padding: 2rem 0;">
+    <div class="discover-container u-pad-y-2">
       <div class="selector-section">
         <h2 data-i18n="discover.title">🎀 Vad letar du efter?</h2>
-        <p style="margin-bottom: 2rem; color: #999;" data-i18n="discover.subtitle">Berätta lite om dig själv för att hitta den perfekta matchen.</p>
+        <p class="discover-subtitle" data-i18n="discover.subtitle">Berätta lite om dig själv för att hitta den perfekta matchen.</p>
 
         <!-- Gender Selection -->
-        <div style="margin: 2rem 0;">
-          <h3 style="text-align: center; margin-bottom: 1.5rem;" data-i18n="discover.interest.heading">Jag är intresserad av att möta</h3>
+        <div class="u-my-2">
+          <h3 class="section-heading" data-i18n="discover.interest.heading">Jag är intresserad av att möta</h3>
           <div class="gender-grid">
-            <div class="option-card" data-value="male" onclick="selectOption('interest', 'male', this)">
+            <div class="option-card" data-value="male" data-action="selectOption" data-category="interest">
               <div class="option-icon">👨</div>
               <h3 data-i18n="discover.interest.male">Män</h3>
               <p data-i18n="discover.interest.male.desc">Anslut med manliga användare</p>
             </div>
-            <div class="option-card" data-value="female" onclick="selectOption('interest', 'female', this)">
+            <div class="option-card" data-value="female" data-action="selectOption" data-category="interest">
               <div class="option-icon">👩</div>
               <h3 data-i18n="discover.interest.female">Kvinnor</h3>
               <p data-i18n="discover.interest.female.desc">Anslut med kvinnliga användare</p>
             </div>
-            <div class="option-card option-card-full" data-value="everyone" onclick="selectOption('interest', 'everyone', this)">
+            <div class="option-card option-card-full" data-value="everyone" data-action="selectOption" data-category="interest">
               <div class="option-icon">🌍</div>
               <h3 data-i18n="discover.interest.everyone">Öppen för alla</h3>
               <p data-i18n="discover.interest.everyone.desc">Anslut med vem som helst</p>
@@ -244,8 +244,8 @@
         </div>
 
         <!-- Age Range -->
-        <div style="margin: 3rem 0;">
-          <h3 style="text-align: center; margin-bottom: 1rem;" data-i18n="discover.age.heading">Åldersintervall</h3>
+        <div class="u-my-3">
+          <h3 class="section-heading section-heading--tight" data-i18n="discover.age.heading">Åldersintervall</h3>
           <div id="ageRangeDisplay" class="age-range-display">18 – 35 år</div>
           <div class="age-sliders">
             <div class="age-slider-row">
@@ -262,9 +262,9 @@
         </div>
 
         <!-- Interests -->
-        <div style="margin: 3rem 0;">
-          <h3 style="text-align: center; margin-bottom: 1.5rem;" data-i18n="discover.interests.heading">Mina intressen</h3>
-          <div class="checkbox-group" style="justify-content: center; gap: 2rem;">
+        <div class="u-my-3">
+          <h3 class="section-heading" data-i18n="discover.interests.heading">Mina intressen</h3>
+          <div class="checkbox-group checkbox-group--centered">
             <div class="checkbox-item">
               <input type="checkbox" id="travel" name="interests" value="travel">
               <label for="travel" data-i18n="interest.travel">✈️ Resor</label>
@@ -293,8 +293,8 @@
         </div>
 
         <div class="action-buttons">
-          <button type="button" class="btn btn-secondary" onclick="showPage('home')" data-i18n="discover.back">← Tillbaka</button>
-          <button type="button" class="btn btn-primary btn-lg" onclick="finishSetup()" data-i18n="discover.finish">Slutför Profilen</button>
+          <button type="button" class="btn btn-secondary" data-action="showPage" data-arg="home" data-i18n="discover.back">← Tillbaka</button>
+          <button type="button" class="btn btn-primary btn-lg" data-action="finishSetup" data-i18n="discover.finish">Slutför Profilen</button>
         </div>
       </div>
     </div>
@@ -307,8 +307,8 @@
 
       <!-- Tab Bar -->
       <div class="matches-tabs-bar">
-        <button type="button" class="matches-tab active" id="tabBrowse" onclick="showMatchesTab('browse')" data-i18n="matches.tab.browse">🃏 Bläddra</button>
-        <button type="button" class="matches-tab" id="tabMyMatches" onclick="showMatchesTab('mymatches')" data-i18n="matches.tab.mymatches">💕 Matchningar</button>
+        <button type="button" class="matches-tab active" id="tabBrowse" data-action="showMatchesTab" data-arg="browse" data-i18n="matches.tab.browse">🃏 Bläddra</button>
+        <button type="button" class="matches-tab" id="tabMyMatches" data-action="showMatchesTab" data-arg="mymatches" data-i18n="matches.tab.mymatches">💕 Matchningar</button>
       </div>
 
       <!-- Browse Tab -->
@@ -351,7 +351,7 @@
               </div>
             </div>
             <div class="card-info">
-              <div id="cardCompat" class="compat-tag" style="display:none;"></div>
+              <div id="cardCompat" class="compat-tag is-hidden"></div>
               <p id="cardBio" class="card-bio"></p>
               <div class="interests-tags">
                 <div id="interestsList"></div>
@@ -360,12 +360,12 @@
           </div>
 
           <!-- No More / No Preferences -->
-          <div id="noMoreProfiles" class="no-more-profiles" style="display: none;">
+          <div id="noMoreProfiles" class="no-more-profiles is-hidden">
             <div class="empty-state">
-              <div style="font-size: 4rem; margin-bottom: 1rem;">🎉</div>
+              <div class="empty-emoji empty-emoji--xl">🎉</div>
               <h2 data-i18n="matches.empty.title">Du har visat alla profiler!</h2>
               <p data-i18n="matches.empty.text">Kom tillbaka senare för fler anslutningar.</p>
-              <button type="button" class="btn btn-primary btn-lg" onclick="showPage('home')" style="margin-top: 1.5rem;" data-i18n="matches.empty.back">
+              <button type="button" class="btn btn-primary btn-lg u-mt-15" data-action="showPage" data-arg="home" data-i18n="matches.empty.back">
                 Tillbaka till Startsidan
               </button>
             </div>
@@ -373,44 +373,44 @@
 
           <!-- Action Buttons -->
           <div class="action-buttons" id="actionButtons">
-            <button type="button" class="btn btn-ghost" onclick="undoProfile()" data-i18n="matches.undo">↩ Ångra</button>
-            <button type="button" class="btn btn-secondary" onclick="passProfile()" data-i18n="matches.pass">Passa</button>
-            <button type="button" class="btn btn-primary" onclick="likeProfile()" data-i18n="matches.like">❤️ Gilla</button>
+            <button type="button" class="btn btn-ghost" data-action="undoProfile" data-i18n="matches.undo">↩ Ångra</button>
+            <button type="button" class="btn btn-secondary" data-action="passProfile" data-i18n="matches.pass">Passa</button>
+            <button type="button" class="btn btn-primary" data-action="likeProfile" data-i18n="matches.like">❤️ Gilla</button>
           </div>
         </div>
       </div>
 
       <!-- My Matches Tab -->
-      <div id="matchesListContent" style="display: none;">
+      <div class="is-hidden" id="matchesListContent">
         <div class="matches-list-grid" id="matchesListGrid"></div>
       </div>
 
       <!-- Bottom Nav -->
       <div class="matches-footer">
-        <button type="button" class="btn btn-secondary btn-sm" onclick="showPage('home')" data-i18n="matches.footer.home">← Hem</button>
+        <button type="button" class="btn btn-secondary btn-sm" data-action="showPage" data-arg="home" data-i18n="matches.footer.home">← Hem</button>
       </div>
     </div>
   </section>
 
   <!-- Profile Page -->
   <section id="profile" class="page">
-    <div class="container" style="padding: 2rem 0;">
+    <div class="container u-pad-y-2">
       <h2 class="profile-page-title" data-i18n="profile.title">Min Profil</h2>
       <div class="profile-page-grid">
 
         <!-- Left: Avatar + Basic Info -->
         <div class="profile-main-card">
           <div class="profile-display-avatar" id="profileDisplayAvatar">👤</div>
-          <h2 id="profileUsername" style="color: var(--heart-primary); margin: 0.75rem 0 0.25rem;"></h2>
-          <p id="profileEmail" style="font-size: 0.875rem;"></p>
-          <p id="profileGender" style="font-size: 0.875rem; margin-top: 0.25rem;"></p>
-          <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem;">
+          <h2 class="profile-username" id="profileUsername"></h2>
+          <p class="u-text-sm" id="profileEmail"></p>
+          <p class="u-text-sm u-mt-025" id="profileGender"></p>
+          <p class="profile-member">
             <span data-i18n="profile.member">Medlem sedan</span>
-            <span id="profileMemberSince" style="display:block; font-weight:600;"></span>
+            <span class="profile-member-date" id="profileMemberSince"></span>
           </p>
 
           <div class="profile-avatar-section">
-            <h3 style="font-size: 0.95rem; margin-bottom: 0.75rem;" data-i18n="profile.avatar.heading">Välj Avatar</h3>
+            <h3 class="profile-subheading" data-i18n="profile.avatar.heading">Välj Avatar</h3>
             <div class="avatar-picker" id="profileAvatarPicker"></div>
           </div>
         </div>
@@ -423,7 +423,7 @@
             <textarea id="profileBioInput" rows="4"
               data-i18n-placeholder="profile.bio.placeholder"
               placeholder="Berätta om dig själv..."></textarea>
-            <button type="button" class="btn btn-primary" onclick="saveProfileBio()" style="margin-top: 1rem;" data-i18n="profile.save">Spara Profil</button>
+            <button type="button" class="btn btn-primary u-mt-1" data-action="saveProfileBio" data-i18n="profile.save">Spara Profil</button>
             <div id="profileSaveMsg" class="success-message"></div>
           </div>
 
@@ -432,12 +432,12 @@
             <h3 data-i18n="profile.stats.heading">Statistik</h3>
             <div class="profile-stats-grid">
               <div class="profile-stat-item">
-                <span style="font-size: 1.5rem;">❤️</span>
+                <span class="u-emoji-md">❤️</span>
                 <span class="stat-value" id="profileLikesCount">0</span>
                 <span class="stat-label" data-i18n="matches.stat.likes">Likes</span>
               </div>
               <div class="profile-stat-item">
-                <span style="font-size: 1.5rem;">💕</span>
+                <span class="u-emoji-md">💕</span>
                 <span class="stat-value" id="profileMatchesCount">0</span>
                 <span class="stat-label" data-i18n="matches.stat.matches">Matchningar</span>
               </div>
@@ -461,7 +461,7 @@
                 <strong id="profilePrefInterests">—</strong>
               </div>
             </div>
-            <button type="button" class="btn btn-secondary" onclick="showPage('discover')" style="margin-top: 1rem;" data-i18n="profile.prefs.edit">Ändra Preferenser</button>
+            <button type="button" class="btn btn-secondary u-mt-1" data-action="showPage" data-arg="discover" data-i18n="profile.prefs.edit">Ändra Preferenser</button>
           </div>
         </div>
       </div>
@@ -469,12 +469,12 @@
   </section>
 
   <!-- Chat Modal -->
-  <div id="chatModal" class="chat-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="chatPartnerName">
+  <div id="chatModal" class="chat-modal is-hidden" role="dialog" aria-modal="true" aria-labelledby="chatPartnerName">
     <div class="chat-container">
       <div class="chat-header">
-        <button type="button" class="btn btn-ghost btn-sm chat-back-btn" onclick="closeChat()">←</button>
+        <button type="button" class="btn btn-ghost btn-sm chat-back-btn" data-action="closeChat">←</button>
         <div class="chat-header-info">
-          <span id="chatPartnerAvatar" style="font-size: 2rem;">👤</span>
+          <span class="chat-partner-avatar" id="chatPartnerAvatar">👤</span>
           <strong id="chatPartnerName"></strong>
         </div>
       </div>
@@ -482,20 +482,19 @@
       <div class="chat-input-bar">
         <input type="text" id="chatInput"
           data-i18n-placeholder="chat.placeholder"
-          placeholder="Skriv ett meddelande..."
-          onkeydown="if(event.key==='Enter')sendChatMessage()">
-        <button type="button" class="btn btn-primary" onclick="sendChatMessage()" data-i18n="chat.send">Skicka</button>
+          placeholder="Skriv ett meddelande...">
+        <button type="button" class="btn btn-primary" data-action="sendChatMessage" data-i18n="chat.send">Skicka</button>
       </div>
     </div>
   </div>
 
   <!-- Match Popup -->
-  <div id="matchPopup" class="match-popup" style="display: none;" onclick="closeMatchPopup()" role="dialog" aria-modal="true" aria-labelledby="matchPopupTitle">
-    <div class="match-popup-content" onclick="event.stopPropagation()">
+  <div id="matchPopup" class="match-popup is-hidden" data-action="closeMatchPopupBackdrop" role="dialog" aria-modal="true" aria-labelledby="matchPopupTitle">
+    <div class="match-popup-content">
       <div class="match-hearts">💕</div>
       <h2 id="matchPopupTitle" data-i18n="matches.popup.title">Det är en match!</h2>
       <p id="matchPopupName"></p>
-      <button type="button" class="btn btn-primary" onclick="closeMatchPopup()" style="margin-top: 1.5rem;" data-i18n="matches.popup.btn">
+      <button type="button" class="btn btn-primary u-mt-15" data-action="closeMatchPopup" data-i18n="matches.popup.btn">
         Fortsätt Bläddra ❤️
       </button>
     </div>
@@ -506,10 +505,10 @@
 
   <footer>
     <div class="container">
-      <p>&copy; 2026 Heartlux. <span data-i18n="footer.note">Demoapp: allt sparas lokalt i din webbläsare.</span></p>
+      <p>&copy; 2026 Mahad Abdullahi</p>
     </div>
   </footer>
 
-  <script src="js/main.js"></script>
+  <script type="module" src="js/app.js"></script>
 </body>
 </html>

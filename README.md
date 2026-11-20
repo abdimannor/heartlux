@@ -25,7 +25,7 @@ You can also register a local account and go through the setup steps yourself.
 
 ## What is implemented
 
-Everything below is in `index.html` and `js/main.js`:
+Everything below is in `index.html` and the ES modules under `js/`:
 
 - **Register and log in.** A local account (username, email, password,
   gender) is saved in `localStorage`. Login compares the input with that one
@@ -59,7 +59,17 @@ No framework and no build step. The site is plain files served as they are:
 | --- | --- |
 | `index.html` | All pages as sections; only one is shown at a time |
 | `css/style.css` | Layout, components, dark mode |
-| `js/main.js` | Translations, navigation, accounts, matching, chat, profile |
+| `js/app.js` | Entry module: one delegated click/submit listener mapping `data-action` names to handlers, then start-up |
+| `js/state.js` | `localStorage` keys and access helpers, the in-memory session (deck, chat partner) |
+| `js/i18n.js` | Swedish and English strings, `t()`, `translateDocument()` |
+| `js/profiles.js` | Pure functions: profile generation, matching, compatibility score, canned replies |
+| `js/dom.js` | `h()` element builder (text via `textContent`), `setVisible()`, `escapeHtml()` |
+| `js/pwa.js` | Service worker registration |
+| `js/ui/navigation.js` | `showPage()`, navbar account links, unread badge, logout |
+| `js/ui/language.js`, `js/ui/theme.js` | Language toggle, dark mode |
+| `js/ui/register.js`, `js/ui/discover.js` | Register/login forms, auth tabs, age sliders, preference setup |
+| `js/ui/matches.js`, `js/ui/swipe.js`, `js/ui/matches-list.js` | Card deck (like/pass/undo, popup, stats), swipe gesture, "my matches" list |
+| `js/ui/chat.js`, `js/ui/profile.js`, `js/ui/demo.js` | Chat modal, own profile page, demo account |
 | `sw.js` | Service worker: cache-first for the app shell, `index.html` as offline fallback |
 | `manifest.webmanifest` | PWA metadata and icons (`images/`) |
 | `404.html`, `robots.txt`, `sitemap.xml` | GitHub Pages extras |
@@ -68,7 +78,13 @@ No framework and no build step. The site is plain files served as they are:
 Some choices worth knowing about:
 
 - **Single page, no router.** `showPage(id)` toggles an `active` class on a
-  section. Inline `onclick` handlers in the HTML call global functions.
+  section. Buttons and links carry `data-action` (and `data-arg`); forms carry
+  `data-submit`. `js/app.js` handles them with one delegated listener, so
+  there are no inline handlers and no globals on `window`.
+- **No inline styles.** Visibility is the `.is-hidden` class; the classes that
+  replaced `style=""` attributes sit at the end of `css/style.css`.
+- **Safe DOM.** Usernames, bios and chat messages are only ever set with
+  `textContent` (through `h()`); no module assigns `innerHTML`.
 - **Translations by attribute.** Elements carry `data-i18n` or
   `data-i18n-placeholder`; `applyTranslations()` fills them from the current
   language. Text built in JavaScript uses `t(key)`. Because the attribute
@@ -86,8 +102,8 @@ npm ci
 npm start          # http://localhost:8080
 ```
 
-Opening `index.html` directly mostly works too, but the service worker needs
-a server.
+The scripts are ES modules, which browsers do not load from `file://`, so
+use the server rather than opening `index.html` directly.
 
 ## Tests
 
@@ -97,10 +113,12 @@ npx playwright install chromium    # once
 npm run check:e2e                  # starts server.js and runs Playwright
 ```
 
-`scripts/smoke-test.js` checks that every handler named in the HTML exists in
-`main.js`, that every translation key used in the HTML exists in both
-languages, and that every id the script looks up with `getElementById` exists
-in the HTML.
+`scripts/smoke-test.js` checks that every `data-action`/`data-submit` has a
+handler in `js/app.js`, that the HTML and modules contain no inline handlers,
+inline styles or `innerHTML` assignments, that every translation key used in
+the HTML exists in both languages, that every id looked up with `byId` or
+`getElementById` exists in the HTML, and that the service worker precaches
+every module.
 
 `tests/app.spec.js` drives a real browser through registration, setup,
 discovery, language and theme switching, profile editing and chat, plus the

@@ -51,7 +51,7 @@ test('core onboarding, matching, language, dark mode, profile, and chat flow wor
   });
   await page.locator('#music').check();
   await page.locator('#travel').check();
-  await page.locator('button[onclick="finishSetup()"]').click();
+  await page.locator('button[data-action="finishSetup"]').click();
 
   await expect(page.locator('#matches.page.active')).toBeVisible({ timeout: 4000 });
   await expect(page.locator('#profileCard')).toBeVisible();
@@ -65,7 +65,7 @@ test('core onboarding, matching, language, dark mode, profile, and chat flow wor
   await page.locator('[data-page="register"]').click();
   await expect(page.locator('#profile.page.active')).toBeVisible();
   await page.locator('#profileBioInput').fill('Building Heartlux with care.');
-  await page.locator('button[onclick="saveProfileBio()"]').click();
+  await page.locator('button[data-action="saveProfileBio"]').click();
   await expect(page.locator('#profileSaveMsg')).toContainText('Profile saved!');
 
   await page.locator('[data-page="matches"]').click();
@@ -83,12 +83,20 @@ test('core onboarding, matching, language, dark mode, profile, and chat flow wor
   await page.locator('#tabMyMatches').click();
   await page.locator('#matchesListGrid .match-list-card').filter({ hasText: 'Sofia, 26' }).click();
   await page.locator('#chatInput').fill('Hello!');
-  await page.locator('button[onclick="sendChatMessage()"]').click();
+  await page.locator('button[data-action="sendChatMessage"]').click();
   await expect(page.locator('#chatMessages')).toContainText('Hello!');
+
+  // User text is rendered as text, never parsed as HTML.
+  const payload = '<img src=x onerror="window.__xss=1"><b>bold</b>';
+  await page.locator('#chatInput').fill(payload);
+  await page.locator('#chatInput').press('Enter');
+  await expect(page.locator('#chatMessages')).toContainText(payload);
+  await expect(page.locator('#chatMessages img, #chatMessages b')).toHaveCount(0);
+  expect(await page.evaluate(() => window.__xss)).toBeUndefined();
 });
 
 test('demo button signs in a local demo account and opens discovery', async ({ page }) => {
-  const demoButton = page.locator('#home button[onclick="startDemo()"]');
+  const demoButton = page.locator('#home button[data-action="startDemo"]');
   await expect(demoButton).toHaveText('Testa demo');
 
   await demoButton.click();
@@ -128,7 +136,7 @@ test('demo button asks before replacing an existing account', async ({ page }) =
   await page.reload();
 
   page.once('dialog', dialog => dialog.dismiss());
-  await page.locator('#home button[onclick="startDemo()"]').click();
+  await page.locator('#home button[data-action="startDemo"]').click();
 
   const user = await page.evaluate(() => JSON.parse(localStorage.getItem('heartlux_user')));
   expect(user.username).toBe('real');
