@@ -94,3 +94,11 @@ html[data-motion="reduce"]::view-transition-old(root), html[data-motion="reduce"
 .typing-dot:nth-child(3) { animation-delay: 0.3s; }
 @keyframes typingDot { 0%, 60%, 100% { transform: translateY(0); opacity: 0.4; } 30% { transform: translateY(-4px); opacity: 1; } }
 html[data-motion="reduce"] .typing-dot { animation: none; opacity: 0.7; }
+
+/* Prompt answer on the Discover deck card (light card body, not the photo overlay). */
+.card-prompt--deck { margin: 0.6rem 0 0.4rem; padding: 0.7rem 0.85rem; border-radius: 14px; background: #fdeaf4; border-left: 4px solid #cc328c; }
+.card-prompt--deck .card-prompt-q { color: #8f1d5f; }
+.card-prompt--deck .card-prompt-a { display: block; color: #2a1020; }
+body.dark-mode .card-prompt--deck { background: #3a1830; border-left-color: #ff7cc4; }
+body.dark-mode .card-prompt--deck .card-prompt-q { color: #ffb3dc; }
+body.dark-mode .card-prompt--deck .card-prompt-a { color: #fbe9f3; }

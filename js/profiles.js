@@ -29,6 +29,37 @@ const BIOS = {
 
 const FIRST_NAMES = ['Emma','Anna','Sofia','Lisa','Maria','Eva','Karin','Petra','Johan','Anders','Lars','Erik','Michael','David','Nils','Per','Magnus','Thomas','Stefan','Daniel'];
 const CITIES      = ['Stockholm','Göteborg','Malmö','Uppsala','Västerås','Örebro','Linköping','Helsingborg','Jönköping','Norrköping'];
+/** Card prompts. Keys match the prompt.* strings in i18n.js. */
+export const PROMPT_KEYS = ['sunday', 'green', 'dinner', 'secret', 'together'];
+
+/** Small curated answer pools that fit each prompt (sample profiles only). */
+const PROMPT_ANSWERS = {
+  sv: {
+    sunday:   ['Sovmorgon, loppis och en lång fika', 'En skogspromenad och soppa efteråt', 'Tidning, kaffe och ingen klocka'],
+    green:    ['Människor som skrattar åt sina egna skämt', 'Någon som alltid har en bok i väskan', 'Ärlighet och dålig dansstil'],
+    dinner:   ['Pasta med citron och parmesan', 'Linsgryta som räcker hela veckan', 'Tacos, alltid på fredagar'],
+    secret:   ['har sprungit ett halvmaraton', 'kan spela dragspel', 'odlar chili på balkongen'],
+    together: ['du gillar spontana dagsutflykter', 'du står ut med min playlist', 'du tycker att fika är en måltid'],
+  },
+  en: {
+    sunday:   ['A lie-in, a flea market and a long coffee', 'A forest walk with soup afterwards', 'Papers, coffee and no clock'],
+    green:    ['People who laugh at their own jokes', 'Someone who always carries a book', 'Honesty and bad dance moves'],
+    dinner:   ['Pasta with lemon and parmesan', 'A lentil stew that lasts all week', 'Tacos, always on Fridays'],
+    secret:   ['have run a half marathon', 'can play the accordion', 'grow chillies on my balcony'],
+    together: ['you like spontaneous day trips', 'you can handle my playlist', 'you think a coffee break counts as a meal'],
+  },
+};
+
+/** Every fourth sample profile has no prompt. Derived from the index, so the
+ *  random sequence (and seeded tests) stay unchanged. */
+export function samplePrompt(lang, i) {
+  if (i % 4 === 3) return null;
+  const key     = PROMPT_KEYS[i % PROMPT_KEYS.length];
+  const answers = (lang === 'en' ? PROMPT_ANSWERS.en : PROMPT_ANSWERS.sv)[key];
+  return { key, answer: answers[(i * 7) % answers.length] };
+}
+
+export const CITY_LIST = CITIES;
 export const ALL_INTERESTS = ['travel','music','fitness','cooking','books','art'];
 
 export const AVATAR_OPTIONS = ['👩','👨','👩‍🦱','👨‍🦱','👩‍🦰','👨‍🦰','👩‍🦳','👨‍🦳','🧕','👱‍♀️','👱','😊','😎','🌸','💫','⭐'];
@@ -59,6 +90,7 @@ export function generateProfiles(lang = 'sv', rng = Math.random, count = 20) {
       city:   pick(CITIES, rng),
       bio:    pick(bioList, rng),
       interests,
+      prompt: samplePrompt(lang, i),
       avatar: gender === 'male' ? '👨' : '👩',
     });
   }

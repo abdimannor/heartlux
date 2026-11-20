@@ -73,6 +73,15 @@ export function loadProfile() {
   byId('cardBio').textContent      = profile.bio;
   paintAvatar(byId('cardAvatar'), profile);
 
+  const promptEl = byId('cardPrompt');
+  if (promptEl) {
+    if (profile.prompt) {
+      byId('cardPromptQ').textContent = t(`prompt.${profile.prompt.key}`);
+      byId('cardPromptA').textContent = profile.prompt.answer;
+    }
+    setVisible(promptEl, Boolean(profile.prompt));
+  }
+
   byId('interestsList').replaceChildren(
     ...profile.interests.map(i => h('div', { className: 'interest-tag' }, t(`interest.${i}`))));
 
