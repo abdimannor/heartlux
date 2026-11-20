@@ -17,13 +17,14 @@ export const KEYS = Object.freeze({
   dark:      'heartlux_dark',
   motion:    'heartlux_motion',
   prompt:    'heartlux_user_prompt',
+  filters:   'heartlux_filters',
 });
 
 /** Everything that belongs to one local account (cleared on logout / demo). */
 export const USER_STORAGE_KEYS = [
   KEYS.user, KEYS.prefs, KEYS.likes, KEYS.passes,
   KEYS.interest, KEYS.matches, KEYS.chats,
-  KEYS.avatar, KEYS.bio, KEYS.prompt,
+  KEYS.avatar, KEYS.bio, KEYS.prompt, KEYS.filters,
   KEYS.unread, KEYS.seen,
 ];
 
@@ -56,6 +57,7 @@ export const getUnread = () => parseInt(getItem(KEYS.unread) || '0', 10);
 export function emptyMatchState() {
   return {
     currentProfileIndex: 0,
+    allProfiles: [],
     profiles: [],
     likes: [],
     passes: [],

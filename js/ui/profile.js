@@ -2,11 +2,11 @@
 import { KEYS, getItem, setItem, getUser, readJSON, writeJSON } from '../state.js';
 import { t, getLang } from '../i18n.js';
 import { byId, h, setVisible } from '../dom.js';
-import { AVATAR_OPTIONS } from '../profiles.js';
+import { AVATAR_OPTIONS, PROMPT_KEYS } from '../profiles.js';
 import { later, cancelScope } from '../timers.js';
 import { cropToCard, savePhoto, deletePhoto, photoUrl } from '../photo-store.js';
 
-export const PROMPTS = ['sunday', 'green', 'dinner', 'secret', 'together'];
+export const PROMPTS = PROMPT_KEYS;
 
 /** The saved card prompt: { key, answer } or null. */
 export function getPrompt() {

@@ -11,6 +11,8 @@ import { saveProfileBio, selectAvatar, removeProfilePhoto, initProfileEditor } f
 import { toggleDarkMode, applyDarkMode } from './ui/theme.js';
 import { applyMotion, toggleMotion, syncMotionButton } from './motion.js';
 import { startDemo } from './ui/demo.js';
+import { initFilters, openFilters, closeFilters, resetFilters } from './ui/filters.js';
+import { refilterDeck } from './ui/matches.js';
 import { registerServiceWorker } from './pwa.js';
 
 /** data-action name -> handler(element, event). data-arg carries a string argument. */
@@ -36,6 +38,9 @@ const actions = {
   sendChatMessage: () => sendChatMessage(),
   saveProfileBio:  () => saveProfileBio(),
   removeProfilePhoto: () => removeProfilePhoto(),
+  openFilters:     () => openFilters(),
+  closeFilters:    () => closeFilters(),
+  resetFilters:    () => resetFilters(),
 };
 
 const submitActions = {
@@ -63,5 +68,9 @@ applyMotion();
 applyDarkMode();
 applyTranslations();
 updateMatchBadge();
+initFilters(() => refilterDeck());
 initMatches();
+// Manifest shortcuts open ./#discover and ./#matches.
+const startPage = location.hash.slice(1);
+if (['discover', 'matches'].includes(startPage)) showPage(startPage);
 registerServiceWorker();

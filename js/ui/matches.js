@@ -2,7 +2,8 @@
 import { KEYS, session, readJSON, writeJSON, getPrefs, getUnread, setItem, resetMatchState } from '../state.js';
 import { t, getLang } from '../i18n.js';
 import { byId, h, setVisible } from '../dom.js';
-import { generateProfiles, matchProfiles, sharedInterests } from '../profiles.js';
+import { generateProfiles, matchProfiles, sharedInterests, applyFilters, activeFilterCount } from '../profiles.js';
+import { getFilters } from './filters.js';
 import { updateMatchBadge } from './navigation.js';
 import { initSwipeGesture } from './swipe.js';
 import { later } from '../timers.js';
@@ -12,9 +13,24 @@ import { heartBurst } from './match-burst.js';
 export { showMatchesTab } from './matches-list.js';
 
 function setDeckVisible(hasProfile) {
+  const state       = session.match;
+  const filteredOut = !hasProfile && state.allProfiles.length > 0
+    && state.profiles.length === 0 && activeFilterCount(getFilters()) > 0;
   setVisible(byId('profileCard'), hasProfile);
   setVisible(byId('actionButtons'), hasProfile);
-  setVisible(byId('noMoreProfiles'), !hasProfile);
+  setVisible(byId('noMoreProfiles'), !hasProfile && !filteredOut);
+  setVisible(byId('noFilterMatch'), filteredOut);
+}
+
+/** Re-deal the deck after a filter change, skipping profiles already acted on. */
+export function refilterDeck() {
+  const state = session.match;
+  if (!state.allProfiles.length) return;
+  const acted = new Set(state.history.map(h => h.profileId));
+  state.profiles = applyFilters(state.allProfiles, getFilters()).filter(p => !acted.has(p.id));
+  state.currentProfileIndex = 0;
+  state.history = [];
+  loadProfile();
 }
 
 function renderNoPreferences(container) {
@@ -48,7 +64,8 @@ export function initMatches() {
     state.likes           = readJSON(KEYS.likes, []);
     state.passes          = readJSON(KEYS.passes, []);
     state.matchedProfiles = readJSON(KEYS.matches, []);
-    state.profiles        = matchProfiles(generateProfiles(getLang()), prefs);
+    state.allProfiles     = matchProfiles(generateProfiles(getLang()), prefs);
+    state.profiles        = applyFilters(state.allProfiles, getFilters());
   }
 
   updateStats();
@@ -72,6 +89,15 @@ export function loadProfile() {
   byId('cardLocation').textContent = `📍 ${profile.city}`;
   byId('cardBio').textContent      = profile.bio;
   paintAvatar(byId('cardAvatar'), profile);
+
+  const promptEl = byId('cardPrompt');
+  if (promptEl) {
+    if (profile.prompt) {
+      byId('cardPromptQ').textContent = t(`prompt.${profile.prompt.key}`);
+      byId('cardPromptA').textContent = profile.prompt.answer;
+    }
+    setVisible(promptEl, Boolean(profile.prompt));
+  }
 
   byId('interestsList').replaceChildren(
     ...profile.interests.map(i => h('div', { className: 'interest-tag' }, t(`interest.${i}`))));

@@ -29,6 +29,37 @@ const BIOS = {
 
 const FIRST_NAMES = ['Emma','Anna','Sofia','Lisa','Maria','Eva','Karin','Petra','Johan','Anders','Lars','Erik','Michael','David','Nils','Per','Magnus','Thomas','Stefan','Daniel'];
 const CITIES      = ['Stockholm','Göteborg','Malmö','Uppsala','Västerås','Örebro','Linköping','Helsingborg','Jönköping','Norrköping'];
+/** Card prompts. Keys match the prompt.* strings in i18n.js. */
+export const PROMPT_KEYS = ['sunday', 'green', 'dinner', 'secret', 'together'];
+
+/** Small curated answer pools that fit each prompt (sample profiles only). */
+const PROMPT_ANSWERS = {
+  sv: {
+    sunday:   ['Sovmorgon, loppis och en lång fika', 'En skogspromenad och soppa efteråt', 'Tidning, kaffe och ingen klocka'],
+    green:    ['Människor som skrattar åt sina egna skämt', 'Någon som alltid har en bok i väskan', 'Ärlighet och dålig dansstil'],
+    dinner:   ['Pasta med citron och parmesan', 'Linsgryta som räcker hela veckan', 'Tacos, alltid på fredagar'],
+    secret:   ['har sprungit ett halvmaraton', 'kan spela dragspel', 'odlar chili på balkongen'],
+    together: ['du gillar spontana dagsutflykter', 'du står ut med min playlist', 'du tycker att fika är en måltid'],
+  },
+  en: {
+    sunday:   ['A lie-in, a flea market and a long coffee', 'A forest walk with soup afterwards', 'Papers, coffee and no clock'],
+    green:    ['People who laugh at their own jokes', 'Someone who always carries a book', 'Honesty and bad dance moves'],
+    dinner:   ['Pasta with lemon and parmesan', 'A lentil stew that lasts all week', 'Tacos, always on Fridays'],
+    secret:   ['have run a half marathon', 'can play the accordion', 'grow chillies on my balcony'],
+    together: ['you like spontaneous day trips', 'you can handle my playlist', 'you think a coffee break counts as a meal'],
+  },
+};
+
+/** Every fourth sample profile has no prompt. Derived from the index, so the
+ *  random sequence (and seeded tests) stay unchanged. */
+export function samplePrompt(lang, i) {
+  if (i % 4 === 3) return null;
+  const key     = PROMPT_KEYS[i % PROMPT_KEYS.length];
+  const answers = (lang === 'en' ? PROMPT_ANSWERS.en : PROMPT_ANSWERS.sv)[key];
+  return { key, answer: answers[(i * 7) % answers.length] };
+}
+
+export const CITY_LIST = CITIES;
 export const ALL_INTERESTS = ['travel','music','fitness','cooking','books','art'];
 
 export const AVATAR_OPTIONS = ['👩','👨','👩‍🦱','👨‍🦱','👩‍🦰','👨‍🦰','👩‍🦳','👨‍🦳','🧕','👱‍♀️','👱','😊','😎','🌸','💫','⭐'];
@@ -59,6 +90,7 @@ export function generateProfiles(lang = 'sv', rng = Math.random, count = 20) {
       city:   pick(CITIES, rng),
       bio:    pick(bioList, rng),
       interests,
+      prompt: samplePrompt(lang, i),
       avatar: gender === 'male' ? '👨' : '👩',
     });
   }
@@ -87,6 +119,39 @@ export function matchProfiles(profiles, prefs) {
       && (prefs.interest === 'everyone' || p.gender === prefs.interest))
     .map(p => ({ ...p, compat: compatScore(p, userInts) }))
     .sort((a, b) => b.compat - a.compat);
+}
+
+export const NO_FILTERS = Object.freeze({ minAge: 18, maxAge: 80, interests: [], city: '', hasPrompt: false });
+
+/** Normalise stored filter values (bad or missing fields fall back to "no filter"). */
+export function normaliseFilters(raw = {}) {
+  const f = { ...NO_FILTERS, ...(raw || {}) };
+  let minAge = Math.min(Math.max(parseInt(f.minAge, 10) || 18, 18), 80);
+  let maxAge = Math.min(Math.max(parseInt(f.maxAge, 10) || 80, 18), 80);
+  if (minAge > maxAge) [minAge, maxAge] = [maxAge, minAge];
+  return {
+    minAge, maxAge,
+    interests: Array.isArray(f.interests) ? f.interests.filter(i => ALL_INTERESTS.includes(i)) : [],
+    city:      CITIES.includes(f.city) ? f.city : '',
+    hasPrompt: Boolean(f.hasPrompt),
+  };
+}
+
+/** How many filters differ from the defaults (shown on the Filter button). */
+export function activeFilterCount(raw) {
+  const f = normaliseFilters(raw);
+  return (f.minAge !== 18 || f.maxAge !== 80 ? 1 : 0)
+    + (f.interests.length ? 1 : 0) + (f.city ? 1 : 0) + (f.hasPrompt ? 1 : 0);
+}
+
+/** Discover deck filters: age range, any of the chosen interests, city, has a prompt. */
+export function applyFilters(profiles, raw) {
+  const f = normaliseFilters(raw);
+  return profiles.filter(p =>
+    p.age >= f.minAge && p.age <= f.maxAge
+    && (!f.interests.length || p.interests.some(i => f.interests.includes(i)))
+    && (!f.city || p.city === f.city)
+    && (!f.hasPrompt || Boolean(p.prompt)));
 }
 
 export function randomReply(lang, rng = Math.random) {
