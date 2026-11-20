@@ -407,6 +407,19 @@
           </p>
 
           <div class="profile-avatar-section">
+            <h3 class="profile-subheading" data-i18n="profile.photo.heading">Ditt foto</h3>
+            <div class="photo-actions">
+              <label class="btn btn-primary btn-sm photo-upload">
+                <span data-i18n="profile.photo.upload">Ladda upp eget foto</span>
+                <input type="file" id="profilePhotoInput" class="visually-hidden" accept="image/*">
+              </label>
+              <button type="button" class="btn btn-secondary btn-sm is-hidden" id="profilePhotoRemove" data-action="removeProfilePhoto" data-i18n="profile.photo.remove">Ta bort foto</button>
+            </div>
+            <p class="u-text-sm u-mt-025 photo-note" data-i18n="profile.photo.note">Fotot beskärs till kortets form och sparas bara på den här enheten.</p>
+            <p class="u-text-sm photo-status" id="profilePhotoStatus" role="status"></p>
+          </div>
+
+          <div class="profile-avatar-section">
             <h3 class="profile-subheading" data-i18n="profile.avatar.heading">Välj Avatar</h3>
             <div class="avatar-picker" id="profileAvatarPicker"></div>
           </div>
@@ -420,6 +433,29 @@
             <textarea id="profileBioInput" rows="4"
               data-i18n-placeholder="profile.bio.placeholder"
               placeholder="Berätta om dig själv..."></textarea>
+            <h3 class="u-mt-1" data-i18n="profile.prompt.heading">Din fråga på kortet</h3>
+            <div class="form-group">
+              <label for="profilePromptSelect" data-i18n="profile.prompt.label">Välj en fråga</label>
+              <select id="profilePromptSelect">
+                <option value="sunday" data-i18n="prompt.sunday"></option>
+                <option value="green" data-i18n="prompt.green"></option>
+                <option value="dinner" data-i18n="prompt.dinner"></option>
+                <option value="secret" data-i18n="prompt.secret"></option>
+                <option value="together" data-i18n="prompt.together"></option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="profilePromptAnswer" data-i18n="profile.prompt.answer">Ditt svar</label>
+              <input type="text" id="profilePromptAnswer" maxlength="120">
+            </div>
+            <p class="u-text-sm" data-i18n="profile.prompt.preview">Så här ser ditt kort ut</p>
+            <article class="own-card" id="ownCard">
+              <div class="own-card-photo" id="ownCardPhoto"></div>
+              <div class="own-card-body">
+                <h4 class="own-card-name" id="ownCardName"></h4>
+                <p class="card-prompt" id="ownCardPrompt"><span class="card-prompt-q" id="ownCardPromptQ"></span> <span class="card-prompt-a" id="ownCardPromptA"></span></p>
+              </div>
+            </article>
             <button type="button" class="btn btn-primary u-mt-1" data-action="saveProfileBio" data-i18n="profile.save">Spara Profil</button>
             <div id="profileSaveMsg" class="success-message"></div>
           </div>
