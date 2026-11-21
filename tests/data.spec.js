@@ -50,6 +50,9 @@ async function buildState(page) {
   await page.locator('.match-list-card .btn-primary').first().click();
   await page.locator('#chatInput').fill('Hej från testet');
   await page.locator('#chatInput').press('Enter');
+  // The match answers after 0.8 to 1.8 s. Wait for it, so no test snapshots a
+  // state that a pending reply is about to change.
+  await expect.poll(async () => Object.values(await read(page, 'heartlux_chats', '{}')).flat().filter(m => m.from === 'match').length, { timeout: 10000 }).toBeGreaterThanOrEqual(2);
   await page.locator('[data-action="closeChat"]').first().click();
   await page.evaluate(() => import('./js/ui/navigation.js').then(m => m.showPage('profile')));
   await page.locator('#profilePhotoInput').setInputFiles(await generatedPng(page));
@@ -114,6 +117,7 @@ test('export, delete everything, import restores profile, matches, chats and pho
   const after = await page.evaluate(() => Object.fromEntries(Object.keys(localStorage).map(k => [k, localStorage.getItem(k)])));
   for (const key of ['heartlux_user', 'heartlux_matches_list', 'heartlux_chats', 'heartlux_likes']) {
     expect(after[key]).toBe(before[key]);
+    expect(exported.storage[key]).toBe(before[key]);
   }
   expect(await rowCount(page, 'photo')).toContain('1');
   await page.evaluate(() => import('./js/ui/navigation.js').then(m => m.showPage('profile')));

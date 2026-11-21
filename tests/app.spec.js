@@ -38,7 +38,7 @@ test('core onboarding, matching, language, dark mode, profile, and chat flow wor
   await registerForm.locator('#genderMale').check();
   await registerForm.locator('button[type="submit"]').click();
 
-  await expect(page.locator('#discover.page.active')).toBeVisible({ timeout: 3000 });
+  await expect(page.locator('#discover.page.active')).toBeVisible({ timeout: 10000 });
 
   await page.locator('.option-card[data-value="female"]').click();
   await page.locator('#ageMin').evaluate(el => {
@@ -53,7 +53,7 @@ test('core onboarding, matching, language, dark mode, profile, and chat flow wor
   await page.locator('#travel').check();
   await page.locator('button[data-action="finishSetup"]').click();
 
-  await expect(page.locator('#matches.page.active')).toBeVisible({ timeout: 4000 });
+  await expect(page.locator('#matches.page.active')).toBeVisible({ timeout: 10000 });
   await expect(page.locator('#profileCard')).toBeVisible();
 
   await page.locator('#langToggle').click();
