@@ -1,4 +1,4 @@
-const CACHE_NAME = 'heartlux-v15';
+const CACHE_NAME = 'heartlux-v16';
 const APP_SHELL = [
   './',
   './index.html',
@@ -27,6 +27,7 @@ const APP_SHELL = [
   './js/ui/navigation.js',
   './js/ui/profile.js',
   './js/ui/register.js',
+  './js/ui/safety.js',
   './js/ui/swipe.js',
   './js/ui/theme.js',
   './manifest.webmanifest',
