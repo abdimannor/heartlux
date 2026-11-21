@@ -14,6 +14,9 @@ import { startDemo } from './ui/demo.js';
 import { initFilters, openFilters, closeFilters, resetFilters } from './ui/filters.js';
 import { refilterDeck } from './ui/matches.js';
 import { registerServiceWorker } from './pwa.js';
+import { initSafety, onSafetyChange, renderBlockedList } from './ui/safety.js';
+import { renderMatchesList } from './ui/matches-list.js';
+import { session } from './state.js';
 
 /** data-action name -> handler(element, event). data-arg carries a string argument. */
 const actions = {
@@ -71,6 +74,17 @@ applyTranslations();
 updateMatchBadge();
 initFilters(() => refilterDeck());
 initMatches();
+initSafety();
+renderBlockedList();
+// After unmatch / block / unblock: close a chat with that person, refresh the list and the deck.
+onSafetyChange(({ type, profile }) => {
+  if (profile && session.chatProfile && String(session.chatProfile.id) === String(profile.id)) closeChat();
+  renderMatchesList();
+  updateMatchBadge();
+  if (type === 'block') refilterDeck();
+  if (type === 'unblock') { session.match.profiles = []; if (document.getElementById('matches')?.classList.contains('active')) initMatches(); }
+  renderBlockedList();
+});
 // Manifest shortcuts open ./#discover and ./#matches.
 const startPage = location.hash.slice(1);
 if (['discover', 'matches'].includes(startPage)) showPage(startPage);

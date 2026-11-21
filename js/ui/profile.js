@@ -5,6 +5,7 @@ import { byId, h, setVisible } from '../dom.js';
 import { AVATAR_OPTIONS, PROMPT_KEYS } from '../profiles.js';
 import { later, cancelScope } from '../timers.js';
 import { cropToCard, savePhoto, deletePhoto, photoUrl } from '../photo-store.js';
+import { renderBlockedList } from './safety.js';
 
 export const PROMPTS = PROMPT_KEYS;
 
@@ -30,6 +31,7 @@ export async function paintOwnAvatar(el, fallback) {
 const defaultAvatar = gender => (gender === 'female' ? '👩' : gender === 'male' ? '👨' : '😊');
 
 export function loadProfilePage() {
+  renderBlockedList();
   const user = getUser();
   if (!user || !byId('profileDisplayAvatar')) return;
   const prefs  = readJSON(KEYS.prefs, {});
