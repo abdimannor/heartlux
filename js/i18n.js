@@ -171,7 +171,7 @@ export const translations = {
 
     // Safety, keyboard swiping and dating tips
     'safety.menu': 'Säkerhet',
-    'safety.menu.label': 'Säkerhetsval för {name}',
+    'safety.menu.for': 'för {name}',
     'safety.unmatch': 'Ta bort matchningen',
     'safety.block': 'Blockera',
     'safety.report': 'Rapportera',
@@ -201,7 +201,7 @@ export const translations = {
     'safety.blocked.heading': 'Blockerade profiler',
     'safety.blocked.empty': 'Du har inte blockerat någon.',
     'safety.unblock': 'Häv blockering',
-    'safety.unblock.label': 'Häv blockeringen av {name}',
+    'safety.unblock.for': 'av {name}',
     'tips.title': 'Innan ni ses',
     'tips.intro': 'Några enkla råd inför en första träff.',
     'tips.1': 'Träffas på en offentlig plats med folk omkring er, till exempel ett kafé.',
@@ -413,7 +413,7 @@ export const translations = {
 
     // Safety, keyboard swiping and dating tips
     'safety.menu': 'Safety',
-    'safety.menu.label': 'Safety options for {name}',
+    'safety.menu.for': 'for {name}',
     'safety.unmatch': 'Unmatch',
     'safety.block': 'Block',
     'safety.report': 'Report',
@@ -443,7 +443,7 @@ export const translations = {
     'safety.blocked.heading': 'Blocked profiles',
     'safety.blocked.empty': 'You haven\'t blocked anyone.',
     'safety.unblock': 'Unblock',
-    'safety.unblock.label': 'Unblock {name}',
+    'safety.unblock.for': '{name}',
     'tips.title': 'Before you meet',
     'tips.intro': 'A few simple pointers for a first date.',
     'tips.1': 'Meet in a public place with people around, such as a café.',

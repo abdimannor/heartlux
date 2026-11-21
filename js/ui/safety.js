@@ -109,8 +109,8 @@ export function safetyMenu(profile, { tips = false } = {}) {
     });
     return btn;
   };
-  const summary = h('summary', { className: 'btn btn-ghost btn-sm safety-summary',
-    'aria-label': t('safety.menu.label', { name: profile.name }) }, t('safety.menu'));
+  const summary = h('summary', { className: 'btn btn-ghost btn-sm safety-summary' },
+    t('safety.menu'), h('span', { className: 'visually-hidden' }, ` ${t('safety.menu.for', { name: profile.name })}`));
   const menu = h('details', { className: 'safety-menu' },
     summary,
     h('div', { className: 'safety-list' },
@@ -128,8 +128,8 @@ export function renderBlockedList() {
   const blocked = readJSON(KEYS.blocked, []);
   setVisible(byId('blockedEmpty'), blocked.length === 0);
   list.replaceChildren(...blocked.map(b => {
-    const btn = h('button', { type: 'button', className: 'btn btn-secondary btn-sm',
-      'aria-label': t('safety.unblock.label', { name: b.name }) }, t('safety.unblock'));
+    const btn = h('button', { type: 'button', className: 'btn btn-secondary btn-sm' },
+      t('safety.unblock'), h('span', { className: 'visually-hidden' }, ` ${t('safety.unblock.for', { name: b.name })}`));
     btn.addEventListener('click', () => {
       const next = btn.closest('li')?.nextElementSibling?.querySelector('button')
         || btn.closest('li')?.previousElementSibling?.querySelector('button');
