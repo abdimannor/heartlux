@@ -87,7 +87,7 @@ const blobToDataUrl = blob => new Promise((resolve, reject) => {
 /** The complete export object (versioned). */
 export async function buildExport() {
   const storage = {};
-  ownKeys().sort().forEach(k => { storage[k] = localStorage.getItem(k); });
+  ownKeys().filter(k => Object.hasOwn(VALUE_CHECKS, k)).sort().forEach(k => { storage[k] = localStorage.getItem(k); });
   const photo = await loadPhoto();
   return {
     app: 'heartlux',
@@ -110,25 +110,85 @@ export async function exportData() {
   status(t('data.export.done'));
 }
 
+const text_ = v => typeof v === 'string';
+const json = v => { try { return { ok: true, value: JSON.parse(v) }; } catch { return { ok: false }; } };
+const isObject = v => !!v && typeof v === 'object' && !Array.isArray(v);
+const optional = (o, field, type) => o[field] === undefined || typeof o[field] === type;
+
+/** The only keys an import may write, each with a check of its stored value. */
+const VALUE_CHECKS = {
+  [KEYS.user]: v => { const r = json(v); const u = r.value;
+    return r.ok && isObject(u) && typeof u.username === 'string' && u.username.trim() !== ''
+      && ['email', 'password', 'gender', 'createdAt'].every(f => optional(u, f, 'string')) && optional(u, 'demo', 'boolean'); },
+  [KEYS.prefs]:    v => { const r = json(v); return r.ok && isObject(r.value); },
+  [KEYS.filters]:  v => { const r = json(v); return r.ok && isObject(r.value); },
+  [KEYS.chatRead]: v => { const r = json(v); return r.ok && isObject(r.value); },
+  [KEYS.prompt]:   v => { const r = json(v); return r.ok && isObject(r.value); },
+  [KEYS.chats]:    v => { const r = json(v); return r.ok && isObject(r.value) && Object.values(r.value).every(Array.isArray); },
+  [KEYS.likes]:    v => { const r = json(v); return r.ok && Array.isArray(r.value); },
+  [KEYS.passes]:   v => { const r = json(v); return r.ok && Array.isArray(r.value); },
+  [KEYS.matches]:  v => { const r = json(v); return r.ok && Array.isArray(r.value); },
+  [KEYS.seen]:     v => { const r = json(v); return r.ok && Array.isArray(r.value); },
+  [KEYS.blocked]:  v => { const r = json(v); return r.ok && Array.isArray(r.value); },
+  [KEYS.reports]:  v => { const r = json(v); return r.ok && Array.isArray(r.value); },
+  [KEYS.avatar]:   text_,
+  [KEYS.bio]:      text_,
+  [KEYS.interest]: text_,
+  [KEYS.unread]:   v => /^\d{1,6}$/.test(v),
+  [KEYS.lang]:     v => v === 'sv' || v === 'en',
+  [KEYS.dark]:     v => v === '0' || v === '1',
+  [KEYS.motion]:   v => v === 'on' || v === 'off',
+};
+
+const PHOTO_RE = /^data:image\/(jpeg|png|webp);base64,([A-Za-z0-9+/]*={0,2})$/;
+
 /** Check an export file. Returns { ok, data } or { ok: false, error: i18n key }. */
 export function validateExport(text, fileSize = bytes(text)) {
   if (fileSize > MAX_FILE_BYTES) return { ok: false, error: 'data.import.error.size' };
   let data;
   try { data = JSON.parse(text); } catch { return { ok: false, error: 'data.import.error.json' }; }
-  if (!data || typeof data !== 'object' || data.app !== 'heartlux') return { ok: false, error: 'data.import.error.app' };
+  if (!isObject(data) || data.app !== 'heartlux') return { ok: false, error: 'data.import.error.app' };
   if (data.schema !== SCHEMA) return { ok: false, error: 'data.import.error.schema' };
   const s = data.storage;
-  if (!s || typeof s !== 'object' || Array.isArray(s)) return { ok: false, error: 'data.import.error.app' };
+  if (!isObject(s)) return { ok: false, error: 'data.import.error.app' };
   for (const [k, v] of Object.entries(s)) {
-    if (!k.startsWith(PREFIX) || typeof v !== 'string') return { ok: false, error: 'data.import.error.app' };
+    if (!Object.hasOwn(VALUE_CHECKS, k)) return { ok: false, error: 'data.import.error.key' };
+    if (typeof v !== 'string' || !VALUE_CHECKS[k](v)) return { ok: false, error: 'data.import.error.value' };
   }
   if (!s[KEYS.user]) return { ok: false, error: 'data.import.error.noprofile' };
-  try { if (!JSON.parse(s[KEYS.user])?.username) throw 0; } catch { return { ok: false, error: 'data.import.error.noprofile' }; }
   if (data.photo !== null && data.photo !== undefined) {
-    if (typeof data.photo !== 'string' || !/^data:image\/(jpeg|png|webp);base64,/.test(data.photo)) return { ok: false, error: 'data.import.error.photo' };
+    if (typeof data.photo !== 'string') return { ok: false, error: 'data.import.error.photo' };
     if (data.photo.length > MAX_PHOTO_BYTES) return { ok: false, error: 'data.import.error.size' };
+    const m = PHOTO_RE.exec(data.photo);
+    if (!m || m[2].length === 0 || m[2].length % 4 !== 0) return { ok: false, error: 'data.import.error.photo' };
   }
   return { ok: true, data };
+}
+
+const SIGNATURES = {
+  jpeg: b => b[0] === 0xFF && b[1] === 0xD8 && b[2] === 0xFF,
+  png:  b => [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A].every((x, i) => b[i] === x),
+  webp: b => String.fromCharCode(...b.slice(0, 4)) === 'RIFF' && String.fromCharCode(...b.slice(8, 12)) === 'WEBP',
+};
+
+/**
+ * Decode the photo of a validated export into a Blob, and make sure the
+ * browser can really draw it. Throws if anything is wrong; touches no storage.
+ */
+export async function decodePhoto(dataUrl) {
+  const m = PHOTO_RE.exec(dataUrl || '');
+  if (!m) throw new Error('photo');
+  const binary = atob(m[2]);
+  const buf = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) buf[i] = binary.charCodeAt(i);
+  if (buf.length < 12 || !SIGNATURES[m[1]](buf)) throw new Error('photo');
+  const blob = new Blob([buf], { type: `image/${m[1]}` });
+  if (typeof createImageBitmap === 'function') {
+    const bitmap = await createImageBitmap(blob);
+    if (!bitmap.width || !bitmap.height) throw new Error('photo');
+    bitmap.close?.();
+  }
+  return blob;
 }
 
 /** Short summary of what a file holds, for the confirm dialog. */
@@ -151,8 +211,12 @@ async function onImportFile(event) {
   if (!file) return;
   const result = validateExport(await file.text(), file.size);
   if (!result.ok) { status(t(result.error), true); return; }
-  pending = result.data;
-  byId('importSummary').textContent = summarise(pending);
+  let photo = null;
+  if (result.data.photo) {
+    try { photo = await decodePhoto(result.data.photo); } catch { status(t('data.import.error.photo'), true); return; }
+  }
+  pending = { data: result.data, photo };
+  byId('importSummary').textContent = summarise(result.data);
   const current = (await inventory()).filter(r => r.count > 0).map(r => t(`data.cat.${r.id}`).toLowerCase());
   byId('importReplaces').textContent = current.length
     ? t('data.import.replaces').replace('{list}', current.join(', '))
@@ -166,14 +230,29 @@ function reloadTo(hash, notice) {
   location.reload();
 }
 
-export async function applyImport(data) {
-  ownKeys().forEach(k => localStorage.removeItem(k));
-  Object.entries(data.storage).forEach(([k, v]) => localStorage.setItem(k, v));
-  if (data.photo) await savePhoto(await (await fetch(data.photo)).blob());
-  else await deletePhoto();
+/**
+ * Replace this app's data with a validated export. The photo is decoded before
+ * anything is touched; if any write fails, the previous keys and photo are put
+ * back and the error is thrown on.
+ */
+export async function applyImport(data, photo) {
+  if (data.photo && !photo) photo = await decodePhoto(data.photo);
+  const snapshot = Object.fromEntries(ownKeys().map(k => [k, localStorage.getItem(k)]));
+  const oldPhoto = await loadPhoto();
+  try {
+    ownKeys().forEach(k => localStorage.removeItem(k));
+    Object.entries(data.storage).forEach(([k, v]) => localStorage.setItem(k, v));
+    if (photo) await savePhoto(photo);
+    else await deletePhoto();
+  } catch (err) {
+    ownKeys().forEach(k => localStorage.removeItem(k));
+    Object.entries(snapshot).forEach(([k, v]) => localStorage.setItem(k, v));
+    try { if (oldPhoto) await savePhoto(oldPhoto); else await deletePhoto(); } catch { /* keys are back; the photo store itself is failing */ }
+    throw err;
+  }
 }
 
-/** Remove every key, the photo database and the offline caches of this app. */
+/** Remove every key, the photo database, the offline caches and the service worker of this app. */
 export async function wipeEverything() {
   ownKeys().forEach(k => localStorage.removeItem(k));
   Object.keys(sessionStorage).filter(k => k.startsWith(PREFIX)).forEach(k => sessionStorage.removeItem(k));
@@ -185,21 +264,36 @@ export async function wipeEverything() {
     const keys = await caches.keys();
     await Promise.all(keys.filter(k => k.startsWith(CACHE_PREFIX)).map(k => caches.delete(k)));
   }
+  if (navigator.serviceWorker?.getRegistrations) {
+    const registrations = await navigator.serviceWorker.getRegistrations();
+    await Promise.all(registrations.map(r => r.unregister()));
+  }
 }
 
 export function initDataPage() {
   byId('dataImportInput')?.addEventListener('change', onImportFile);
   byId('importDialog')?.addEventListener('close', async event => {
     const dialog = event.currentTarget;
-    const data = pending;
+    const job = pending;
     pending = null;
-    if (dialog.returnValue !== 'ok' || !data) { byId('dataImportInput')?.focus(); return; }
-    await applyImport(data);
+    if (dialog.returnValue !== 'ok' || !job) { byId('dataImportInput')?.focus(); return; }
+    try {
+      await applyImport(job.data, job.photo);
+    } catch {
+      status(t('data.import.error.write'), true);
+      byId('dataImportInput')?.focus();
+      return;
+    }
     reloadTo('data', 'data.import.done');
   });
   byId('wipeDialog')?.addEventListener('close', async event => {
     if (event.currentTarget.returnValue !== 'ok') { byId('dataWipeButton')?.focus(); return; }
-    await wipeEverything();
+    try {
+      await wipeEverything();
+    } catch {
+      status(t('data.wipe.error'), true);
+      return;
+    }
     history.replaceState(null, '', location.pathname);
     location.reload();
   });
