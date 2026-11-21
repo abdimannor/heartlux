@@ -2,7 +2,11 @@ const { test, expect } = require('@playwright/test');
 
 test.use({ contextOptions: { reducedMotion: 'reduce' } });
 
-test('after the first load the app shell and demo work offline', async ({ page, context }) => {
+test('after the first load the app shell and demo work offline', async ({ page, context, browserName }) => {
+  // Playwright's WebKit cannot reload an offline page through a service worker
+  // ("WebKit encountered an internal error" on every run); this says nothing about
+  // Safari itself, which this suite cannot drive. Chromium and Firefox cover it.
+  test.skip(browserName === 'webkit', 'offline reload through a service worker is not supported by Playwright WebKit');
   await page.goto('/');
   await page.evaluate(async () => {
     const reg = await navigator.serviceWorker.ready;
