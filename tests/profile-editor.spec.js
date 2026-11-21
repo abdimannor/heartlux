@@ -27,7 +27,9 @@ const storedPhoto = page => page.evaluate(() => new Promise(resolve => {
   req.onsuccess = () => {
     const get = req.result.transaction('photos').objectStore('photos').get('me');
     get.onsuccess = async () => {
-      const blob = get.result;
+      // Stored as a Blob, or as { type, bytes } where WebKit refuses Blobs.
+      const v = get.result;
+      const blob = v && !(v instanceof Blob) && v.bytes ? new Blob([v.bytes], { type: v.type }) : v;
       if (!blob) return resolve(null);
       const bmp = await createImageBitmap(blob);
       resolve({ type: blob.type, size: blob.size, width: bmp.width, height: bmp.height });

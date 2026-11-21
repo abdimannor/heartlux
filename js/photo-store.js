@@ -44,12 +44,22 @@ export async function cropToCard(file) {
   return new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.88));
 }
 
+// WebKit refuses Blob values in IndexedDB in ephemeral sessions (Safari private
+// windows), so the photo falls back to its bytes plus type when the Blob is refused.
+const toRecord = async blob => ({ type: blob.type, bytes: await blob.arrayBuffer() });
+const fromRecord = v => (v && !(v instanceof Blob) && v.bytes ? new Blob([v.bytes], { type: v.type }) : v);
+
 export async function savePhoto(blob) {
-  await run('readwrite', s => s.put(blob, KEY));
+  try {
+    await run('readwrite', s => s.put(blob, KEY));
+  } catch {
+    const record = await toRecord(blob);
+    await run('readwrite', s => s.put(record, KEY));
+  }
   resetUrl();
 }
 
-export const loadPhoto = () => run('readonly', s => s.get(KEY)).catch(() => null);
+export const loadPhoto = () => run('readonly', s => s.get(KEY)).then(fromRecord).catch(() => null);
 
 export async function deletePhoto() {
   await run('readwrite', s => s.delete(KEY)).catch(() => null);
