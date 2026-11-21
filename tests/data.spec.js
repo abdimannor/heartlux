@@ -84,7 +84,6 @@ test('the inventory counts what is really stored', async ({ page }) => {
 
 test('export, delete everything, import restores profile, matches, chats and photo', async ({ page }) => {
   await buildState(page);
-  const before = await page.evaluate(() => Object.fromEntries(Object.keys(localStorage).map(k => [k, localStorage.getItem(k)])));
   await openData(page);
   const download = page.waitForEvent('download');
   await page.locator('[data-action="exportData"]').click();
@@ -113,7 +112,9 @@ test('export, delete everything, import restores profile, matches, chats and pho
 
   const after = await page.evaluate(() => Object.fromEntries(Object.keys(localStorage).map(k => [k, localStorage.getItem(k)])));
   for (const key of ['heartlux_user', 'heartlux_matches_list', 'heartlux_chats', 'heartlux_likes']) {
-    expect(after[key]).toBe(before[key]);
+    // Compare with the exported file, not an earlier snapshot: a pending chat
+    // reply can land between a snapshot and the export on a slow runner.
+    expect(after[key]).toBe(exported.storage[key]);
   }
   expect(await rowCount(page, 'photo')).toContain('1');
   await page.evaluate(() => import('./js/ui/navigation.js').then(m => m.showPage('profile')));
