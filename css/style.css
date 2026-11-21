@@ -363,7 +363,6 @@
   @media (max-width: 480px) {
     .navbar-content { flex-direction: column; gap: 0.75rem; }
     .navbar-nav { flex-wrap: wrap; justify-content: center; gap: 0.35rem 0.42rem; font-size: 0.9rem; }
-    .navbar-nav .lang-toggle { padding-inline: 0.4rem; }
   }
 }
 
@@ -400,20 +399,31 @@
   .btn-sm { padding: 0.45rem 1rem; font-size: var(--step--1); }
   .btn-block { width: 100%; margin-top: 1rem; }
 
-  .lang-toggle {
-    padding: 0.25rem 0.7rem;
-    border: 1.5px solid var(--heart);
-    border-radius: var(--pill);
+  /* Quiet icon controls: language, motion, dark mode. */
+  .nav-controls { display: inline-flex; align-items: center; gap: 0.4rem; }
+  .ctl-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+    inline-size: 34px;
+    block-size: 34px;
+    padding: 0;
+    border: 1px solid color-mix(in srgb, currentColor 22%, transparent);
+    border-radius: 999px;
     background: transparent;
     color: var(--heart);
-    font-size: 0.8rem;
-    font-weight: 800;
-    letter-spacing: 0.06em;
-    line-height: 1.5;
+    font: inherit;
     cursor: pointer;
-    transition: background-color 0.2s, color 0.2s;
+    transition: background-color 150ms;
   }
-  .lang-toggle:hover { background: var(--heart); color: var(--on-heart); }
+  .ctl-btn svg { flex: none; }
+  #motionBtn[aria-pressed="false"] .i-pause, #motionBtn[aria-pressed="true"] .i-play,
+  body.dark-mode #darkModeBtn .i-moon, body:not(.dark-mode) #darkModeBtn .i-sun { display: none; }
+  .ctl-btn:hover, .ctl-btn:focus-visible { background: color-mix(in srgb, currentColor 10%, transparent); }
+  .ctl-btn:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+  .ctl-lang { inline-size: auto; padding-inline: 0.55rem 0.65rem; }
+  .ctl-code { font-size: 11px; font-weight: 600; letter-spacing: 0.06em; line-height: 1; }
 
   /* Forms */
   .form-group { display: flex; flex-direction: column; margin-bottom: 1.5rem; }
@@ -892,19 +902,11 @@
 @keyframes cardFloat { 50% { transform: translateY(-10px); } }
 @keyframes badgePop { from { transform: scale(0); } }
 
-/* Reduced motion: set by js/motion.js from the OS setting or the navbar switch.
-   The media query covers the moment before the script runs. */
-html[data-motion="reduce"] { scroll-behavior: auto; }
-html[data-motion="reduce"] *, html[data-motion="reduce"] *::before, html[data-motion="reduce"] *::after {
+/* Motion off: set by the inline <head> script and the navbar button.
+   Motion is on by default; only the visitor's own choice turns it off. */
+html[data-motion="off"] { scroll-behavior: auto; }
+html[data-motion="off"] *, html[data-motion="off"] *::before, html[data-motion="off"] *::after {
   animation-duration: 0.01ms;
   animation-iteration-count: 1;
   transition-duration: 0.01ms;
-}
-@media (prefers-reduced-motion: reduce) {
-  html:not([data-motion]) { scroll-behavior: auto; }
-  html:not([data-motion]) *, html:not([data-motion]) *::before, html:not([data-motion]) *::after {
-    animation-duration: 0.01ms;
-    animation-iteration-count: 1;
-    transition-duration: 0.01ms;
-  }
 }
