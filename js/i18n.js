@@ -174,7 +174,7 @@ export const translations = {
 
     'starter.heading': 'Förslag på första meddelande',
     'starter.prompt':  'Du svarade ”{answer}” på ”{question}”. Det vill jag höra mer om!',
-    'starter.shared':  'Vi gillar båda {topic}. Vad är din senaste favorit?',
+    'starter.shared':  'Vi gillar båda {topic}! Vad har du fastnat för på sistone?',
     'starter.pick':    'Om du fick välja en ledig lördag: {a} eller {b}?',
     'starter.city':    'Hur är det att bo i {city}? Vad ska man inte missa där?',
     'starter.generic': 'Vad gör en vanlig tisdag riktigt bra för dig?',
@@ -361,7 +361,7 @@ export const translations = {
 
     'starter.heading': 'Ideas for a first message',
     'starter.prompt':  'You answered "{answer}" to "{question}". I want to hear more about that!',
-    'starter.shared':  'We both like {topic}. What is your latest favourite?',
+    'starter.shared':  'We both like {topic}! What have you been into lately?',
     'starter.pick':    'If you had a free Saturday: {a} or {b}?',
     'starter.city':    'What is it like living in {city}? What should nobody miss there?',
     'starter.generic': 'What makes an ordinary Tuesday really good for you?',
