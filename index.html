@@ -562,6 +562,13 @@
             <button type="button" class="btn btn-secondary u-mt-1" data-action="showPage" data-arg="discover" data-i18n="profile.prefs.edit">Ändra Preferenser</button>
           </div>
 
+          <!-- Your data -->
+          <div class="profile-section-card">
+            <h3 data-i18n="data.title">Din data</h3>
+            <p class="u-text-sm" data-i18n="data.card.text">Se exakt vad som sparas på den här enheten, flytta det till en annan eller radera allt.</p>
+            <button type="button" class="btn btn-secondary u-mt-1" data-action="showPage" data-arg="data" data-i18n="data.card.open">Visa din data</button>
+          </div>
+
           <!-- Blocked profiles -->
           <div class="profile-section-card">
             <h3 id="blockedHeading" tabindex="-1" data-i18n="safety.blocked.heading">Blockerade profiler</h3>
@@ -572,6 +579,38 @@
       </div>
     </div>
   </section>
+
+  <section id="data" class="page" aria-labelledby="dataTitle">
+    <div class="container data-page">
+      <h1 class="view-title" id="dataTitle" data-i18n="data.title">Din data</h1>
+      <p class="data-lead" data-i18n="data.lead">Allt Heartlux vet om dig finns här i webbläsaren. Det finns ingen server och inget konto någon annanstans: ingenting av det här lämnar enheten.</p>
+      <div class="profile-section-card">
+        <h2 class="data-heading" data-i18n="data.inventory.heading">Det här sparas just nu</h2>
+        <ul class="data-inventory" id="dataInventory"></ul>
+        <p class="data-total" id="dataTotal"></p>
+        <p class="u-text-sm" data-i18n="data.inventory.note">Storleken är ungefärlig. Listan läses direkt från webbläsarens lagring varje gång du öppnar sidan.</p>
+      </div>
+      <div class="profile-section-card">
+        <h2 class="data-heading" data-i18n="data.move.heading">Flytta till en annan enhet</h2>
+        <p data-i18n="data.move.text">Spara allt som en JSON-fil, med fotot inbakat. Öppna Heartlux på den andra enheten, välj Importera och peka ut filen. Filen innehåller dina chattar och ditt foto, så förvara den som något privat.</p>
+        <div class="data-actions">
+          <button type="button" class="btn btn-primary" data-action="exportData" data-i18n="data.export">Exportera allt</button>
+          <label class="btn btn-secondary data-import-label" id="dataImportLabel">
+            <span data-i18n="data.import">Importera fil</span>
+            <input type="file" id="dataImportInput" class="visually-hidden" accept="application/json,.json">
+          </label>
+        </div>
+      </div>
+      <div class="profile-section-card">
+        <h2 class="data-heading" data-i18n="data.wipe.heading">Radera allt</h2>
+        <p data-i18n="data.wipe.text">Tar bort profilen, fotot, likes, matchningar, chattar, blockeringar, rapporter, inställningar och de sparade filerna för offlineläget. Det går inte att ångra.</p>
+        <button type="button" class="btn btn-danger" id="dataWipeButton" data-action="openWipeDialog" data-i18n="data.wipe">Radera allt</button>
+      </div>
+      <p class="data-status" id="dataStatus" role="status"></p>
+      <button type="button" class="btn btn-ghost" data-action="showPage" data-arg="profile" data-i18n="data.back">← Tillbaka till profilen</button>
+    </div>
+  </section>
+
 
   <!-- Chat Modal -->
   <div id="chatModal" class="chat-modal is-hidden" role="dialog" aria-modal="true" aria-labelledby="chatPartnerName">
@@ -610,6 +649,29 @@
 
 
   <!-- Safety dialogs -->
+  <dialog id="importDialog" class="safety-dialog" aria-labelledby="importTitle" aria-describedby="importSummary importReplaces">
+    <form method="dialog" class="safety-form">
+      <h2 id="importTitle" data-i18n="data.import.title">Importera den här filen?</h2>
+      <p id="importSummary"></p>
+      <p id="importReplaces"></p>
+      <div class="safety-actions">
+        <button type="submit" value="cancel" class="btn btn-ghost" data-i18n="safety.cancel" autofocus>Avbryt</button>
+        <button type="submit" value="ok" class="btn btn-danger" id="importOk" data-i18n="data.import.ok">Ersätt och importera</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="wipeDialog" class="safety-dialog" aria-labelledby="wipeTitle" aria-describedby="wipeText">
+    <form method="dialog" class="safety-form">
+      <h2 id="wipeTitle" data-i18n="data.wipe.title">Radera allt i den här webbläsaren?</h2>
+      <p id="wipeText" data-i18n="data.wipe.confirm">Allt som Heartlux har sparat tas bort och du kommer tillbaka till startsidan. Exportera först om du vill behålla något.</p>
+      <div class="safety-actions">
+        <button type="submit" value="cancel" class="btn btn-ghost" data-i18n="safety.cancel" autofocus>Avbryt</button>
+        <button type="submit" value="ok" class="btn btn-danger" id="wipeOk" data-i18n="data.wipe.ok">Radera allt</button>
+      </div>
+    </form>
+  </dialog>
+
   <dialog id="confirmDialog" class="safety-dialog" aria-labelledby="confirmTitle" aria-describedby="confirmText">
     <form method="dialog" class="safety-form">
       <h2 id="confirmTitle"></h2>

@@ -17,6 +17,7 @@ import { registerServiceWorker } from './pwa.js';
 import { initSafety, onSafetyChange, renderBlockedList } from './ui/safety.js';
 import { renderMatchesList } from './ui/matches-list.js';
 import { session } from './state.js';
+import { exportData, openWipeDialog, initDataPage } from './ui/data.js';
 
 /** data-action name -> handler(element, event). data-arg carries a string argument. */
 const actions = {
@@ -44,6 +45,8 @@ const actions = {
   openFilters:     () => openFilters(),
   closeFilters:    () => closeFilters(),
   resetFilters:    () => resetFilters(),
+  exportData:      () => exportData(),
+  openWipeDialog:  () => openWipeDialog(),
 };
 
 const submitActions = {
@@ -75,6 +78,7 @@ updateMatchBadge();
 initFilters(() => refilterDeck());
 initMatches();
 initSafety();
+initDataPage();
 renderBlockedList();
 // After unmatch / block / unblock: close a chat with that person, refresh the list and the deck.
 onSafetyChange(({ type, profile }) => {
@@ -87,5 +91,5 @@ onSafetyChange(({ type, profile }) => {
 });
 // Manifest shortcuts open ./#discover and ./#matches.
 const startPage = location.hash.slice(1);
-if (['discover', 'matches'].includes(startPage)) showPage(startPage);
+if (['discover', 'matches', 'profile', 'data'].includes(startPage)) showPage(startPage);
 registerServiceWorker();

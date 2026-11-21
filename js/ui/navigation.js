@@ -5,6 +5,7 @@ import { byId, h, setVisible } from '../dom.js';
 import { switchAuthTab } from './register.js';
 import { showMatchesTab, initMatches } from './matches.js';
 import { loadProfilePage } from './profile.js';
+import { renderDataPage } from './data.js';
 import { cancelScope, PAGE } from '../timers.js';
 import { motionReduced } from '../motion.js';
 
@@ -40,6 +41,7 @@ export function showPage(pageId) {
   activatePage(pageId);
   if (pageId === 'matches') { showMatchesTab('browse'); initMatches(); }
   if (pageId === 'profile') loadProfilePage();
+  if (pageId === 'data') renderDataPage();
 }
 
 function navLink(id, className, action, arg) {

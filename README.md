@@ -20,6 +20,19 @@ exists in the browser, it asks before replacing it.
 
 You can also register a local account and go through the setup steps yourself.
 
+
+## Your data
+
+Heartlux has no server. Everything it knows about you (profile, photo, likes, matches, chats, blocks, reports and settings) is kept in this browser: in localStorage, and the photo in IndexedDB. None of it leaves the device.
+
+Under Min profil > Din data you can:
+
+- see what is stored right now, per category, with counts and an approximate size, read live from the browser storage;
+- export everything as one JSON file (schema version 1, the photo included as a data URL) and import that file in another browser or on another device, after a confirm dialog that shows what will be replaced. Files from other apps, other schema versions, files without a profile and oversized files are rejected and nothing changes;
+- delete everything: all `heartlux_` keys, the photo database and the offline caches, then back to the start page.
+
+The export file holds your chats and photo, so keep it somewhere private.
+
 ## What is implemented
 
 Everything below is in `index.html` and the ES modules under `js/`:
