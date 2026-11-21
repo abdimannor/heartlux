@@ -1,7 +1,7 @@
 const { test, expect } = require('@playwright/test');
 
-// The owner's Mac has Reduce motion on. The OS setting is the default, and the
-// navbar switch overrides it; the choice survives a reload.
+// Motion is on by default, even when the OS asks for reduced motion (the
+// owner's Mac does). The navbar button turns it off; the choice survives a reload.
 test.use({ contextOptions: { reducedMotion: 'reduce' } });
 
 test.beforeEach(async ({ page }) => {
@@ -52,35 +52,63 @@ async function likeAndCheckBurst(page) {
   return burst;
 }
 
-test('reduced motion is the default and the switch shows it', async ({ page }) => {
-  await expect(page.locator('html')).toHaveAttribute('data-motion', 'reduce');
+test('motion is on by default, even with reduced motion in the OS', async ({ page }) => {
+  await expect(page.locator('html')).toHaveAttribute('data-motion', 'on');
   const btn = page.locator('#motionBtn');
-  await expect(btn).toHaveAttribute('aria-pressed', 'false');
-  await expect(btn).toHaveText(/Rörelse av/);
-  await expect(btn).toHaveAttribute('aria-label', /systeminställningen/);
+  await expect(btn).toHaveAttribute('aria-pressed', 'true');
+  await expect(btn).toHaveAttribute('aria-label', 'Pausa rörelse');
+  await expect(btn).toHaveText('');
+  await expect(btn.locator('.i-pause')).toBeVisible();
+  await expect(btn.locator('.i-play')).toBeHidden();
 });
 
-test('no heart burst or swipe spring by default', async ({ page }) => {
-  await startDeck(page);
-  expect(await dragCardAndRelease(page)).not.toContain('transform 0.5s');
-  expect(await likeAndCheckBurst(page)).toBe(0);
-});
-
-test('the switch turns on the swipe spring and heart burst, and the choice survives reload', async ({ page }) => {
-  await page.locator('#motionBtn').click();
-  await expect(page.locator('html')).toHaveAttribute('data-motion', 'full');
-  await expect(page.locator('#motionBtn')).toHaveAttribute('aria-pressed', 'true');
+test('swipe spring and heart burst run by default', async ({ page }) => {
   await startDeck(page);
   expect(await dragCardAndRelease(page)).toContain('transform 0.5s');
   expect(await likeAndCheckBurst(page)).toBe(1);
-
-  await page.reload();
-  await expect(page.locator('html')).toHaveAttribute('data-motion', 'full');
-  await expect(page.locator('#motionBtn')).toHaveText(/Rörelse på/);
-  await expect(page.locator('#motionBtn')).not.toHaveAttribute('aria-label', /systeminställningen/);
 });
 
-test('the switch label follows the language', async ({ page }) => {
+test('the button turns motion off, and the choice survives reload', async ({ page }) => {
+  await page.locator('#motionBtn').click();
+  await expect(page.locator('html')).toHaveAttribute('data-motion', 'off');
+  await expect(page.locator('#motionBtn')).toHaveAttribute('aria-pressed', 'false');
+  await expect(page.locator('#motionBtn')).toHaveAttribute('aria-label', 'Starta rörelse');
+  await startDeck(page);
+  expect(await dragCardAndRelease(page)).not.toContain('transform 0.5s');
+  expect(await likeAndCheckBurst(page)).toBe(0);
+
+  await page.reload();
+  await expect(page.locator('html')).toHaveAttribute('data-motion', 'off');
+  await expect(page.locator('#motionBtn')).toHaveAttribute('aria-pressed', 'false');
+});
+
+test('the motion off choice is applied before first paint', async ({ page }) => {
+  await page.evaluate(() => localStorage.setItem('heartlux_motion', 'off'));
+  const seen = [];
+  page.on('console', m => seen.push(m.text()));
+  await page.addInitScript(() => {
+    document.addEventListener('readystatechange', () => {
+      if (document.readyState === 'interactive') console.log('motion:' + document.documentElement.dataset.motion);
+    }, { once: true });
+  });
+  await page.reload();
+  await expect.poll(() => seen.join()).toContain('motion:off');
+});
+
+test('the controls are quiet icons with names in the page language', async ({ page }) => {
+  for (const id of ['#langToggle', '#motionBtn', '#darkModeBtn']) {
+    const box = await page.locator(id).boundingBox();
+    expect(Math.round(box.height)).toBe(34);
+  }
+  await expect(page.locator('#langToggle')).toHaveAttribute('aria-label', 'Byt till engelska, EN');
+  await expect(page.locator('#langToggle .ctl-code')).toHaveAttribute('lang', 'en');
+  await expect(page.locator('#darkModeBtn')).toHaveAttribute('aria-label', 'Byt till mörkt läge');
   await page.locator('#langToggle').click();
-  await expect(page.locator('#motionBtn')).toHaveText(/Motion off/);
+  await expect(page.locator('#langToggle')).toHaveAttribute('aria-label', 'Switch to Swedish, SV');
+  await expect(page.locator('#langToggle .ctl-code')).toHaveText('SV');
+  await expect(page.locator('#langToggle .ctl-code')).toHaveAttribute('lang', 'sv');
+  await expect(page.locator('#motionBtn')).toHaveAttribute('aria-label', 'Pause motion');
+  await expect(page.locator('#darkModeBtn')).toHaveAttribute('aria-label', 'Switch to dark mode');
+  await page.locator('#darkModeBtn').click();
+  await expect(page.locator('#darkModeBtn')).toHaveAttribute('aria-label', 'Switch to light mode');
 });

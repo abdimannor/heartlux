@@ -1,22 +1,14 @@
-// Motion preference. The OS setting (prefers-reduced-motion) is the default;
-// an explicit choice from the navbar switch overrides it and is remembered.
-// The result lives on <html data-motion="full|reduce"> for CSS and JS alike.
+// Motion preference. Motion is on by default for every visitor; the navbar
+// button turns it off and the choice is remembered. An inline script in
+// <head> sets <html data-motion="on|off"> before first paint, and CSS and JS
+// read that attribute only.
 import { KEYS, getItem, setItem } from './state.js';
 import { t } from './i18n.js';
 
-const osReduced = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
-
-/** 'on' | 'off' | null (no choice yet: follow the OS). */
-export const motionChoice = () => {
-  const v = getItem(KEYS.motion);
-  return v === 'on' || v === 'off' ? v : null;
-};
 
 /** True when animations should be skipped right now. */
 export function motionReduced() {
-  const choice = motionChoice();
-  if (choice) return choice === 'off';
-  return osReduced();
+  return getItem(KEYS.motion) === 'off';
 }
 
 export function syncMotionButton() {
@@ -24,17 +16,13 @@ export function syncMotionButton() {
   if (!btn) return;
   const on = !motionReduced();
   btn.setAttribute('aria-pressed', String(on));
-  btn.dataset.state = on ? 'on' : 'off';
-  const label = t(on ? 'nav.motion.on' : 'nav.motion.off');
-  btn.querySelector('.motion-label').textContent = label;
-  // The accessible name starts with the visible text (WCAG 2.5.3).
-  const source = motionChoice() ? '' : ` ${t('nav.motion.system')}`;
-  btn.setAttribute('aria-label', `${label}. ${t(on ? 'nav.motion.labelOn' : 'nav.motion.labelOff')}${source}`);
-  btn.title = btn.getAttribute('aria-label');
+  const label = t(on ? 'nav.motion.pause' : 'nav.motion.play');
+  btn.setAttribute('aria-label', label);
+  btn.title = label;
 }
 
 export function applyMotion() {
-  document.documentElement.dataset.motion = motionReduced() ? 'reduce' : 'full';
+  document.documentElement.dataset.motion = motionReduced() ? 'off' : 'on';
   syncMotionButton();
 }
 

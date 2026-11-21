@@ -158,7 +158,7 @@ test('delete everything leaves localStorage, IndexedDB and caches empty', async 
   expect(left.keys).toEqual([]);
   expect(left.dbs).not.toContain('heartlux');
   // The service worker may re-cache the start page on reload; the old caches must be gone.
-  expect(left.caches.filter(k => k !== 'heartlux-v18')).toEqual([]);
+  expect(left.caches.filter(k => k !== 'heartlux-v19')).toEqual([]);
 });
 
 /** A valid export of the current state, as a string, built in the page. */
