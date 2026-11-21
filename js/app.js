@@ -5,7 +5,7 @@ import { showPage, logout, updateMatchBadge } from './ui/navigation.js';
 import { switchAuthTab, selectOption, handleRegister, handleLogin, initAgeRange, restoreInterestSelection } from './ui/register.js';
 import { finishSetup } from './ui/discover.js';
 import { initMatches, likeProfile, passProfile, undoProfile, closeMatchPopup } from './ui/matches.js';
-import { showMatchesTab } from './ui/matches-list.js';
+import { showMatchesTab, initMatchSearch } from './ui/matches-list.js';
 import { closeChat, sendChatMessage, initChat } from './ui/chat.js';
 import { saveProfileBio, selectAvatar, removeProfilePhoto, initProfileEditor } from './ui/profile.js';
 import { toggleDarkMode, applyDarkMode } from './ui/theme.js';
@@ -62,6 +62,7 @@ document.addEventListener('submit', event => {
 
 initAgeRange();
 initChat();
+initMatchSearch();
 initProfileEditor();
 restoreInterestSelection();
 applyMotion();

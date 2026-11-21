@@ -1,6 +1,6 @@
 // "My matches" tab: the list of matched profiles.
 import { paintAvatar } from '../avatars.js';
-import { KEYS, readJSON, setItem } from '../state.js';
+import { KEYS, readJSON, setItem, isChatUnread } from '../state.js';
 import { t } from '../i18n.js';
 import { byId, h, setVisible } from '../dom.js';
 import { updateMatchBadge } from './navigation.js';
@@ -24,12 +24,15 @@ export function showMatchesTab(tab) {
   }
 }
 
-function matchCard(profile, isNew) {
-  const card = h('div', { className: 'match-list-card' },
+function matchCard(profile, isNew, lastMessage) {
+  const unread = isChatUnread(String(profile.id));
+  const card = h('div', { className: `match-list-card${unread ? ' is-unread' : ''}`, dataset: { matchId: String(profile.id) } },
     h('div', { className: 'match-list-avatar' }),
     h('div', { className: 'match-list-info' },
       h('strong', {}, `${profile.name}, ${profile.age} `,
-        isNew && h('span', { className: 'match-new-badge' }, t('matches.new.badge'))),
+        isNew && h('span', { className: 'match-new-badge' }, t('matches.new.badge')),
+        unread && h('span', { className: 'unread-dot', role: 'img', 'aria-label': t('matches.unread') })),
+      lastMessage && h('span', { className: 'match-list-preview' }, lastMessage),
       h('span', {}, `📍 ${profile.city}`),
       h('div', { className: 'match-list-tags' },
         profile.interests.slice(0, 2).map(i => t(`interest.${i}`)).join(' · '))),
@@ -57,6 +60,22 @@ export function renderMatchesList() {
     return;
   }
 
-  const seen = readJSON(KEYS.seen, []);
-  grid.replaceChildren(...matched.map(p => matchCard(p, !seen.includes(String(p.id)))));
+  const seen  = readJSON(KEYS.seen, []);
+  const chats = readJSON(KEYS.chats, {});
+  const query = (byId('matchSearch')?.value || '').trim().toLocaleLowerCase();
+  const hits  = matched.filter(p => !query
+    || p.name.toLocaleLowerCase().includes(query)
+    || (chats[String(p.id)] || []).some(m => String(m.text).toLocaleLowerCase().includes(query)));
+
+  if (hits.length === 0) {
+    grid.replaceChildren(h('p', { className: 'match-search-empty', role: 'status' },
+      t('matches.search.empty', { q: byId('matchSearch').value.trim() })));
+    return;
+  }
+  grid.replaceChildren(...hits.map(p =>
+    matchCard(p, !seen.includes(String(p.id)), (chats[String(p.id)] || []).at(-1)?.text)));
+}
+
+export function initMatchSearch() {
+  byId('matchSearch')?.addEventListener('input', renderMatchesList);
 }
