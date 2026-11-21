@@ -18,6 +18,7 @@ export const KEYS = Object.freeze({
   motion:    'heartlux_motion',
   prompt:    'heartlux_user_prompt',
   filters:   'heartlux_filters',
+  chatRead:  'heartlux_chat_read',
 });
 
 /** Everything that belongs to one local account (cleared on logout / demo). */
@@ -25,7 +26,7 @@ export const USER_STORAGE_KEYS = [
   KEYS.user, KEYS.prefs, KEYS.likes, KEYS.passes,
   KEYS.interest, KEYS.matches, KEYS.chats,
   KEYS.avatar, KEYS.bio, KEYS.prompt, KEYS.filters,
-  KEYS.unread, KEYS.seen,
+  KEYS.unread, KEYS.seen, KEYS.chatRead,
 ];
 
 export const getItem    = key => localStorage.getItem(key);
@@ -53,6 +54,20 @@ export function clearUserData() {
 export const getUser  = () => readJSON(KEYS.user);
 export const getPrefs = () => readJSON(KEYS.prefs);
 export const getUnread = () => parseInt(getItem(KEYS.unread) || '0', 10);
+
+/** Remember when a conversation was last read (for the unread dot). */
+export function markChatRead(pid) {
+  const read = readJSON(KEYS.chatRead, {});
+  read[pid] = Date.now();
+  writeJSON(KEYS.chatRead, read);
+}
+
+/** A conversation is unread when its newest message is from the match and arrived after you last read it. */
+export function isChatUnread(pid) {
+  const last = (readJSON(KEYS.chats, {})[pid] || []).at(-1);
+  if (!last || last.from === 'user') return false;
+  return (last.ts || 0) > (readJSON(KEYS.chatRead, {})[pid] || 0);
+}
 
 export function emptyMatchState() {
   return {

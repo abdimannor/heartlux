@@ -171,6 +171,23 @@ export const translations = {
 
     'profile.pref.interest':  'Intresserad av',
     'profile.pref.interests': 'Intressen',
+
+    'starter.heading': 'Förslag på första meddelande',
+    'starter.prompt':  'Du svarade ”{answer}” på ”{question}”. Det vill jag höra mer om!',
+    'starter.shared':  'Vi gillar båda {topic}. Vad är din senaste favorit?',
+    'starter.pick':    'Om du fick välja en ledig lördag: {a} eller {b}?',
+    'starter.city':    'Hur är det att bo i {city}? Vad ska man inte missa där?',
+    'starter.generic': 'Vad gör en vanlig tisdag riktigt bra för dig?',
+    'starter.topic.travel':  'resor',
+    'starter.topic.music':   'musik',
+    'starter.topic.fitness': 'träning',
+    'starter.topic.cooking': 'mat',
+    'starter.topic.books':   'böcker',
+    'starter.topic.art':     'konst',
+    'matches.search.label':       'Sök bland dina matchningar',
+    'matches.search.placeholder': 'Sök på namn eller meddelande',
+    'matches.search.empty':       'Inga träffar för ”{q}”',
+    'matches.unread':             'Oläst meddelande',
   },
   en: {
     'nav.home':     'Home',
@@ -341,6 +358,23 @@ export const translations = {
 
     'profile.pref.interest':  'Interested in',
     'profile.pref.interests': 'Interests',
+
+    'starter.heading': 'Ideas for a first message',
+    'starter.prompt':  'You answered "{answer}" to "{question}". I want to hear more about that!',
+    'starter.shared':  'We both like {topic}. What is your latest favourite?',
+    'starter.pick':    'If you had a free Saturday: {a} or {b}?',
+    'starter.city':    'What is it like living in {city}? What should nobody miss there?',
+    'starter.generic': 'What makes an ordinary Tuesday really good for you?',
+    'starter.topic.travel':  'travel',
+    'starter.topic.music':   'music',
+    'starter.topic.fitness': 'fitness',
+    'starter.topic.cooking': 'food',
+    'starter.topic.books':   'books',
+    'starter.topic.art':     'art',
+    'matches.search.label':       'Search your matches',
+    'matches.search.placeholder': 'Search by name or message',
+    'matches.search.empty':       'No results for "{q}"',
+    'matches.unread':             'Unread message',
   }
 };
 

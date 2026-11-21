@@ -1,5 +1,5 @@
 // Chat modal. Messages are user text, so they are rendered with textContent only.
-import { KEYS, session, readJSON, writeJSON } from '../state.js';
+import { KEYS, session, readJSON, writeJSON, getPrefs, markChatRead } from '../state.js';
 import { t, getLang } from '../i18n.js';
 import { byId, h, setVisible } from '../dom.js';
 import { randomReply } from '../profiles.js';
@@ -7,6 +7,7 @@ import { renderMatchesList } from './matches-list.js';
 import { later, cancelScope } from '../timers.js';
 import { paintAvatar } from '../avatars.js';
 import { photoUrl } from '../photo-store.js';
+import { buildStarters } from './chat-starters.js';
 
 const getChats = () => readJSON(KEYS.chats, {});
 
@@ -24,6 +25,8 @@ export function openChat(profile) {
   }
 
   renderChatMessages();
+  markChatRead(String(profile.id));
+  renderMatchesList();
   later('chat:ui', () => byId('chatInput').focus(), 50);
 }
 
@@ -54,7 +57,34 @@ function renderChatMessages(pid = String(session.chatProfile.id)) {
   container.replaceChildren(...bubbles);
   container.dataset.chatId = pid;
   container.scrollTop = container.scrollHeight;
+  renderStarters(messages);
   paintSelfPhoto();
+}
+
+/** Openers show until you have written your first message in this chat. */
+function renderStarters(messages) {
+  const profile = session.chatProfile;
+  let box = byId('chatStarters');
+  if (!box) {
+    box = h('div', { id: 'chatStarters', className: 'chat-starters', role: 'group' });
+    byId('chatMessages').after(box);
+  }
+  box.setAttribute('aria-label', t('starter.heading'));
+  const started = messages.some(m => m.from === 'user');
+  if (!profile || started) { box.replaceChildren(); setVisible(box, false); return; }
+  const ideas = buildStarters(getLang(), profile, getPrefs()?.interests || []);
+  box.replaceChildren(
+    h('p', { className: 'chat-starters-title' }, t('starter.heading')),
+    ...ideas.map(text => {
+      const chip = h('button', { type: 'button', className: 'chat-starter' }, text);
+      chip.addEventListener('click', () => {
+        const input = byId('chatInput');
+        input.value = text;
+        input.focus();
+      });
+      return chip;
+    }));
+  setVisible(box, true);
 }
 
 /** Your own photo beside your messages, when you have uploaded one. */
@@ -95,7 +125,11 @@ export function sendChatMessage() {
     if (!updated[pid]) return;
     updated[pid].push({ from: 'match', text: reply, ts: Date.now() });
     writeJSON(KEYS.chats, updated);
-    if (isOpenChat(pid)) renderChatMessages(pid);
+    if (isOpenChat(pid)) {
+      renderChatMessages(pid);
+      markChatRead(pid);
+    }
+    renderMatchesList();
   }, Math.max(delay, 400));
 }
 
