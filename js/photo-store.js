@@ -20,8 +20,16 @@ function open() {
 async function run(mode, fn) {
   const db = await open();
   return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE, mode);
-    const req = fn(tx.objectStore(STORE));
+    let tx, req;
+    try {
+      tx = db.transaction(STORE, mode);
+      req = fn(tx.objectStore(STORE));
+    } catch (err) {
+      // WebKit can throw synchronously from put(); close before the caller retries.
+      db.close();
+      reject(err);
+      return;
+    }
     tx.oncomplete = () => { db.close(); resolve(req?.result ?? null); };
     tx.onerror = () => { db.close(); reject(tx.error); };
   });
