@@ -154,5 +154,92 @@ test('delete everything leaves localStorage, IndexedDB and caches empty', async 
   expect(left.keys).toEqual([]);
   expect(left.dbs).not.toContain('heartlux');
   // The service worker may re-cache the start page on reload; the old caches must be gone.
-  expect(left.caches.filter(k => k !== 'heartlux-v17')).toEqual([]);
+  expect(left.caches.filter(k => k !== 'heartlux-v18')).toEqual([]);
+});
+
+/** A valid export of the current state, as a string, built in the page. */
+const currentExport = page => page.evaluate(() => import('./js/ui/data.js').then(async m => m.buildExport()));
+const asFile = obj => ({ name: 'x.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(obj)) });
+const snapshot = page => page.evaluate(() => Object.fromEntries(Object.keys(localStorage).filter(k => k.startsWith('heartlux_')).sort().map(k => [k, localStorage.getItem(k)])));
+
+test('a corrupt photo is rejected before anything is written and the profile stays intact', async ({ page }) => {
+  await buildState(page);
+  await openData(page);
+  const before = await snapshot(page);
+  const good = await currentExport(page);
+  const other = { ...good, storage: { ...good.storage, heartlux_user: JSON.stringify({ username: 'Någon annan' }) } };
+
+  // Valid prefix, broken base64 payload.
+  await page.locator('#dataImportInput').setInputFiles(asFile({ ...other, photo: 'data:image/jpeg;base64,@@@notbase64@@@' }));
+  await expect(page.locator('#dataStatus')).toHaveClass(/data-status--error/);
+  await expect(page.locator('#dataStatus')).toContainText('Fotot');
+  await expect(page.locator('#importDialog')).toBeHidden();
+
+  // Well-formed base64 that is not an image.
+  await page.locator('#dataImportInput').setInputFiles(asFile({ ...other, photo: 'data:image/png;base64,' + Buffer.from('this is not a png at all').toString('base64') }));
+  await expect(page.locator('#dataStatus')).toContainText('Fotot');
+  await expect(page.locator('#importDialog')).toBeHidden();
+
+  // Even if the import function is called directly, it throws before touching storage.
+  const threw = await page.evaluate(d => import('./js/ui/data.js').then(m => m.applyImport(d).then(() => false, () => true)),
+    { ...other, photo: 'data:image/jpeg;base64,' + Buffer.from('JFIF but not really').toString('base64') });
+  expect(threw).toBe(true);
+  expect(await snapshot(page)).toEqual(before);
+  expect(await rowCount(page, 'photo')).toContain('1');
+  expect(await page.evaluate(() => import('./js/photo-store.js').then(m => m.loadPhoto()).then(b => b && b.size))).toBeGreaterThan(0);
+});
+
+test('a failed write during import puts the previous data back', async ({ page }) => {
+  await buildState(page);
+  await openData(page);
+  const before = await snapshot(page);
+  const good = await currentExport(page);
+  const result = await page.evaluate(d => import('./js/ui/data.js').then(async m => {
+    const real = Storage.prototype.setItem;
+    let n = 0;
+    Storage.prototype.setItem = function (k, v) { if (++n === 3) throw new DOMException('full', 'QuotaExceededError'); return real.call(this, k, v); };
+    try { await m.applyImport({ ...d, storage: { ...d.storage, heartlux_user: JSON.stringify({ username: 'Ny' }) } }); return 'ok'; }
+    catch { return 'threw'; }
+    finally { Storage.prototype.setItem = real; }
+  }), good);
+  expect(result).toBe('threw');
+  expect(await snapshot(page)).toEqual(before);
+});
+
+test('unknown keys and values of the wrong type are rejected', async ({ page }) => {
+  await buildState(page);
+  await openData(page);
+  const before = await snapshot(page);
+  const good = await currentExport(page);
+  const cases = [
+    [{ ...good.storage, heartlux_evil: '1' }, 'inte hör till Heartlux'],
+    [{ ...good.storage, heartlux_likes: '{"a":1}' }, 'fel format'],
+    [{ ...good.storage, heartlux_chats: '[]' }, 'fel format'],
+    [{ ...good.storage, heartlux_chats: '{"1":"hej"}' }, 'fel format'],
+    [{ ...good.storage, heartlux_user: '{"username":42}' }, 'fel format'],
+    [{ ...good.storage, heartlux_user: '"Demo"' }, 'fel format'],
+    [{ ...good.storage, heartlux_dark: 'yes' }, 'fel format'],
+    [{ ...good.storage, heartlux_matches_list: 'not json' }, 'fel format'],
+  ];
+  for (const [storage, message] of cases) {
+    await page.locator('#dataStatus').evaluate(el => { el.textContent = ''; });
+    await page.locator('#dataImportInput').setInputFiles(asFile({ ...good, storage }));
+    await expect(page.locator('#dataStatus')).toHaveClass(/data-status--error/);
+    await expect(page.locator('#dataStatus')).toContainText(message);
+    await expect(page.locator('#importDialog')).toBeHidden();
+  }
+  expect(await snapshot(page)).toEqual(before);
+  // The untouched export itself is still accepted.
+  await page.locator('#dataImportInput').setInputFiles(asFile(good));
+  await expect(page.locator('#importDialog')).toBeVisible();
+  await page.locator('#importDialog button[value="cancel"], #importCancel').first().click();
+  expect(await snapshot(page)).toEqual(before);
+});
+
+test('delete everything unregisters the service worker', async ({ page }) => {
+  await page.evaluate(() => navigator.serviceWorker.register('./sw.js').then(() => navigator.serviceWorker.ready));
+  expect(await page.evaluate(() => navigator.serviceWorker.getRegistrations().then(r => r.length))).toBeGreaterThan(0);
+  await page.evaluate(() => import('./js/ui/data.js').then(m => m.wipeEverything()));
+  expect(await page.evaluate(() => navigator.serviceWorker.getRegistrations().then(r => r.length))).toBe(0);
+  expect(await page.evaluate(() => caches.keys().then(k => k.filter(n => n.startsWith('heartlux-'))))).toEqual([]);
 });
