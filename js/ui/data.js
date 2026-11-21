@@ -3,7 +3,7 @@
 // file, import of that file on another device, and delete everything.
 // There is no server: nothing here is ever sent anywhere.
 import { KEYS, readJSON } from '../state.js';
-import { t } from '../i18n.js';
+import { t, getLang } from '../i18n.js';
 import { byId, h } from '../dom.js';
 import { loadPhoto, savePhoto, deletePhoto } from '../photo-store.js';
 
@@ -32,7 +32,8 @@ const CATEGORIES = [
 ];
 
 const bytes = text => new Blob([text]).size;
-const kb = n => (n === 0 ? '0' : Math.max(0.1, n / 1024).toFixed(1));
+const kb = n => (n === 0 ? '0' : Math.max(0.1, n / 1024)
+  .toLocaleString(getLang() === 'en' ? 'en-GB' : 'sv-SE', { minimumFractionDigits: 1, maximumFractionDigits: 1 }));
 
 /** Every key this app owns in localStorage (the origin may be shared with other sites). */
 export const ownKeys = () => Object.keys(localStorage).filter(k => k.startsWith(PREFIX));
@@ -62,6 +63,7 @@ export async function renderDataPage() {
     h('span', { className: 'data-row-size' }, t('data.size').replace('{kb}', kb(r.bytes))))));
   const total = rows.reduce((n, r) => n + r.bytes, 0);
   byId('dataTotal').textContent = t('data.total').replace('{kb}', kb(total));
+  status('');
   const notice = sessionStorage.getItem(NOTICE);
   if (notice) {
     sessionStorage.removeItem(NOTICE);

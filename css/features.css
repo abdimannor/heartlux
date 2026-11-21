@@ -215,3 +215,4 @@ body.dark-mode .details-interests li { background: #3a1830; color: #ffd1e8; }
 .data-status { padding: 0.75rem 1rem; border-radius: 12px; background: var(--surface, #fff); font-weight: 600; }
 .data-status--error { color: #b0123f; border: 2px solid #b0123f; }
 @media (max-width: 480px) { .data-row { grid-template-columns: 1fr auto; } .data-row-size { grid-column: 1 / -1; text-align: start; } }
+.data-import-label { text-transform: none; letter-spacing: normal; font-size: inherit; margin: 0; }
