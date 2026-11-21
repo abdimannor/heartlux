@@ -64,11 +64,8 @@ function renderChatMessages(pid = String(session.chatProfile.id)) {
 /** Openers show until you have written your first message in this chat. */
 function renderStarters(messages) {
   const profile = session.chatProfile;
-  let box = byId('chatStarters');
-  if (!box) {
-    box = h('div', { id: 'chatStarters', className: 'chat-starters', role: 'group' });
-    byId('chatMessages').after(box);
-  }
+  const box = byId('chatStarters');
+  if (!box) return;
   box.setAttribute('aria-label', t('starter.heading'));
   const started = messages.some(m => m.from === 'user');
   if (!profile || started) { box.replaceChildren(); setVisible(box, false); return; }
