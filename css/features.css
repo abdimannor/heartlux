@@ -165,7 +165,7 @@ body.dark-mode .safety-item--block, body.dark-mode .safety-item--report { color:
 .match-list-actions { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: flex-start; }
 .btn-danger { border: 0; background: #b0123f; color: #fff; }
 .btn-danger:hover { background: #8d0e32; }
-.safety-dialog { width: min(30rem, calc(100vw - 2rem)); max-height: 90vh; padding: 0; border: 0; border-radius: 22px; background: var(--surface, #fff); color: var(--ink, #1b0d18); box-shadow: 0 24px 60px rgb(60 10 40 / 0.35); }
+.safety-dialog { width: min(30rem, calc(100vw - 2rem)); max-height: 90vh; margin: auto; padding: 0; border: 0; border-radius: 22px; background: var(--surface, #fff); color: var(--ink, #1b0d18); box-shadow: 0 24px 60px rgb(60 10 40 / 0.35); }
 .safety-dialog::backdrop { background: rgb(30 6 24 / 0.55); }
 .safety-form { display: grid; gap: 0.9rem; padding: 1.4rem; }
 .safety-form h2 { margin: 0; font-size: 1.3rem; }
@@ -192,3 +192,8 @@ body.dark-mode .details-interests li { background: #3a1830; color: #ffd1e8; }
 @media (prefers-reduced-motion: no-preference) {
   :root:not([data-motion]) .safety-dialog[open] { animation: filter-sheet-in 0.28s cubic-bezier(0.2, 0.8, 0.2, 1); }
 }
+.match-list-card:has(.safety-menu[open]) { position: relative; z-index: 10; }
+.safety-form label, .safety-form legend { font-size: 1rem; letter-spacing: normal; text-transform: none; }
+/* The layered sticky rule in style.css comes after its own mobile override, so the
+   profile card covered the sections below it on phones. Unlayered, this wins. */
+@media (max-width: 900px) { .profile-main-card { position: static; } }
