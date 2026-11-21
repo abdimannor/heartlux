@@ -62,7 +62,7 @@ test('arrow keys like and pass, and the swipe deck is built', async ({ page }) =
   await page.locator('#home button[data-action="startDemo"]').click();
   await expect(page.locator('#matches.page.active')).toBeVisible();
   await expect(page.locator('.deck .deck-ghost')).toHaveCount(2);
-  await expect(page.locator('#swipeKeyHint kbd')).toHaveCount(2);
+  await expect(page.locator('#swipeKeyHint kbd')).toHaveCount(3);
   await expect(page.locator('#cardAvatar svg.gen-avatar')).toHaveCount(1);
   const shown = page.locator('#shownCount');
   const before = Number(await shown.textContent());

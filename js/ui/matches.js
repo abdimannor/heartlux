@@ -1,5 +1,5 @@
 // Browse tab: the profile card deck, like / pass / undo, match popup and stats.
-import { KEYS, session, readJSON, writeJSON, getPrefs, getUnread, setItem, resetMatchState } from '../state.js';
+import { KEYS, session, readJSON, writeJSON, getPrefs, getUnread, setItem, resetMatchState, blockedIds } from '../state.js';
 import { t, getLang } from '../i18n.js';
 import { byId, h, setVisible } from '../dom.js';
 import { generateProfiles, matchProfiles, sharedInterests, applyFilters, activeFilterCount } from '../profiles.js';
@@ -27,6 +27,8 @@ export function refilterDeck() {
   const state = session.match;
   if (!state.allProfiles.length) return;
   const acted = new Set(state.history.map(h => h.profileId));
+  const blocked = blockedIds();
+  state.allProfiles = state.allProfiles.filter(p => !blocked.has(String(p.id)));
   state.profiles = applyFilters(state.allProfiles, getFilters()).filter(p => !acted.has(p.id));
   state.currentProfileIndex = 0;
   state.history = [];
@@ -64,7 +66,8 @@ export function initMatches() {
     state.likes           = readJSON(KEYS.likes, []);
     state.passes          = readJSON(KEYS.passes, []);
     state.matchedProfiles = readJSON(KEYS.matches, []);
-    state.allProfiles     = matchProfiles(generateProfiles(getLang()), prefs);
+    const blocked         = blockedIds();
+    state.allProfiles     = matchProfiles(generateProfiles(getLang()), prefs).filter(p => !blocked.has(String(p.id)));
     state.profiles        = applyFilters(state.allProfiles, getFilters());
   }
 
@@ -78,6 +81,31 @@ export function currentProfile() {
   return state.currentProfileIndex < state.profiles.length
     ? state.profiles[state.currentProfileIndex]
     : null;
+}
+
+/** Speak the result of a like or pass to screen readers through the deck's live region. */
+function announce(text) {
+  const live = byId('deckStatus');
+  if (!live) return;
+  const next = currentProfile();
+  live.textContent = `${text} ${next ? t('swipe.said.next', { name: `${next.name}, ${next.age}` }) : t('swipe.said.empty')}`;
+}
+
+/** Full profile in a native dialog (the Up arrow on Discover). */
+export function openProfileDetails() {
+  const profile = currentProfile();
+  const dialog = byId('detailsDialog');
+  if (!profile || !dialog || dialog.open) return;
+  byId('detailsName').textContent = `${profile.name}, ${profile.age}`;
+  byId('detailsCity').textContent = `📍 ${profile.city}`;
+  byId('detailsBio').textContent = profile.bio;
+  const prompt = byId('detailsPrompt');
+  prompt.textContent = profile.prompt ? `${t(`prompt.${profile.prompt.key}`)} ${profile.prompt.answer}` : '';
+  setVisible(prompt, Boolean(profile.prompt));
+  byId('detailsInterests').replaceChildren(...profile.interests.map(i => h('li', {}, t(`interest.${i}`))));
+  const opener = document.activeElement;
+  dialog.addEventListener('close', () => { if (opener?.isConnected) opener.focus(); }, { once: true });
+  dialog.showModal();
 }
 
 export function loadProfile() {
@@ -134,6 +162,7 @@ export function likeProfile(fromSwipe = false) {
     state.currentProfileIndex++;
     writeJSON(KEYS.likes, state.likes);
     loadProfile();
+    announce(t(isMatch ? 'swipe.said.match' : 'swipe.said.like', { name: profile.name }));
     if (isMatch) {
       state.matchedProfiles.push(profile);
       writeJSON(KEYS.matches, state.matchedProfiles);
@@ -159,6 +188,7 @@ export function passProfile(fromSwipe = false) {
     state.currentProfileIndex++;
     writeJSON(KEYS.passes, state.passes);
     loadProfile();
+    announce(t('swipe.said.pass', { name: profile.name }));
   }, fromSwipe ? 50 : 500);
 }
 

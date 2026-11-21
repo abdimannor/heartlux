@@ -4,7 +4,7 @@
 // style properties rather than classes.
 import { byId, h } from '../dom.js';
 import { t } from '../i18n.js';
-import { currentProfile, likeProfile, passProfile } from './matches.js';
+import { currentProfile, likeProfile, passProfile, openProfileDetails } from './matches.js';
 import { later } from '../timers.js';
 import { motionReduced } from '../motion.js';
 
@@ -43,10 +43,12 @@ function buildHint() {
 export function renderHint() {
   const hint = byId('swipeKeyHint');
   if (!hint) return;
+  const sep = () => h('span', { className: 'swipe-key-sep', 'aria-hidden': 'true' }, '\u00b7');
   hint.replaceChildren(
-    h('kbd', {}, '\u2190'), ` ${t('swipe.pass')}`,
-    h('span', { className: 'swipe-key-sep', 'aria-hidden': 'true' }, '\u00b7'),
-    `${t('swipe.like')} `, h('kbd', {}, '\u2192'));
+    h('span', { className: 'visually-hidden' }, `${t('swipe.key.label')}: `),
+    h('kbd', {}, '\u2190'), ` ${t('swipe.key.pass')} `, sep(),
+    h('kbd', {}, '\u2191'), ` ${t('swipe.key.details')} `, sep(),
+    h('kbd', {}, '\u2192'), ` ${t('swipe.key.like')}`);
 }
 
 /** Throw the card off screen, carrying the release velocity. */
@@ -140,13 +142,14 @@ export function initSwipeGesture() {
   card.addEventListener('pointercancel', release);
 
   document.addEventListener('keydown', e => {
-    if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+    if (!['ArrowLeft', 'ArrowRight', 'ArrowUp'].includes(e.key)) return;
     if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
     if (!byId('matches')?.classList.contains('active')) return;
     if (e.target.closest?.('input, textarea, select, [contenteditable="true"]')) return;
-    if (isOpen('chatModal') || isOpen('matchPopup')) return;
+    if (isOpen('chatModal') || isOpen('matchPopup') || document.querySelector('dialog[open]')) return;
     if (!currentProfile() || busy) return;
     e.preventDefault();
+    if (e.key === 'ArrowUp') { openProfileDetails(); return; }
     commit(e.key === 'ArrowRight' ? 1 : -1, 1.6);
   });
 }

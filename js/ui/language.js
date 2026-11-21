@@ -4,6 +4,7 @@ import { byId } from '../dom.js';
 import { updateNavbar } from './navigation.js';
 import { updateAgeRangeDisplay } from './register.js';
 import { renderHint } from './swipe.js';
+import { renderBlockedList } from './safety.js';
 
 export function applyTranslations() {
   translateDocument();
@@ -17,6 +18,7 @@ export function applyTranslations() {
   updateNavbar();
   updateAgeRangeDisplay();
   renderHint();
+  renderBlockedList();
 }
 
 export function toggleLanguage() {

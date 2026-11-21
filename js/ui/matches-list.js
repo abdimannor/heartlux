@@ -5,6 +5,7 @@ import { t } from '../i18n.js';
 import { byId, h, setVisible } from '../dom.js';
 import { updateMatchBadge } from './navigation.js';
 import { openChat } from './chat.js';
+import { safetyMenu } from './safety.js';
 
 export function showMatchesTab(tab) {
   const browseEl    = byId('browseContent');
@@ -36,7 +37,9 @@ function matchCard(profile, isNew, lastMessage) {
       h('span', {}, `📍 ${profile.city}`),
       h('div', { className: 'match-list-tags' },
         profile.interests.slice(0, 2).map(i => t(`interest.${i}`)).join(' · '))),
-    h('button', { className: 'btn btn-primary btn-sm' }, t('matches.list.chat')));
+    h('div', { className: 'match-list-actions' },
+      h('button', { type: 'button', className: 'btn btn-primary btn-sm' }, t('matches.list.chat')),
+      safetyMenu(profile)));
   paintAvatar(card.querySelector('.match-list-avatar'), profile);
   card.addEventListener('click', () => openChat(profile));
   return card;

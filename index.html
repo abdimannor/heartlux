@@ -397,7 +397,7 @@
               <button type="button" class="btn btn-primary btn-lg u-mt-15" data-action="resetFilters" data-i18n="filters.reset">Återställ filter</button>
             </div>
           </div>
-          <div id="profileCard" class="profile-card">
+          <div id="profileCard" class="profile-card" tabindex="0" role="group" aria-labelledby="cardName" aria-describedby="swipeKeyHint">
             <div class="card-image">
               <div id="cardAvatar" class="card-avatar">👤</div>
               <div class="swipe-indicator swipe-like" id="swipeLike" data-i18n="swipe.like">GILLA ❤️</div>
@@ -436,6 +436,7 @@
             <button type="button" class="btn btn-primary" data-action="likeProfile" data-i18n="matches.like">❤️ Gilla</button>
           </div>
           <p id="swipeKeyHint" class="swipe-key-hint"></p>
+          <p id="deckStatus" class="visually-hidden" role="status" aria-live="polite"></p>
         </div>
       </div>
 
@@ -560,6 +561,13 @@
             </div>
             <button type="button" class="btn btn-secondary u-mt-1" data-action="showPage" data-arg="discover" data-i18n="profile.prefs.edit">Ändra Preferenser</button>
           </div>
+
+          <!-- Blocked profiles -->
+          <div class="profile-section-card">
+            <h3 id="blockedHeading" tabindex="-1" data-i18n="safety.blocked.heading">Blockerade profiler</h3>
+            <p id="blockedEmpty" class="blocked-empty" data-i18n="safety.blocked.empty">Du har inte blockerat någon.</p>
+            <ul id="blockedList" class="blocked-list" aria-labelledby="blockedHeading"></ul>
+          </div>
         </div>
       </div>
     </div>
@@ -575,6 +583,7 @@
           <strong id="chatPartnerName"></strong>
         </div>
         <span class="chat-self-photo is-hidden" id="chatSelfPhoto"></span>
+        <div id="chatSafety" class="chat-safety"></div>
       </div>
       <div class="chat-messages" id="chatMessages"></div>
       <div class="chat-starters is-hidden" id="chatStarters" role="group" aria-label="Förslag på första meddelande"></div>
@@ -598,6 +607,77 @@
       </button>
     </div>
   </div>
+
+
+  <!-- Safety dialogs -->
+  <dialog id="confirmDialog" class="safety-dialog" aria-labelledby="confirmTitle" aria-describedby="confirmText">
+    <form method="dialog" class="safety-form">
+      <h2 id="confirmTitle"></h2>
+      <p id="confirmText"></p>
+      <div class="safety-actions">
+        <button type="submit" value="cancel" class="btn btn-ghost" data-i18n="safety.cancel" autofocus>Avbryt</button>
+        <button type="submit" value="ok" class="btn btn-danger" id="confirmOk"></button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="reportDialog" class="safety-dialog" aria-labelledby="reportTitle">
+    <form method="dialog" class="safety-form" id="reportForm">
+      <h2 id="reportTitle"></h2>
+      <fieldset class="report-reasons">
+        <legend data-i18n="safety.report.reasons">Vad hände?</legend>
+            <label class="report-reason"><input type="radio" name="reason" value="fake" required> <span data-i18n="safety.report.reason.fake"></span></label>
+            <label class="report-reason"><input type="radio" name="reason" value="harass" required> <span data-i18n="safety.report.reason.harass"></span></label>
+            <label class="report-reason"><input type="radio" name="reason" value="explicit" required> <span data-i18n="safety.report.reason.explicit"></span></label>
+            <label class="report-reason"><input type="radio" name="reason" value="minor" required> <span data-i18n="safety.report.reason.minor"></span></label>
+            <label class="report-reason"><input type="radio" name="reason" value="other" required> <span data-i18n="safety.report.reason.other"></span></label>
+      </fieldset>
+      <label class="report-details"><span data-i18n="safety.report.details">Berätta mer (valfritt)</span>
+        <textarea name="details" rows="3" maxlength="1000"></textarea>
+      </label>
+      <label class="filter-toggle"><input type="checkbox" name="alsoBlock" value="1"> <span data-i18n="safety.report.alsoBlock">Blockera också profilen</span></label>
+      <p class="safety-note" data-i18n="safety.report.note"></p>
+      <div class="safety-actions">
+        <button type="submit" value="cancel" class="btn btn-ghost" formnovalidate data-i18n="safety.cancel">Avbryt</button>
+        <button type="submit" value="send" class="btn btn-danger" data-i18n="safety.report.submit">Spara rapporten</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="tipsDialog" class="safety-dialog" aria-labelledby="tipsTitle">
+    <form method="dialog" class="safety-form">
+      <h2 id="tipsTitle" data-i18n="tips.title">Innan ni ses</h2>
+      <p data-i18n="tips.intro"></p>
+      <ul class="tips-list">
+          <li data-i18n="tips.1"></li>
+          <li data-i18n="tips.2"></li>
+          <li data-i18n="tips.3"></li>
+          <li data-i18n="tips.4"></li>
+          <li data-i18n="tips.5"></li>
+          <li data-i18n="tips.6"></li>
+      </ul>
+      <p class="safety-note"><span data-i18n="tips.help"></span> <a href="https://polisen.se/" rel="noopener" target="_blank">polisen.se</a>.</p>
+      <div class="safety-actions">
+        <button type="submit" class="btn btn-primary" data-i18n="tips.close">Stäng</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="detailsDialog" class="safety-dialog" aria-labelledby="detailsName">
+    <form method="dialog" class="safety-form">
+      <h2 id="detailsName"></h2>
+      <p id="detailsCity"></p>
+      <p id="detailsBio"></p>
+      <p id="detailsPrompt" class="card-prompt card-prompt--deck"></p>
+      <h3 data-i18n="details.interests">Intressen</h3>
+      <ul id="detailsInterests" class="details-interests"></ul>
+      <div class="safety-actions">
+        <button type="submit" class="btn btn-primary" data-i18n="details.close">Stäng</button>
+      </div>
+    </form>
+  </dialog>
+
+  <p id="safetyStatus" class="visually-hidden" role="status"></p>
 
   <!-- Footer -->
   </main>
