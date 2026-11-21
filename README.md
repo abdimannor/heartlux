@@ -1,7 +1,6 @@
 # Heartlux
 
-[![Checks](https://github.com/abdimannor/heartlux/actions/workflows/checks.yml/badge.svg)](https://github.com/abdimannor/heartlux/actions/workflows/checks.yml)
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+Live: https://abdimannor.github.io/heartlux/
 
 Heartlux is a front-end concept of a dating and social discovery app. It runs
 entirely in the browser: there is no backend, and everything you enter is kept
@@ -13,8 +12,6 @@ profile, the people you browse are generated at random, and their chat replies
 are canned.
 
 ## Try it
-
-Live version: https://abdimannor.github.io/heartlux/
 
 The quickest way in is the **Testa demo / Try demo** button on the start page.
 It creates a local demo account with preferences already filled in, adds three
@@ -34,22 +31,30 @@ Everything below is in `index.html` and the ES modules under `js/`:
 - **Setup.** Choose who you want to see (women, men or everyone), an age range
   and a set of interests (travel, music, fitness, cooking, books, art).
 - **Discovery.** Twenty profiles are generated with random names, ages, Swedish
-  cities, bios and interests, filtered by your preferences and sorted by how
-  many interests you share. You can like, pass, undo, or swipe the card with
-  mouse or touch.
+  cities, bios, interests and a short prompt answer, filtered by your
+  preferences and sorted by how many interests you share. You can like, pass,
+  undo, or swipe the card with mouse or touch. A filter sheet narrows the deck
+  live (and is remembered); when nothing is left, an empty state offers a reset.
 - **Matches.** A like turns into a match about a third of the time (random).
   Matches are listed in their own tab with a "new" marker, and the nav link
   shows an unread count.
-- **Chat.** Each match has a chat window. Messages are stored per match, and
-  the match answers with a random canned reply after a second or two.
-- **Profile page.** Pick an emoji avatar, write a short bio, and see simple
-  counts of likes and matches. Logout removes all Heartlux user data from
+- **Chat.** Each match has a chat window. Messages are stored per match and
+  survive a reload. The chat suggests three conversation starters built from
+  shared interests, the match's prompt answer and city. A typing indicator,
+  tied to that one conversation, comes before a random canned reply. The
+  matches list can be searched by name or message text and shows the last
+  message and an unread dot per chat.
+- **Profile editor.** Upload your own photo (cropped to the card and kept in
+  IndexedDB, never uploaded), or pick an emoji avatar; write a bio and answer
+  card prompts while a live preview shows your card. Simple counts of likes
+  and matches sit beside it. Logout removes all Heartlux user data from
   `localStorage`.
 - **Language and theme.** Swedish and English strings live in one
   `translations` object; the language choice and a dark mode toggle are both
   remembered.
-- **Installable app shell.** A web manifest and a service worker that caches
-  the app files, so the site loads offline after the first visit.
+- **Installable app shell.** A web manifest (with Discover and Matches
+  shortcuts) and a service worker that caches the app files, so the site
+  loads offline after the first visit.
 
 ## How it is built
 
@@ -120,8 +125,10 @@ the HTML exists in both languages, that every id looked up with `byId` or
 `getElementById` exists in the HTML, and that the service worker precaches
 every module.
 
-`tests/app.spec.js` drives a real browser through registration, setup,
-discovery, language and theme switching, profile editing and chat, plus the
+The Playwright specs in `tests/` drive a real browser through registration,
+setup, discovery and the filter sheet, language and theme switching, the
+profile editor and photo storage, chat (starters, persistence, search, unread
+dot, typing indicator), the motion switch, timers and offline use, plus the
 demo button. The same two commands run in GitHub Actions on pushes and pull
 requests to `master`.
 
@@ -133,8 +140,8 @@ requests to `master`.
   concept and not acceptable anywhere real. Do not reuse a real password here.
 - Profiles, matches and replies are random. There is no matching logic beyond
   counting shared interests.
-- No server means no messaging between people, no moderation, no photos and no
-  privacy controls.
+- No server means no messaging between people, no moderation and no privacy
+  controls. Your own photo stays in this browser only.
 - Accessibility has had an automated check only: Lighthouse accessibility
   scores 100 and axe-core reports no violations on the landing page and the
   demo matches view, in light and dark mode. No screen reader or keyboard-only
