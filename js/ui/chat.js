@@ -8,6 +8,7 @@ import { later, cancelScope } from '../timers.js';
 import { paintAvatar } from '../avatars.js';
 import { photoUrl } from '../photo-store.js';
 import { buildStarters } from './chat-starters.js';
+import { safetyMenu } from './safety.js';
 
 const getChats = () => readJSON(KEYS.chats, {});
 
@@ -16,6 +17,7 @@ export function openChat(profile) {
   paintAvatar(byId('chatPartnerAvatar'), profile);
   byId('chatPartnerName').textContent   = `${profile.name}, ${profile.age}`;
   setVisible(byId('chatModal'), true);
+  byId('chatSafety')?.replaceChildren(safetyMenu(profile, { tips: true }));
 
   const seen = readJSON(KEYS.seen, []);
   if (!seen.includes(String(profile.id))) {
