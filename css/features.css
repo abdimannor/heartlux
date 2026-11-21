@@ -143,7 +143,7 @@ body.dark-mode .filter-chip:has(input:checked) { background: #3a1830; color: #ff
   html[data-motion="reduce"] .chat-starter { transition: none; }
 
   /* Matches list search and per-conversation unread dot. */
-  .match-search { display: block; inline-size: 100%; max-inline-size: 32rem; margin: 0 auto 1.25rem; border: 1.5px solid var(--line); border-radius: 999px; padding: 0.7rem 1.25rem; background: var(--surface); }
+  .match-search { display: block; inline-size: min(32rem, 100% - 2rem); margin: 0 auto 1.25rem; border: 1.5px solid var(--line); border-radius: 999px; padding: 0.7rem 1.25rem; background: var(--surface); }
   .match-search:focus-visible { outline: none; border-color: var(--heart); box-shadow: var(--ring); }
   .match-list-preview { display: block; color: var(--muted); font-size: 0.85rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-inline-size: 22ch; }
   .match-list-card.is-unread .match-list-preview { color: var(--ink); font-weight: 700; }
