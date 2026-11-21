@@ -129,3 +129,24 @@ body.dark-mode .filter-chip:has(input:checked) { background: #3a1830; color: #ff
 }
 @keyframes filter-sheet-in { from { transform: translateY(40px); opacity: 0; } }
 @keyframes filter-fade { from { opacity: 0; } }
+
+@layer features {
+  /* Conversation starters: tap a chip to put the opener in the message field. */
+  .chat-starters { display: flex; flex-wrap: wrap; gap: 0.5rem; padding: 0.75rem 1.25rem; border-top: 1px solid var(--line); background: var(--surface-2); }
+  .chat-starters-title { flex-basis: 100%; font-size: 0.8rem; font-weight: 700; color: var(--muted); letter-spacing: 0.02em; }
+  .chat-starter {
+    border: 1.5px solid var(--heart); border-radius: 1rem; background: var(--surface); color: var(--heart-ink);
+    padding: 0.45rem 0.85rem; font-size: 0.875rem; text-align: start; cursor: pointer; line-height: 1.35;
+    transition: background-color 160ms ease, color 160ms ease;
+  }
+  .chat-starter:hover, .chat-starter:focus-visible { background: var(--heart); color: var(--on-heart); }
+  html[data-motion="reduce"] .chat-starter { transition: none; }
+
+  /* Matches list search and per-conversation unread dot. */
+  .match-search { display: block; inline-size: min(32rem, 100% - 2rem); margin: 0 auto 1.25rem; border: 1.5px solid var(--line); border-radius: 999px; padding: 0.7rem 1.25rem; background: var(--surface); }
+  .match-search:focus-visible { outline: none; border-color: var(--heart); box-shadow: var(--ring); }
+  .match-list-preview { display: block; color: var(--muted); font-size: 0.85rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-inline-size: 22ch; }
+  .match-list-card.is-unread .match-list-preview { color: var(--ink); font-weight: 700; }
+  .unread-dot { display: inline-block; inline-size: 0.65rem; block-size: 0.65rem; border-radius: 50%; background: var(--heart); box-shadow: 0 0 0 2px var(--surface); vertical-align: middle; margin-inline-start: 0.25rem; }
+  .match-search-empty { grid-column: 1 / -1; text-align: center; color: var(--muted); padding: 2rem 1rem; }
+}

@@ -441,6 +441,8 @@
 
       <!-- My Matches Tab -->
       <div class="is-hidden" id="matchesListContent">
+        <label class="visually-hidden" for="matchSearch" data-i18n="matches.search.label">Sök bland dina matchningar</label>
+        <input type="search" id="matchSearch" class="match-search" autocomplete="off" data-i18n-placeholder="matches.search.placeholder" placeholder="Sök på namn eller meddelande">
         <div class="matches-list-grid" id="matchesListGrid"></div>
       </div>
 
@@ -575,6 +577,7 @@
         <span class="chat-self-photo is-hidden" id="chatSelfPhoto"></span>
       </div>
       <div class="chat-messages" id="chatMessages"></div>
+      <div class="chat-starters is-hidden" id="chatStarters" role="group" aria-label="Förslag på första meddelande"></div>
       <div class="chat-input-bar">
         <input type="text" id="chatInput"
           data-i18n-placeholder="chat.placeholder"

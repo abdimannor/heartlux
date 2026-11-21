@@ -57,7 +57,7 @@ test('reduced motion is the default and the switch shows it', async ({ page }) =
   const btn = page.locator('#motionBtn');
   await expect(btn).toHaveAttribute('aria-pressed', 'false');
   await expect(btn).toHaveText(/Rörelse av/);
-  await expect(btn).toHaveAttribute('aria-label', /systemets inställning/);
+  await expect(btn).toHaveAttribute('aria-label', /systeminställningen/);
 });
 
 test('no heart burst or swipe spring by default', async ({ page }) => {
@@ -77,7 +77,7 @@ test('the switch turns on the swipe spring and heart burst, and the choice survi
   await page.reload();
   await expect(page.locator('html')).toHaveAttribute('data-motion', 'full');
   await expect(page.locator('#motionBtn')).toHaveText(/Rörelse på/);
-  await expect(page.locator('#motionBtn')).not.toHaveAttribute('aria-label', /systemets/);
+  await expect(page.locator('#motionBtn')).not.toHaveAttribute('aria-label', /systeminställningen/);
 });
 
 test('the switch label follows the language', async ({ page }) => {
