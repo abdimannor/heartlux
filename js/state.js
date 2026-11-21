@@ -19,6 +19,8 @@ export const KEYS = Object.freeze({
   prompt:    'heartlux_user_prompt',
   filters:   'heartlux_filters',
   chatRead:  'heartlux_chat_read',
+  blocked:   'heartlux_blocked',
+  reports:   'heartlux_reports',
 });
 
 /** Everything that belongs to one local account (cleared on logout / demo). */
@@ -27,6 +29,7 @@ export const USER_STORAGE_KEYS = [
   KEYS.interest, KEYS.matches, KEYS.chats,
   KEYS.avatar, KEYS.bio, KEYS.prompt, KEYS.filters,
   KEYS.unread, KEYS.seen, KEYS.chatRead,
+  KEYS.blocked, KEYS.reports,
 ];
 
 export const getItem    = key => localStorage.getItem(key);
@@ -50,6 +53,9 @@ export function clearUserData() {
   USER_STORAGE_KEYS.forEach(removeItem);
   deletePhoto();
 }
+
+/** Ids of profiles you have blocked; they never show in Discover again. */
+export const blockedIds = () => new Set(readJSON(KEYS.blocked, []).map(b => String(b.id)));
 
 export const getUser  = () => readJSON(KEYS.user);
 export const getPrefs = () => readJSON(KEYS.prefs);
